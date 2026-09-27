@@ -12,6 +12,8 @@ import { cellLonLat, landEstimate, type Candidate } from "../engine/mcda";
 import { useStargaze } from "../state/stargaze";
 import { cloudAt, darknessFactor, hourIndex, WX_ATTRIBUTION } from "../engine/weather";
 import { siteTimeLabel, skyState } from "../engine/sky";
+import { add3DLayers, set3D, setLamps } from "../map/terrain3d";
+import { basemapRoads, buildLamps, lampLayers, slotLooks } from "../map/lights3d";
 import type { GridMeta } from "../engine/types";
 import type { FeatureCollection } from "geojson";
 import { fetchJson, loadLin16, loadLog16 } from "../data/load";
@@ -83,6 +85,9 @@ export default function MapView() {
   const lift = buildOpen ? "md:bottom-[19rem]" : "";
   const [venues, setVenues] = useState<FeatureCollection | null>(null);
   const prevMode = useRef<"planner" | "observatory" | "stargaze">("planner");
+  const [is3D, setIs3D] = useState(false);              // planner tabs: terrain, buildings and light sources in 3D
+  const [zoom, setZoom] = useState(8);
+  const [surveyed, setSurveyed] = useState<FeatureCollection | null>(null);
   const [hover, setHover] = useState<{ rank: number; x: number; y: number } | null>(null);
   const [priceView, setPriceView] = useState(false);   // Observatory: land-price overlay instead of suitability
   const acres = mc.acres ?? e.seed.mcda.land_pricing?.target_site_acres.value ?? 80;
@@ -192,6 +197,8 @@ export default function MapView() {
       });
       map.on("mouseleave", "candidates", () => { map.getCanvas().style.cursor = ""; setHover(null); });
       map.on("movestart", () => setHover(null));
+      add3DLayers(map, "sky");
+      map.on("zoomend", () => setZoom(map.getZoom()));
       // Publish the map to the other effects only once its sources exist (a remount or hot reload otherwise races them).
       mapRef.current = map;
       setReady(true);
@@ -334,6 +341,56 @@ export default function MapView() {
     prevMode.current = modeNow;
   }, [ready, observatory, stargaze, planner, mc.score, priceView, sg.overlay, e]);
 
+  // ---- 3D terrain, buildings and light sources (planner tabs)
+  const show3D = is3D && planner;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    set3D(map, show3D, 3);
+    // The ~450 m sky-brightness cells look blotchy at street level: fade them out as you zoom in in 3D.
+    map.setPaintProperty("sky", "raster-opacity", show3D ? ["interpolate", ["linear"], ["zoom"], 11, 0.6, 14, 0.12] : 0.82);
+    if (show3D) {
+      map.setMaxPitch(75);
+      map.dragRotate.enable();
+      map.touchZoomRotate.enableRotation();
+      map.easeTo({ pitch: 60, duration: 800 });
+      if (!surveyed) fetchJson<FeatureCollection>("fixtures_surveyed.geojson").then(setSurveyed);
+      if (!venues) fetchJson<FeatureCollection>("sports_venues.geojson").then(setVenues);
+    } else if (map.getPitch() > 0 || map.getBearing() !== 0) {
+      map.easeTo({ pitch: 0, bearing: 0, duration: 600 });
+      map.dragRotate.disable();
+      map.touchZoomRotate.disableRotation();
+    }
+  }, [ready, show3D]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const lampInputs = useRef<() => void>(() => undefined);
+  lampInputs.current = () => {
+    const map = mapRef.current;
+    if (!map || !show3D) return;
+    const b = map.getBounds(), z = map.getZoom();
+    const near = z >= 14; // individual modeled lights need street-level tiles
+    const roads = near ? basemapRoads(map) : [];
+    const c = map.getCenter();
+    const lamps = buildLamps({
+      e, looks: slotLooks(e, params), selected: new Set(params.selection.counties), surveyed, venues, sportsOn: params.view_window === "evening",
+      grid: e.grids.a15, cat: d.fixCat15, catNames: e.files.fixtures_cat_a15.names ?? ["street", "commercial", "residential", "sports"],
+      county: d.county15, countyValues: e.files.county_a15.values, roads, focus: [c.lng, c.lat],
+      bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], maxLamps: near ? 6000 : 2500,
+    });
+    const { poles, pools } = lampLayers(lamps);
+    setLamps(map, poles, pools);
+  };
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    if (!show3D) { setLamps(map, { type: "FeatureCollection", features: [] }, { type: "FeatureCollection", features: [] }); return; }
+    let t = 0;
+    const onIdle = () => { clearTimeout(t); t = window.setTimeout(() => lampInputs.current(), 150); };
+    map.on("idle", onIdle);
+    lampInputs.current();
+    return () => { clearTimeout(t); map.off("idle", onIdle); };
+  }, [ready, show3D, surveyed, venues, params.fixtures, params.selection.counties, params.view_window, d.fixCat15, d.county15]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ---- Stargaze layers
   useEffect(() => {
     const map = mapRef.current;
@@ -444,6 +501,14 @@ export default function MapView() {
             <button key={v.value} role="radio" aria-checked={view === v.value} onClick={() => setView(v.value)}
               className={`rounded px-2 py-1 text-xs ${view === v.value ? "bg-amber-400 text-ink-950" : "text-star-300 hover:bg-ink-800"}`}>{v.label}</button>
           ))}
+          <button onClick={() => setIs3D(!is3D)} aria-pressed={is3D} title="3D terrain, buildings and light sources"
+            className={`ml-1 rounded border px-2 py-1 text-xs font-semibold ${is3D ? "border-glow-400 bg-glow-400/20 text-glow-400" : "border-ink-600 text-star-300 hover:bg-ink-800"}`}>3D</button>
+        </div>
+      )}
+      {show3D && (
+        <div className={`pointer-events-none absolute bottom-24 left-2 max-w-[17rem] rounded-lg bg-ink-950/80 p-2 text-[10px] text-star-300 backdrop-blur ${lift}`}>
+          <b className="text-star-100">3D</b> · terrain ×3 · right-drag or Ctrl-drag to tilt and turn.
+          {zoom < 14 ? " Zoom in to street level to see buildings and each modeled light." : " Mapped streetlights at their surveyed spots; modeled lights spread along the roads of their ~450 m cell (streetlights on the road, business and porch lights set back from it). Lamp color = fixture type (equipped cards recolor their share); sports towers light up in the evening view."}
         </div>
       )}
       {observatory && e.land && (

@@ -4,11 +4,23 @@
 // are placed for the chosen date and time at the site; twilight and moonlight add to the modeled sky.
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { useModel } from "../state/model";
+import * as maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import type { FeatureCollection } from "geojson";
+import { useData, useModel } from "../state/model";
+import { fetchJson } from "../data/load";
+import { domesFor, glowCurve, glowModel, glowUniforms, luminanceAt, LUM_LEGEND, magOf, mcdOf, SKYGLOW_GLSL, type GlowModel } from "../engine/skyglow";
+import { add3DLayers, BASEMAP_STYLE, set3D, setLamps } from "../map/terrain3d";
+import { basemapRoads, buildLamps, lampLayers, slotLooks } from "../map/lights3d";
 import { formatSky, nelmFromSqm } from "../engine/bortle";
 import { BRIGHT_STARS, dirFromAltAz, eqUnit, equatorialToScene, GALACTIC_POLE, SITE_TZ, skyNow, skyState, utcToZoned, zonedToUtc, type SkyState } from "../engine/sky";
 
+maplibregl.setWorkerUrl(workerUrl);
 const R_STARS = 45;
+const EYE_HEIGHTS = [{ m: 2, label: "Standing (2 m)" }, { m: 30, label: "Rooftop (30 m)" }, { m: 150, label: "Drone (150 m)" }, { m: 600, label: "Aircraft (600 m)" }];
+let lightData: Promise<[FeatureCollection, FeatureCollection]> | null = null;
+const loadLightData = () => (lightData ??= Promise.all([fetchJson<FeatureCollection>("fixtures_surveyed.geojson"), fetchJson<FeatureCollection>("sports_venues.geojson")]));
 const MOON_SCALE = 3; // Moon drawn 3x its 0.52° size so the phase is readable
 
 // Star field in equatorial coordinates: named bright stars at catalog positions, plus a deterministic synthetic
@@ -59,7 +71,7 @@ function nightOf(t: number) {
 /** Any place the dome can show: a named site, or a spot picked in Stargaze mode. */
 export interface DomePlace { id: string; name: string; lat: number; lon: number; modelMag: number; baseMag?: number; note?: string }
 
-interface Overlays { directions: boolean; names: boolean }
+interface Overlays { directions: boolean; names: boolean; ground: boolean; eye: number; indicators: boolean; lumMap: boolean }
 interface Frame { st: SkyState; modelMag: number; twilightMag: number; moonMag: number; nelm: number; ov: Overlays }
 
 export default function SkyDome({ place, sites, onPickSite, initialTime, startFull, onExitFull }: {
@@ -73,7 +85,11 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
   const [t, setT] = useState(() => initialTime ?? defaultTime(m.params.view_window));
   const exitRef = useRef(onExitFull);
   exitRef.current = onExitFull;
-  const [ov, setOv] = useState<Overlays>({ directions: true, names: false });
+  const [ov, setOv] = useState<Overlays>({ directions: true, names: false, ground: false, eye: 2, indicators: false, lumMap: false });
+  const d = useData();
+  const groundHost = useRef<HTMLDivElement>(null);
+  const cam = useRef<[number, number, number]>([Math.PI, 0.45, 75]);          // yaw, pitch (rad), vertical fov (deg)
+  const groundSync = useRef<(() => void) | null>(null);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const modelMag = place.modelMag;
@@ -85,6 +101,10 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
   const frame = useRef<Frame>({ st, modelMag, twilightMag: now.twilightMag, moonMag: now.moonMag, nelm, ov });
   frame.current = { st, modelMag, twilightMag: now.twilightMag, moonMag: now.moonMag, nelm, ov };
   const api = useRef<{ update: () => void } | null>(null);
+  const domes = useMemo(() => domesFor(m.e.light_domes, siteDef.lat, siteDef.lon), [m.e.light_domes, siteDef]);
+  const glow: GlowModel = useMemo(() => glowModel(modelMag, now.twilightMag, now.moonMag, domes, st.sun, st.moon), [modelMag, now, domes, st]);
+  const glowRef = useRef(glow);
+  glowRef.current = glow;
 
   useEffect(() => {
     const el = ref.current!;
@@ -97,19 +117,18 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
 
-    const domes = m.e.light_domes.map((d) => {
-      const dx = (d.lon - siteDef.lon) * Math.cos((siteDef.lat * Math.PI) / 180), dy = d.lat - siteDef.lat;
-      const km = Math.hypot(dx, dy) * 111.32;
-      return { name: d.name, km, az: Math.atan2(dx, dy), strength: Math.min(1.5, (d.population / 150000) * (20 / Math.max(km, 5)) ** 2.5) };
-    }).filter((d) => d.strength > 0.01);
-
+    const gu = glowUniforms(glowRef.current);
     const uniforms = {
       uGlow: { value: 0 },
-      uDomeAz: { value: domes.map((d) => d.az).concat(Array(8).fill(0)).slice(0, 8) },
+      uDomeAz: { value: domes.map((d) => (d.az * Math.PI) / 180).concat(Array(8).fill(0)).slice(0, 8) },
       uDomeS: { value: domes.map((d) => d.strength).concat(Array(8).fill(0)).slice(0, 8) },
       uPole: { value: new THREE.Vector3(0, 1, 0) },
       uTwi: { value: 0 }, uSun: { value: new THREE.Vector3(0, -1, 0) },
       uMoon: { value: new THREE.Vector3(0, -1, 0) }, uMoonK: { value: 0 },
+      // Luminance model (false-color map), see engine/skyglow.ts.
+      uFalse: { value: 0 }, uArt: { value: gu.uArt }, uNat: { value: gu.uNat }, uTwiL: { value: gu.uTwiL }, uMoonL: { value: gu.uMoonL },
+      uGDomeAz: { value: gu.uGDomeAz }, uGDomeS: { value: gu.uGDomeS },
+      uSunDir: { value: new THREE.Vector3(...gu.uSunDir) }, uMoonDir: { value: new THREE.Vector3(...gu.uMoonDir) },
     };
     const skyGeo = new THREE.SphereGeometry(50, 64, 32);
     const sky = new THREE.Mesh(skyGeo, new THREE.ShaderMaterial({
@@ -117,10 +136,12 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       vertexShader: "varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
       fragmentShader: `
         varying vec3 vDir; uniform float uGlow; uniform float uDomeAz[8]; uniform float uDomeS[8]; uniform vec3 uPole;
-        uniform float uTwi; uniform vec3 uSun; uniform vec3 uMoon; uniform float uMoonK;
+        uniform float uTwi; uniform vec3 uSun; uniform vec3 uMoon; uniform float uMoonK; uniform float uFalse;
+        ${SKYGLOW_GLSL}
         void main(){
           float alt = asin(clamp(vDir.y, -1.0, 1.0));
           if (alt < 0.0) { gl_FragColor = vec4(vec3(0.02,0.02,0.025) + vec3(0.05,0.07,0.10)*uTwi, 1.0); return; }
+          if (uFalse > 0.5) { gl_FragColor = vec4(lumColor(skyLum(normalize(vDir))), 1.0); return; }
           float az = atan(vDir.x, -vDir.z);
           float airmass = 1.0 / max(sin(alt), 0.06);
           vec3 night = vec3(0.012,0.016,0.035);
@@ -198,8 +219,17 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
 
     // HTML labels projected each frame: compass points, light-dome towns, bright-star names.
     const layer = document.createElement("div");
-    layer.className = "pointer-events-none absolute inset-0 overflow-hidden";
+    layer.className = "pointer-events-none absolute inset-0 z-20 overflow-hidden";
     el.appendChild(layer);
+    // Indicators: sky-glow curve along the horizon and a luminance readout at the center of view.
+    const curveMat = new THREE.LineBasicMaterial({ color: 0xf6b44b, transparent: true, opacity: 0.9 });
+    const curve = new THREE.Line(new THREE.BufferGeometry(), curveMat);
+    scene.add(curve);
+    const cross = document.createElement("div");
+    cross.className = "pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 text-center text-[11px] text-amber-300";
+    cross.innerHTML = '<div class="text-lg leading-none">+</div><div data-readout class="mt-1 whitespace-nowrap rounded bg-ink-950/70 px-1.5 py-0.5"></div>';
+    el.appendChild(cross);
+    const readout = cross.querySelector("[data-readout]") as HTMLDivElement;
     type Label = { node: HTMLSpanElement; dir: THREE.Vector3; kind: "dir" | "dome" | "star"; star?: number };
     const label = (text: string, cls: string, kind: Label["kind"], dir: THREE.Vector3, star?: number): Label => {
       const node = document.createElement("span");
@@ -211,7 +241,7 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
     const labels: Label[] = [
       ...COMPASS.map((c, i) => label(c, i % 2 ? "text-[11px] text-star-300" : "text-sm font-bold text-amber-400", "dir", new THREE.Vector3(...dirFromAltAz(2, i * 45)))),
       ...domes.filter((d) => d.strength > 0.03).map((d) => label(`${d.name} ${d.km.toFixed(0)} km`, "text-[10px] text-amber-200/80", "dome",
-        new THREE.Vector3(...dirFromAltAz(6, (d.az * 180) / Math.PI)))),
+        new THREE.Vector3(...dirFromAltAz(6, d.az)))),
       ...FIELD.flatMap((s, i) => (s.name ? [label(s.name, "text-[10px] text-glow-400/90 pl-3", "star", new THREE.Vector3(), i)] : [])),
     ];
 
@@ -227,6 +257,14 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       renderer.render(scene, camera);
       const f = frame.current, cw = el.clientWidth, ch = el.clientHeight;
       camera.getWorldDirection(fwd);
+      cam.current = [yaw, pitch, camera.fov];
+      groundSync.current?.();
+      cross.style.display = f.ov.indicators ? "" : "none";
+      if (f.ov.indicators) {
+        const alt = (Math.asin(Math.max(-1, Math.min(1, fwd.y))) * 180) / Math.PI, az = ((Math.atan2(fwd.x, -fwd.z) * 180) / Math.PI + 360) % 360;
+        if (alt < 0) readout.textContent = `az ${az.toFixed(0)}° · below the horizon`;
+        else { const mg = magOf(luminanceAt(glowRef.current, alt, az)); readout.textContent = `az ${az.toFixed(0)}° alt ${alt.toFixed(0)}° · ${mg.toFixed(2)} mag/arcsec² · ${mcdOf(mg).toFixed(2)} mcd/m²`; }
+      }
       for (const l of labels) {
         let show = l.kind === "star" ? f.ov.names && l.dir.y > 0.02 && FIELD[l.star!].mag < f.nelm : f.ov.directions;
         if (show && l.dir.dot(fwd) < 0.1) show = false;
@@ -256,6 +294,19 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       moon.position.copy(uniforms.uMoon.value).multiplyScalar(44);
       moonUniforms.uVis.value = f.st.moon.alt > -0.3 ? 1 : 0;
       grid.visible = f.ov.directions;
+      const g = glowRef.current, u = glowUniforms(g);
+      uniforms.uFalse.value = f.ov.lumMap ? 1 : 0;
+      uniforms.uArt.value = u.uArt; uniforms.uNat.value = u.uNat; uniforms.uTwiL.value = u.uTwiL; uniforms.uMoonL.value = u.uMoonL;
+      uniforms.uGDomeAz.value = u.uGDomeAz; uniforms.uGDomeS.value = u.uGDomeS;
+      uniforms.uSunDir.value.set(...u.uSunDir); uniforms.uMoonDir.value.set(...u.uMoonDir);
+      celestial.visible = !f.ov.lumMap;
+      moon.visible = !f.ov.lumMap;
+      // Glow curve: brightness at 10° altitude by azimuth, drawn as a line whose height grows with the excess over the zenith.
+      const zen = magOf(luminanceAt(g, 90, 0));
+      curve.visible = f.ov.indicators;
+      curve.geometry.dispose();
+      curve.geometry = new THREE.BufferGeometry().setFromPoints(glowCurve(g, 10, 3).map((p) =>
+        new THREE.Vector3(...dirFromAltAz(1 + 8 * Math.min(4, Math.max(0, zen - p.mag)), p.az)).multiplyScalar(43)));
       draw();
     };
     api.current = { update };
@@ -264,7 +315,8 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
     const down = (ev: PointerEvent) => { drag = { x: ev.clientX, y: ev.clientY }; el.setPointerCapture(ev.pointerId); };
     const move = (ev: PointerEvent) => {
       if (!drag) return;
-      yaw += (ev.clientX - drag.x) * 0.005; pitch = Math.min(1.5, Math.max(-0.1, pitch + (ev.clientY - drag.y) * 0.005));
+      // With the ground shown you can look down (e.g. from drone height); otherwise the view stays at or above the horizon.
+      yaw += (ev.clientX - drag.x) * 0.005; pitch = Math.min(1.5, Math.max(frame.current.ov.ground ? -1.2 : -0.1, pitch + (ev.clientY - drag.y) * 0.005));
       drag = { x: ev.clientX, y: ev.clientY };
       redraw();
     };
@@ -294,12 +346,70 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       cancelAnimationFrame(raf);
       el.removeEventListener("pointerdown", down); el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up);
       el.removeEventListener("wheel", wheel);
-      renderer.dispose(); geo.dispose(); skyGeo.dispose(); moonGeo.dispose();
-      el.removeChild(renderer.domElement); el.removeChild(layer);
+      renderer.dispose(); geo.dispose(); skyGeo.dispose(); moonGeo.dispose(); curve.geometry.dispose();
+      el.removeChild(renderer.domElement); el.removeChild(layer); el.removeChild(cross);
     };
-  }, [siteDef, m.e.light_domes]);
+  }, [siteDef, domes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { api.current?.update(); }, [st, now, nelm, ov, modelMag]);
+  useEffect(() => { api.current?.update(); }, [st, now, nelm, ov, modelMag, glow]);
+
+  // Ground view: terrain, buildings and the scenario's light sources seen from the site, drawn by MapLibre over the
+  // sky with a transparent sky above the horizon, and following the dome camera (bearing, tilt, field of view).
+  const lampState = useRef({ e: m.e, params: m.params, d });
+  lampState.current = { e: m.e, params: m.params, d };
+  useEffect(() => {
+    const host = groundHost.current;
+    if (!ov.ground || !host) return;
+    const gm = new maplibregl.Map({ container: host, style: BASEMAP_STYLE, interactive: false, attributionControl: { compact: true },
+      center: [siteDef.lon, siteDef.lat], zoom: 17, pitch: 80, maxPitch: 180, maxZoom: 24 });
+    let alive = true, timer = 0;
+    gm.on("load", async () => {
+      add3DLayers(gm);
+      set3D(gm, true, 1);
+      gm.setLayoutProperty("hillshade-3d", "visibility", "none");
+      // MapLibre misdraws the ground when pitched above the horizon (pitch > 90°), so for upward views its camera stays
+      // at pitch 89° and a lens shift (padding) moves its horizon to where the sky camera's horizon is; the ground
+      // layer hides once the horizon leaves the frame.
+      groundSync.current = () => {
+        const [yaw, pitch, fov] = cam.current;
+        const up = (pitch * 180) / Math.PI, H = host.clientHeight, RADS = Math.PI / 180;
+        const focal = H / 2 / Math.tan((fov / 2) * RADS);
+        const mlPitch = up <= -1 ? 90 + up : 89;
+        const pad = up <= -1 ? 0 : 2 * focal * (Math.tan(up * RADS) + Math.tan(RADS));
+        host.style.visibility = pad >= H * 0.98 ? "hidden" : "";
+        if (pad >= H * 0.98) return;
+        const bearing = ((((-yaw * 180) / Math.PI) % 360) + 360) % 360;
+        const elev = gm.queryTerrainElevation([siteDef.lon, siteDef.lat]) ?? 0;
+        gm.setVerticalFieldOfView(fov);
+        gm.jumpTo({ ...gm.calculateCameraOptionsFromCameraLngLatAltRotation([siteDef.lon, siteDef.lat], elev + eyeRef.current, bearing, mlPitch),
+          padding: { top: pad, bottom: 0, left: 0, right: 0 } });
+      };
+      groundSync.current();
+      const [surveyed, venues] = await loadLightData();
+      const refresh = () => {
+        if (!alive) return;
+        const { e, params, d: dd } = lampState.current, r = 0.03;
+        const roads = basemapRoads(gm);
+        const lamps = buildLamps({
+          e, looks: slotLooks(e, params), selected: new Set(params.selection.counties), surveyed, venues, sportsOn: params.view_window === "evening",
+          grid: e.grids.a15, cat: dd.fixCat15, catNames: e.files.fixtures_cat_a15.names ?? ["street", "commercial", "residential", "sports"],
+          county: dd.county15, countyValues: e.files.county_a15.values, roads, focus: [siteDef.lon, siteDef.lat],
+          bbox: [siteDef.lon - r, siteDef.lat - r, siteDef.lon + r, siteDef.lat + r], maxLamps: 5000,
+        });
+        const { poles, pools } = lampLayers(lamps);
+        setLamps(gm, poles, pools);
+      };
+      gm.on("idle", () => { clearTimeout(timer); timer = window.setTimeout(refresh, 200); });
+      refresh();
+    });
+    const ro = new ResizeObserver(() => { gm.resize(); groundSync.current?.(); });
+    ro.observe(host);
+    return () => { alive = false; clearTimeout(timer); ro.disconnect(); groundSync.current = null; gm.remove(); };
+  }, [ov.ground, siteDef]);
+  const eyeRef = useRef(ov.eye);
+  eyeRef.current = ov.eye;
+  useEffect(() => { groundSync.current?.(); }, [ov.eye]);
+  const curveData = useMemo(() => (ov.indicators ? glowCurve(glow, 10, 5) : []), [ov.indicators, glow]);
 
   // Full screen: the browser Fullscreen API where available, else a fixed overlay (e.g. iPhone Safari). Esc exits either.
   useEffect(() => {
@@ -344,12 +454,25 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
     <div>
       <div ref={box} className={full ? "fixed inset-0 z-50 bg-black" : "relative"}>
         <div ref={ref} className={`relative w-full touch-none overflow-hidden ${full ? "h-full" : "h-64 rounded-lg"}`} aria-label={`Illustrative all-sky view at ${place.name}`} role="img" />
-        <button onClick={toggle} className="absolute right-2 top-2 rounded bg-ink-950/70 px-2 py-0.5 text-[11px] text-star-300 hover:bg-ink-800"
+        {ov.ground && (
+          // MapLibre forces its container to position: relative, so it fills a positioned wrapper.
+          <div className={`pointer-events-none absolute inset-0 z-10 overflow-hidden ${full ? "" : "rounded-lg"}`} aria-hidden>
+            <div ref={groundHost} className="h-full w-full" />
+          </div>
+        )}
+        {(ov.indicators || ov.lumMap) && (
+          <div className={`pointer-events-none absolute right-2 z-30 w-64 rounded-lg bg-ink-950/80 p-2 text-[10px] text-star-300 backdrop-blur ${full ? "top-10" : "top-9 hidden sm:block"}`}>
+            <div>Zenith now: <b className="text-star-100">{now.mag.toFixed(2)} mag/arcsec²</b> = {mcdOf(now.mag).toFixed(2)} mcd/m²</div>
+            {ov.indicators && <GlowChart data={curveData} zenith={now.mag} domes={domes} />}
+            {ov.lumMap && <LumLegend />}
+          </div>
+        )}
+        <button onClick={toggle} className="absolute right-2 top-2 z-30 rounded bg-ink-950/70 px-2 py-0.5 text-[11px] text-star-300 hover:bg-ink-800"
           aria-label={full ? "Exit full screen" : "Full screen sky view"} title={full ? "Exit full screen (Esc)" : "Full screen"}>
           {full ? "✕ Exit full screen" : "⛶ Full screen"}
         </button>
         {full && (
-          <div className="absolute left-3 top-3 max-w-[calc(100%-10rem)] rounded-lg bg-ink-950/75 p-2 text-xs text-star-300 backdrop-blur">
+          <div className="absolute left-3 top-3 z-30 max-w-[calc(100%-10rem)] rounded-lg bg-ink-950/75 p-2 text-xs text-star-300 backdrop-blur">
             {sites && onPickSite ? (
               <label className="flex items-center gap-2">
                 <span className="sr-only">Site</span>
@@ -366,11 +489,11 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
             <div className="text-star-500">{conditions}</div>
           </div>
         )}
-        <div className={`pointer-events-none absolute left-2 rounded bg-ink-950/70 px-2 py-0.5 text-[11px] text-star-300 ${full ? "bottom-24 md:bottom-20" : "bottom-2"}`}>
+        <div className={`pointer-events-none absolute left-2 z-30 rounded bg-ink-950/70 px-2 py-0.5 text-[11px] text-star-300 ${full ? "bottom-24 md:bottom-20" : "bottom-2"}`}>
           Limiting magnitude ≈ {nelm.toFixed(1)}{full && " · illustrative, not a photograph"}
         </div>
         {full && (
-          <div className="absolute inset-x-2 bottom-2 mx-auto max-w-3xl rounded-xl bg-ink-950/80 p-2 backdrop-blur">
+          <div className="absolute inset-x-2 bottom-2 z-30 mx-auto max-w-3xl rounded-xl bg-ink-950/80 p-2 backdrop-blur">
             <TimeBar t={t} setT={setT} ov={ov} setOv={setOv} autoplay={{ playing, setPlaying, speed, setSpeed }} />
           </div>
         )}
@@ -386,7 +509,7 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
 }
 
 function TimeBar({ t, setT, ov, setOv, autoplay }: {
-  t: number; setT: (t: number) => void; ov: Overlays; setOv: (o: Overlays) => void;
+  t: number; setT: (t: number) => void; ov: Overlays; setOv: React.Dispatch<React.SetStateAction<Overlays>>;
   autoplay?: { playing: boolean; setPlaying: (p: boolean) => void; speed: number; setSpeed: (s: number) => void };
 }) {
   const n = nightOf(t);
@@ -415,13 +538,54 @@ function TimeBar({ t, setT, ov, setOv, autoplay }: {
         <span className="tabular-nums text-sm font-semibold text-star-100">{pad(n.z.h)}:{pad(n.z.mi)} <span className="text-[10px] font-normal text-star-500">{tz}</span></span>
         <button onClick={() => setT(Date.now())} className={chip(false)}>Now</button>
         <span className="ml-auto flex gap-1">
-          <button onClick={() => setOv({ ...ov, directions: !ov.directions })} aria-pressed={ov.directions} className={chip(ov.directions)}>Directions</button>
-          <button onClick={() => setOv({ ...ov, names: !ov.names })} aria-pressed={ov.names} className={chip(ov.names)}>Star names</button>
+          <button onClick={() => setOv((o) => ({ ...o, directions: !o.directions }))} aria-pressed={ov.directions} className={chip(ov.directions)}>Directions</button>
+          <button onClick={() => setOv((o) => ({ ...o, names: !o.names }))} aria-pressed={ov.names} className={chip(ov.names)}>Star names</button>
+          <button onClick={() => setOv((o) => ({ ...o, ground: !o.ground }))} aria-pressed={ov.ground} className={chip(ov.ground)} title="3D terrain, buildings and light sources around the site">Terrain &amp; lights</button>
+          <button onClick={() => setOv((o) => ({ ...o, indicators: !o.indicators }))} aria-pressed={ov.indicators} className={chip(ov.indicators)} title="Sky-glow curve and luminance readout">Indicators</button>
+          <button onClick={() => setOv((o) => ({ ...o, lumMap: !o.lumMap }))} aria-pressed={ov.lumMap} className={chip(ov.lumMap)} title="False-color sky luminance">Luminance map</button>
         </span>
       </div>
+      {ov.ground && (
+        <label className="mt-1 flex items-center gap-1">Viewpoint
+          <select value={ov.eye} onChange={(ev) => setOv((o) => ({ ...o, eye: Number(ev.target.value) }))} className="rounded bg-ink-800 px-1 py-0.5">
+            {EYE_HEIGHTS.map((h) => <option key={h.m} value={h.m}>{h.label}</option>)}
+          </select>
+          <span className="text-star-500">basemap roads and buildings, terrain; lights = scenario fixtures (mapped positions, or modeled along the roads)</span>
+        </label>
+      )}
       <input type="range" min={0} max={1439} step={5} value={n.minute} onChange={(ev) => set(date, Number(ev.target.value))}
         className="mt-1 w-full accent-amber-400" aria-label="Time of night" />
       <div className="flex justify-between text-[10px] text-star-500"><span>12:00</span><span>18:00</span><span>00:00</span><span>06:00</span><span>12:00</span></div>
+    </div>
+  );
+}
+
+/** Sky-glow curve chart: mag/arcsec² at 10° altitude around the horizon (lower = brighter), light-dome towns marked. */
+function GlowChart({ data, zenith, domes }: { data: { az: number; mag: number }[]; zenith: number; domes: { name: string; az: number; strength: number }[] }) {
+  if (!data.length) return null;
+  const W = 240, H = 70, lo = Math.min(zenith, ...data.map((p) => p.mag)) - 0.1, hi = Math.max(zenith, ...data.map((p) => p.mag)) + 0.1;
+  const x = (az: number) => (az / 360) * W, y = (mg: number) => ((mg - lo) / (hi - lo || 1)) * H;
+  return (
+    <div className="mt-1">
+      <div className="flex justify-between"><span className="text-amber-400">Sky-glow curve (10° altitude)</span><span>brighter ↑</span></div>
+      <svg viewBox={`0 0 ${W} ${H + 12}`} className="mt-0.5 w-full">
+        <line x1={0} x2={W} y1={y(zenith)} y2={y(zenith)} stroke="#7cc4ff" strokeDasharray="3 2" strokeWidth={0.8} />
+        <polyline fill="none" stroke="#f6b44b" strokeWidth={1.5} points={data.map((p) => `${x(p.az)},${y(p.mag)}`).join(" ")} />
+        {domes.filter((d) => d.strength > 0.03).slice(0, 4).map((d, i) => <text key={d.name} x={Math.min(W - 40, x(d.az))} y={7 + i * 8} fontSize={7} fill="#fcd9a0">▾{d.name}</text>)}
+        {["N", "E", "S", "W", "N"].map((c, i) => <text key={i} x={Math.min(W - 5, (i / 4) * W)} y={H + 10} fontSize={8} fill="#a79f88">{c}</text>)}
+      </svg>
+      <div className="flex justify-between text-star-500"><span>brightest {Math.min(...data.map((p) => p.mag)).toFixed(2)}</span><span className="text-glow-400">- - zenith {zenith.toFixed(2)}</span><span>darkest {Math.max(...data.map((p) => p.mag)).toFixed(2)}</span></div>
+    </div>
+  );
+}
+
+function LumLegend() {
+  return (
+    <div className="mt-1">
+      <div className="text-amber-400">Luminance map (mag/arcsec²)</div>
+      <div className="mt-0.5 flex h-2 overflow-hidden rounded">{LUM_LEGEND.map((s) => <div key={s.mag} className="flex-1" style={{ background: s.css }} />)}</div>
+      <div className="flex justify-between"><span>22 · {mcdOf(22).toFixed(2)}</span><span>19 · {mcdOf(19).toFixed(1)}</span><span>16 · {mcdOf(16).toFixed(0)} mcd/m²</span></div>
+      <div className="text-star-500">Zenith is modeled; the spread over the sky is illustrative.</div>
     </div>
   );
 }
