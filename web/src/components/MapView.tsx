@@ -10,6 +10,8 @@ import { deltaColor, scoreColor, SKY_LEGEND, skyColor } from "../engine/colors";
 import { bortleClass, bortleLabel } from "../engine/bortle";
 import { cellLonLat, landEstimate, type Candidate } from "../engine/mcda";
 import { useStargaze } from "../state/stargaze";
+import { useTraffic } from "../state/traffic";
+import { gatewayPoints, unitPoints } from "../engine/wildsight";
 import { cloudAt, darknessFactor, hourIndex, WX_ATTRIBUTION } from "../engine/weather";
 import { siteTimeLabel, skyState } from "../engine/sky";
 import { add3DLayers, set3D, setLamps } from "../map/terrain3d";
@@ -78,13 +80,15 @@ export default function MapView() {
   const [ready, setReady] = useState(false);
   const observatory = tab === "observatory";
   const stargaze = tab === "stargaze";
-  const planner = !observatory && !stargaze;
+  const traffic = tab === "traffic";
+  const planner = !observatory && !stargaze && !traffic;
+  const tf = useTraffic();
   const sg = useStargaze();
   const showInstalls = useStore((s) => s.showInstalls);
   const buildOpen = useStore((s) => s.buildOpen) && planner;
   const lift = buildOpen ? "md:bottom-[19rem]" : "";
   const [venues, setVenues] = useState<FeatureCollection | null>(null);
-  const prevMode = useRef<"planner" | "observatory" | "stargaze">("planner");
+  const prevMode = useRef<"planner" | "observatory" | "stargaze" | "traffic">("planner");
   const [is3D, setIs3D] = useState(false);              // planner tabs: terrain, buildings and light sources in 3D
   const [lightOpacity, setLightOpacity] = useState(0.55); // 3D: transparency of the sky-brightness (light) map over the terrain
   const [zoom, setZoom] = useState(8);
@@ -164,6 +168,43 @@ export default function MapView() {
       });
       map.on("mouseenter", "spots", () => { map.getCanvas().style.cursor = "pointer"; });
       map.on("mouseleave", "spots", () => { map.getCanvas().style.cursor = ""; });
+      // Traffic Insights: crash-risk roads, WildSight units and gateways, UF hotspots, crash reports.
+      map.addSource("ws-hot", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-hot", type: "fill", source: "ws-hot", layout: { visibility: "none" },
+        paint: { "fill-color": ["match", ["get", "tier"], 3, "#ff5a4f", 2, "#ff9a3c", "#ffd84a"], "fill-opacity": 0.16 } }, firstSymbol);
+      map.addLayer({ id: "ws-hot-line", type: "line", source: "ws-hot", layout: { visibility: "none" },
+        paint: { "line-color": ["match", ["get", "tier"], 3, "#ff5a4f", 2, "#ff9a3c", "#ffd84a"], "line-width": 1, "line-opacity": 0.6 } }, firstSymbol);
+      map.addSource("ws-roads", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-roads-case", type: "line", source: "ws-roads", layout: { visibility: "none", "line-cap": "round" },
+        paint: { "line-color": "#f6b44b", "line-width": ["interpolate", ["linear"], ["zoom"], 8, 4, 13, 10],
+          "line-opacity": ["case", ["boolean", ["feature-state", "dep"], false], 0.85, 0] } }, firstSymbol);
+      map.addLayer({ id: "ws-roads", type: "line", source: "ws-roads", layout: { visibility: "none", "line-cap": "round" },
+        paint: { "line-color": ["interpolate", ["linear"], ["get", "risk"], 0, "#2b3552", 0.1, "#4a6fa5", 0.3, "#e3c34a", 0.7, "#f08a3c", 1.5, "#e0453a"],
+          "line-width": ["interpolate", ["linear"], ["zoom"], 8, ["match", ["get", "cls"], [0, 1], 1.6, 1.1], 13, ["match", ["get", "cls"], [0, 1], 5, 3.5]],
+          "line-opacity": 0.9 } }, firstSymbol);
+      map.addSource("ws-sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-sel", type: "line", source: "ws-sel", layout: { visibility: "none", "line-cap": "round" },
+        paint: { "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 8, 3, 14, 9], "line-opacity": 0.9 } });
+      map.addSource("ws-crashes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-crashes", type: "circle", source: "ws-crashes", layout: { visibility: "none" },
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 1.6, 14, 4],
+          "circle-color": ["match", ["get", "g"], 0, "#c78d52", 1, "#b07cff", 2, "#8fe38f", 3, "#7cc4ff", 4, "#f08ab8", "#a79f88"], "circle-opacity": 0.8 } });
+      map.addSource("ws-units", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-units", type: "circle", source: "ws-units", minzoom: 12, layout: { visibility: "none" },
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 12, 1.8, 16, 4.5], "circle-color": "#5fd6c4", "circle-stroke-color": "#05070d", "circle-stroke-width": 0.6 } });
+      map.addSource("ws-gw", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ws-gw-range", type: "circle", source: "ws-gw", layout: { visibility: "none" },
+        paint: { "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 0, ["/", ["get", "r"], 78271.517 * 0.87], 24, ["/", ["*", ["get", "r"], 2 ** 24], 78271.517 * 0.87]],
+          "circle-color": "rgba(95,214,196,0.05)", "circle-stroke-color": "rgba(95,214,196,0.45)", "circle-stroke-width": 1, "circle-pitch-alignment": "map" } });
+      map.addLayer({ id: "ws-gw", type: "circle", source: "ws-gw", layout: { visibility: "none" },
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 3, 14, 7], "circle-color": "#ffffff", "circle-stroke-color": "#5fd6c4", "circle-stroke-width": 2 } });
+      map.on("click", "ws-roads", (ev: MapLayerMouseEvent) => {
+        if (useStore.getState().tab !== "traffic") return;
+        const id = ev.features?.[0]?.id;
+        if (id !== undefined) useTraffic.getState().select(Number(id));
+      });
+      map.on("mouseenter", "ws-roads", () => { if (useStore.getState().tab === "traffic") map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "ws-roads", () => { map.getCanvas().style.cursor = ""; });
       // Catalog install markers (Build tab): clustered by count, colored by slot.
       map.addSource("installs", { type: "geojson", data: { type: "FeatureCollection", features: [] }, cluster: true, clusterRadius: 45,
         clusterMaxZoom: 13, clusterProperties: { units: ["+", ["get", "units"]] } });
@@ -330,17 +371,68 @@ export default function MapView() {
     map.setLayoutProperty("price", "visibility", observatory && priceView ? "visible" : "none");
     map.setLayoutProperty("candidate-price", "visibility", observatory && priceView ? "visible" : "none");
     map.setLayoutProperty("sky", "visibility", planner ? "visible" : "none");
+    for (const id of ["sites", "site-labels"]) map.setLayoutProperty(id, "visibility", traffic ? "none" : "visible");
     for (const id of ["candidates", "candidate-labels"]) map.setLayoutProperty(id, "visibility", observatory ? "visible" : "none");
     for (const id of ["rings"]) map.setLayoutProperty(id, "visibility", planner ? "visible" : "none");
     for (const id of ["skyb", "spots", "spot-labels", "spot-sel"]) map.setLayoutProperty(id, "visibility", stargaze ? "visible" : "none");
     map.setLayoutProperty("wx", "visibility", stargaze && sg.overlay !== "none" ? "visible" : "none");
-    const modeNow = observatory ? "observatory" : stargaze ? "stargaze" : "planner";
+    const modeNow = observatory ? "observatory" : stargaze ? "stargaze" : traffic ? "traffic" : "planner";
     if (modeNow !== prevMode.current) {
-      const g = modeNow === "planner" ? e.grids.a15 : e.grids.b;
-      map.fitBounds([[g.west, g.south], [g.east, g.north]], { padding: modeNow === "planner" ? 10 : 20, duration: 600 });
+      const wide = modeNow === "observatory" || modeNow === "stargaze";
+      const g = wide ? e.grids.b : e.grids.a15;
+      if (wide || prevMode.current === "observatory" || prevMode.current === "stargaze" || modeNow === "traffic")
+        map.fitBounds([[g.west, g.south], [g.east, g.north]], { padding: wide ? 20 : 10, duration: 600 });
     }
     prevMode.current = modeNow;
-  }, [ready, observatory, stargaze, planner, mc.score, priceView, sg.overlay, e]);
+  }, [ready, observatory, stargaze, traffic, planner, mc.score, priceView, sg.overlay, e]);
+
+  // ---- Traffic Insights layers
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const L = tf.layers;
+    const vis = (on: boolean) => (traffic && on ? "visible" : "none");
+    for (const id of ["ws-roads", "ws-roads-case", "ws-sel"]) map.setLayoutProperty(id, "visibility", vis(L.risk));
+    for (const id of ["ws-hot", "ws-hot-line"]) map.setLayoutProperty(id, "visibility", vis(L.hotspots));
+    map.setLayoutProperty("ws-crashes", "visibility", vis(L.crashes));
+    for (const id of ["ws-units", "ws-gw", "ws-gw-range"]) map.setLayoutProperty(id, "visibility", vis(L.units));
+  }, [ready, traffic, tf.layers]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !tf.segs) return;
+    (map.getSource("ws-roads") as GeoJSONSource).setData({ type: "FeatureCollection", features: tf.segs.map((s) => ({
+      type: "Feature", id: s.id, properties: { risk: s.risk, cls: s.cls }, geometry: { type: "LineString", coordinates: s.coords } })) });
+    (map.getSource("ws-crashes") as GeoJSONSource).setData({ type: "FeatureCollection", features: (tf.crashes ?? []).map((c) => ({
+      type: "Feature", properties: { g: c.group, y: c.year }, geometry: { type: "Point", coordinates: [c.lon, c.lat] } })) });
+    if (tf.hotspots) (map.getSource("ws-hot") as GeoJSONSource).setData(tf.hotspots);
+  }, [ready, tf.segs, tf.crashes, tf.hotspots]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const D = tf.derived, P = tf.p;
+    if (!ready || !map || !D || !P || !tf.segs) return;
+    map.removeFeatureState({ source: "ws-roads" });
+    for (const s of D.sel) map.setFeatureState({ source: "ws-roads", id: s.id }, { dep: true });
+    (map.getSource("ws-units") as GeoJSONSource).setData({ type: "FeatureCollection", features: unitPoints(D.sel, P.spacingM, P.sides).map(([lon, lat]) => ({
+      type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [lon, lat] } })) });
+    (map.getSource("ws-gw") as GeoJSONSource).setData({ type: "FeatureCollection", features: gatewayPoints(D.sel, P.gatewayKm).map((c) => ({
+      type: "Feature", properties: { r: P.gatewayKm * 1000 }, geometry: { type: "Point", coordinates: c } })) });
+  }, [ready, tf.derived, tf.p, tf.segs]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !tf.segs) return;
+    const s = tf.selected !== null ? tf.segs[tf.selected] : null;
+    (map.getSource("ws-sel") as GeoJSONSource).setData({ type: "FeatureCollection", features: s ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: s.coords } }] : [] });
+  }, [ready, tf.selected, tf.segs]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !tf.segs || tf.selected === null || !tf.fly) return;
+    const s = tf.segs[tf.selected], c = s.coords[Math.floor(s.coords.length / 2)];
+    map.easeTo({ center: c, zoom: Math.max(map.getZoom(), 12.5), duration: 700 });
+  }, [ready, tf.fly]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- 3D terrain, buildings and light sources (planner tabs)
   const show3D = is3D && planner;
@@ -551,7 +643,7 @@ export default function MapView() {
         </div>
       )}
       {stargaze && <StargazeControls />}
-      <Legend view={observatory ? (priceView ? "price" : "score") : stargaze ? `stargaze-${sg.overlay}` : view} mode={mode} lift={lift} anchor={costAnchor} />
+      <Legend view={observatory ? (priceView ? "price" : "score") : stargaze ? `stargaze-${sg.overlay}` : traffic ? "traffic" : view} mode={mode} lift={lift} anchor={costAnchor} />
       {view === "viirs" && e.viirs && planner && (
         <label className="absolute left-2 top-12 flex items-center gap-2 rounded-lg bg-ink-950/80 px-2 py-1 text-xs text-star-300 backdrop-blur">
           VNP46A2 {year}
@@ -674,7 +766,16 @@ function Legend({ view, mode, lift, anchor }: { view: string; mode: string; lift
   let body;
   const skyBar = <><div className="flex h-2 w-44 overflow-hidden rounded">{[...SKY_LEGEND].reverse().map((s) => <div key={s.mag} className="flex-1" style={{ background: s.css }} />)}</div>
     <div className="flex justify-between text-[10px]"><span>17.8 urban</span><span>modeled sky</span><span>22.0 natural</span></div></>;
-  if (view.startsWith("stargaze")) {
+  if (view === "traffic") {
+    body = <><div className="h-2 w-44 rounded" style={{ background: "linear-gradient(90deg, #2b3552, #4a6fa5, #e3c34a, #f08a3c, #e0453a)" }} />
+      <div className="flex justify-between text-[10px]"><span>0</span><span>crashes / mile / yr (expected)</span><span>1.5+</span></div>
+      <div className="mt-1 flex flex-wrap gap-x-2 text-[10px]">
+        <span><span className="inline-block h-1.5 w-3 rounded-sm bg-amber-400 align-middle" /> deployed</span>
+        <span><span className="text-[#5fd6c4]">●</span> unit</span><span>○ gateway + LoRa range</span>
+        <span><span className="inline-block h-2 w-3 rounded-sm align-middle" style={{ background: "rgba(255,90,79,0.35)" }} /> UF hotspot</span>
+      </div>
+      <div className="text-[10px] text-star-500">Crash reports: <span className="text-[#c78d52]">deer</span> · <span className="text-[#b07cff]">bear</span> · <span className="text-[#8fe38f]">other wildlife</span> · <span className="text-[#7cc4ff]">dogs/cats</span> · <span className="text-[#f08ab8]">livestock</span></div></>;
+  } else if (view.startsWith("stargaze")) {
     body = <>{view === "stargaze-score" ? <><div className="h-2 w-44 rounded" style={{ background: "linear-gradient(90deg, rgb(30,40,70), rgb(90,140,140), rgb(255,240,120))" }} />
       <div className="flex justify-between text-[10px]"><span>poor</span><span>dark &amp; clear now</span><span>best</span></div></> : <>{skyBar}
       {view === "stargaze-clouds" && <div className="mt-1 flex items-center gap-1 text-[10px]"><span className="inline-block h-2 w-8 rounded-sm" style={{ background: "linear-gradient(90deg, rgba(236,240,247,0.1), rgba(236,240,247,0.9))" }} /> forecast cloud cover</div>}</>}

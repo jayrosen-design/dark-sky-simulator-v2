@@ -1,0 +1,287 @@
+{
+ "built": "2026-09-27",
+ "classes": [
+  "motorway",
+  "trunk",
+  "primary",
+  "secondary",
+  "tertiary",
+  "unclassified"
+ ],
+ "groups": [
+  "Deer",
+  "Bear",
+  "Other wildlife",
+  "Dogs and cats",
+  "Livestock",
+  "Other / multiple"
+ ],
+ "years": [
+  2014,
+  2024
+ ],
+ "counties": {
+  "12001": "Alachua",
+  "12075": "Levy",
+  "12083": "Marion",
+  "12041": "Gilchrist",
+  "12107": "Putnam",
+  "12019": "Clay",
+  "12007": "Bradford",
+  "12125": "Union"
+ },
+ "network_km": 8554.8,
+ "network_km_by_class": {
+  "motorway": 341.9,
+  "trunk": 1186.2,
+  "primary": 1145.5,
+  "secondary": 1576.7,
+  "tertiary": 2994.9,
+  "unclassified": 1309.6
+ },
+ "crashes": {
+  "bbox": 11149,
+  "eight_counties": 6917,
+  "on_network": 6399,
+  "by_year": {
+   "2014": 497,
+   "2015": 526,
+   "2016": 658,
+   "2017": 676,
+   "2018": 623,
+   "2019": 641,
+   "2020": 593,
+   "2021": 527,
+   "2022": 570,
+   "2023": 552,
+   "2024": 536
+  },
+  "by_group": {
+   "Deer": 4871,
+   "Bear": 212,
+   "Other wildlife": 385,
+   "Dogs and cats": 483,
+   "Livestock": 379,
+   "Other / multiple": 69
+  }
+ },
+ "aadt_fdot_share_km": 0.727,
+ "model": {
+  "form": "negative binomial NB2, offset ln(km x years)",
+  "coefficients": {
+   "intercept": -3.5468,
+   "ln(AADT/1000)": 0.7026,
+   "ln(AADT/1000)^2": -0.1848,
+   "habitat": 0.2302,
+   "(speed-45)/10 mph": 0.4965,
+   "two-lane": 0.1554
+  },
+  "alpha": 1.1414,
+  "converged": true,
+  "eb_total_per_year": 581.7
+ },
+ "backtest": {
+  "train": [
+   2014,
+   2019
+  ],
+  "test": [
+   2020,
+   2024
+  ],
+  "share_of_test_crashes_on_top_miles": {
+   "eb": {
+    "top5": 0.172,
+    "top10": 0.284,
+    "top20": 0.469
+   },
+   "observed": {
+    "top5": 0.174,
+    "top10": 0.282,
+    "top20": 0.442
+   },
+   "model": {
+    "top5": 0.091,
+    "top10": 0.208,
+    "top20": 0.41
+   },
+   "length": {
+    "top5": 0.041,
+    "top10": 0.102,
+    "top20": 0.137
+   }
+  }
+ },
+ "seed": {
+  "device": {
+   "pir_range_m": {
+    "value": 17,
+    "low": 15,
+    "high": 20,
+    "provenance": "WildSight README 3.2 (PIR 15-20 m, assumed) and SIM_CONFIG.pirRange = 17"
+   },
+   "spacing_m": {
+    "value": 40,
+    "options": [
+     40,
+     80,
+     160,
+     320
+    ],
+    "provenance": "design: two 17 m PIR zones plus overlap give continuous roadside coverage; wider spacing leaves gaps between units"
+   },
+   "sides": {
+    "value": 2,
+    "provenance": "design: animals approach from both shoulders"
+   },
+   "service_life_years": {
+    "value": 5,
+    "provenance": "WildSight README 10 (reliable for 5 years)"
+   },
+   "solar_w": {
+    "value": 6,
+    "provenance": "WildSight README 4 (assumed)"
+   },
+   "battery_wh": {
+    "value": 40,
+    "provenance": "WildSight README 4 (assumed)"
+   },
+   "standby_wh_day": {
+    "value": 1.8,
+    "provenance": "WildSight README 4 daily energy budget with motion wake"
+   }
+  },
+  "network": {
+   "gateway_range_km": {
+    "value": 3,
+    "low": 2,
+    "high": 5,
+    "provenance": "design: LoRa at roadside height reaches about 2-5 km in rural terrain; every unit within range of a solar gateway with cellular backhaul (WildSight README 9.2, 11)"
+   }
+  },
+  "costs": {
+   "unit_hardware": {
+    "value": 450,
+    "low": 300,
+    "high": 700,
+    "provenance": "design assumption: bill of the README 3.2 proposed parts (edge-AI board and camera, PIR, ultrasonic transducers, amber beacon, 6 W panel, 40 Wh LiFePO4, enclosure)"
+   },
+   "unit_install": {
+    "value": 250,
+    "low": 150,
+    "high": 500,
+    "provenance": "design assumption: guardrail clamp, sign-post strap or ground stake (README 10), crew time and traffic control"
+   },
+   "gateway_installed": {
+    "value": 1500,
+    "low": 800,
+    "high": 3000,
+    "provenance": "design assumption: pole-mounted solar LoRa gateway with LTE-M modem"
+   },
+   "backhaul_per_gateway_month": {
+    "value": 15,
+    "low": 5,
+    "high": 30,
+    "provenance": "design assumption: IoT cellular data plan"
+   },
+   "cloud_per_unit_year": {
+    "value": 24,
+    "low": 10,
+    "high": 60,
+    "provenance": "design assumption: event store, fleet health and DOT dashboard (README 9.2)"
+   },
+   "maintenance_per_unit_year": {
+    "value": 60,
+    "low": 30,
+    "high": 120,
+    "provenance": "design assumption: about one service visit a year (README 10)"
+   }
+  },
+  "benefits": {
+   "effectiveness": {
+    "value": 0.4,
+    "low": 0.0,
+    "high": 0.82,
+    "provenance": "assumption. FHWA 2008 Report to Congress: animal detection with driver warning cut large-animal collisions 82% on average at seven Swiss sites; WildSight's own effect is unproven (README 13)"
+   },
+   "crash_cost_usd": {
+    "value": 10300,
+    "provenance": "Huijser et al. 2009 (Ecology and Society 14(2):15) average deer-vehicle collision cost $6,617 in 2007 USD, x 1.55 CPI-U 2007 to 2025 (approximate); applied to every reported animal crash"
+   },
+   "unreported_factor": {
+    "value": 1.0,
+    "low": 1.0,
+    "high": 4.0,
+    "provenance": "1 = police-reported crashes only (conservative); carcass surveys find several times more collisions than crash reports"
+   }
+  },
+  "model": {
+   "segment_km": {
+    "value": 1.0,
+    "provenance": "design: deployment planning unit"
+   },
+   "crash_snap_m": {
+    "value": 100,
+    "provenance": "design: crash reports are geocoded to about 100 m (Signal Four verification levels)"
+   },
+   "aadt_join_m": {
+    "value": 40,
+    "provenance": "design: an OSM segment takes the FDOT count of the section within 40 m"
+   },
+   "train_years": {
+    "value": [
+     2014,
+     2019
+    ],
+    "provenance": "back-test split"
+   },
+   "test_years": {
+    "value": [
+     2020,
+     2024
+    ],
+    "provenance": "back-test split"
+   },
+   "default_aadt": {
+    "value": {
+     "motorway": 45000,
+     "trunk": 22000,
+     "primary": 12000,
+     "secondary": 5000,
+     "tertiary": 2500,
+     "unclassified": 800
+    },
+    "provenance": "design defaults by OSM class where FDOT has no count (FDOT counts state highways only)"
+   },
+   "default_speed_mph": {
+    "value": {
+     "motorway": 70,
+     "trunk": 60,
+     "primary": 55,
+     "secondary": 50,
+     "tertiary": 45,
+     "unclassified": 35
+    },
+    "provenance": "design defaults by OSM class where OSM has no maxspeed"
+   },
+   "default_lanes": {
+    "value": {
+     "motorway": 4,
+     "trunk": 4,
+     "primary": 2,
+     "secondary": 2,
+     "tertiary": 2,
+     "unclassified": 2
+    },
+    "provenance": "design defaults by OSM class where OSM has no lanes tag"
+   }
+  },
+  "sources": {
+   "crashes": "Animal-Related Vehicle Collisions 2014-2024, University of Florida Center for Landscape Conservation Planning (D. Smith, C. Gagne), from Signal Four Analytics crash reports",
+   "hotspots": "Large Animal-Vehicle Collision Hotspots 2014-2024 (Getis-Ord Gi*), UF CLCP for FDOT",
+   "aadt": "FDOT Transportation Data and Analytics, Annual Average Daily Traffic (2025)",
+   "roads": "OpenStreetMap contributors (ODbL)",
+   "device": "WildSight, Engineering Innovation Team 7, University of Florida (github.com/jayrosen-design/wildsight)"
+  }
+ }
+}

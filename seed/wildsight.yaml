@@ -1,0 +1,46 @@
+# Traffic Insights: WildSight roadside AI wildlife-detection deployment and cost assumptions.
+# Device facts come from the WildSight design document (github.com/jayrosen-design/wildsight, README, "Proposed"
+# production design). The WildSight repo gives no prices, so every cost is a design assumption with a range, to be
+# replaced by quotes. Money in 2026 US dollars.
+device:
+  pir_range_m: {value: 17, low: 15, high: 20, provenance: "WildSight README 3.2 (PIR 15-20 m, assumed) and SIM_CONFIG.pirRange = 17"}
+  spacing_m: {value: 40, options: [40, 80, 160, 320], provenance: "design: two 17 m PIR zones plus overlap give continuous roadside coverage; wider spacing leaves gaps between units"}
+  sides: {value: 2, provenance: "design: animals approach from both shoulders"}
+  service_life_years: {value: 5, provenance: "WildSight README 10 (reliable for 5 years)"}
+  solar_w: {value: 6, provenance: "WildSight README 4 (assumed)"}
+  battery_wh: {value: 40, provenance: "WildSight README 4 (assumed)"}
+  standby_wh_day: {value: 1.8, provenance: "WildSight README 4 daily energy budget with motion wake"}
+network:
+  gateway_range_km: {value: 3, low: 2, high: 5, provenance: "design: LoRa at roadside height reaches about 2-5 km in rural terrain; every unit within range of a solar gateway with cellular backhaul (WildSight README 9.2, 11)"}
+costs:
+  unit_hardware: {value: 450, low: 300, high: 700, provenance: "design assumption: bill of the README 3.2 proposed parts (edge-AI board and camera, PIR, ultrasonic transducers, amber beacon, 6 W panel, 40 Wh LiFePO4, enclosure)"}
+  unit_install: {value: 250, low: 150, high: 500, provenance: "design assumption: guardrail clamp, sign-post strap or ground stake (README 10), crew time and traffic control"}
+  gateway_installed: {value: 1500, low: 800, high: 3000, provenance: "design assumption: pole-mounted solar LoRa gateway with LTE-M modem"}
+  backhaul_per_gateway_month: {value: 15, low: 5, high: 30, provenance: "design assumption: IoT cellular data plan"}
+  cloud_per_unit_year: {value: 24, low: 10, high: 60, provenance: "design assumption: event store, fleet health and DOT dashboard (README 9.2)"}
+  maintenance_per_unit_year: {value: 60, low: 30, high: 120, provenance: "design assumption: about one service visit a year (README 10)"}
+benefits:
+  effectiveness: {value: 0.40, low: 0.0, high: 0.82, provenance: "assumption. FHWA 2008 Report to Congress: animal detection with driver warning cut large-animal collisions 82% on average at seven Swiss sites; WildSight's own effect is unproven (README 13)"}
+  crash_cost_usd: {value: 10300, provenance: "Huijser et al. 2009 (Ecology and Society 14(2):15) average deer-vehicle collision cost $6,617 in 2007 USD, x 1.55 CPI-U 2007 to 2025 (approximate); applied to every reported animal crash"}
+  unreported_factor: {value: 1.0, low: 1.0, high: 4.0, provenance: "1 = police-reported crashes only (conservative); carcass surveys find several times more collisions than crash reports"}
+model:
+  segment_km: {value: 1.0, provenance: "design: deployment planning unit"}
+  crash_snap_m: {value: 100, provenance: "design: crash reports are geocoded to about 100 m (Signal Four verification levels)"}
+  aadt_join_m: {value: 40, provenance: "design: an OSM segment takes the FDOT count of the section within 40 m"}
+  train_years: {value: [2014, 2019], provenance: "back-test split"}
+  test_years: {value: [2020, 2024], provenance: "back-test split"}
+  default_aadt:
+    value: {motorway: 45000, trunk: 22000, primary: 12000, secondary: 5000, tertiary: 2500, unclassified: 800}
+    provenance: "design defaults by OSM class where FDOT has no count (FDOT counts state highways only)"
+  default_speed_mph:
+    value: {motorway: 70, trunk: 60, primary: 55, secondary: 50, tertiary: 45, unclassified: 35}
+    provenance: "design defaults by OSM class where OSM has no maxspeed"
+  default_lanes:
+    value: {motorway: 4, trunk: 4, primary: 2, secondary: 2, tertiary: 2, unclassified: 2}
+    provenance: "design defaults by OSM class where OSM has no lanes tag"
+sources:
+  crashes: "Animal-Related Vehicle Collisions 2014-2024, University of Florida Center for Landscape Conservation Planning (D. Smith, C. Gagne), from Signal Four Analytics crash reports"
+  hotspots: "Large Animal-Vehicle Collision Hotspots 2014-2024 (Getis-Ord Gi*), UF CLCP for FDOT"
+  aadt: "FDOT Transportation Data and Analytics, Annual Average Daily Traffic (2025)"
+  roads: "OpenStreetMap contributors (ODbL)"
+  device: "WildSight, Engineering Innovation Team 7, University of Florida (github.com/jayrosen-design/wildsight)"

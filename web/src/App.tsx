@@ -15,10 +15,12 @@ const MapView = lazy(() => import("./components/MapView"));
 const ObservatoryPanel = lazy(() => import("./components/ObservatoryPanel"));
 const BuildTray = lazy(() => import("./components/BuildTray"));
 const StargazePanel = lazy(() => import("./components/StargazePanel"));
+const TrafficPanel = lazy(() => import("./components/TrafficPanel"));
 
 const TABS: { value: Tab; label: string }[] = [
   { value: "scenario", label: "Scenario" }, { value: "sites", label: "Sites" }, { value: "economics", label: "Costs" },
   { value: "observatory", label: "Observatory" }, { value: "stargaze", label: "Stargaze" }, { value: "brief", label: "Brief" },
+  { value: "traffic", label: "Traffic Insights" },
 ];
 
 export default function App() {
@@ -29,7 +31,7 @@ export default function App() {
   const setTab = useStore((s) => s.setTab);
   const buildOpen = useStore((s) => s.buildOpen);
   const setBuildOpen = useStore((s) => s.setBuildOpen);
-  const planner = tab !== "observatory" && tab !== "stargaze"; // lighting-scenario tabs (budget + build mode)
+  const planner = tab !== "observatory" && tab !== "stargaze" && tab !== "traffic"; // lighting-scenario tabs (budget + build mode)
 
   useEffect(() => {
     (async () => {
@@ -68,7 +70,7 @@ export default function App() {
             {buildOpen && planner && <ErrorBoundary label="build"><Suspense fallback={null}><BuildTray /></Suspense></ErrorBoundary>}
           </div>
           <aside className="flex min-h-0 flex-1 flex-col border-ink-700 md:order-1 md:w-[420px] md:flex-none md:border-r">
-            <nav className="flex shrink-0 gap-1 overflow-x-auto border-b border-ink-700 bg-ink-950 px-2 py-1.5" role="tablist" aria-label="Modules">
+            <nav className="flex shrink-0 flex-wrap gap-1 border-b border-ink-700 bg-ink-950 px-2 py-1.5" role="tablist" aria-label="Modules">
               {TABS.map((t) => (
                 <button key={t.value} role="tab" aria-selected={tab === t.value} onClick={() => setTab(t.value)}
                   className={`whitespace-nowrap rounded-md px-2 py-1 text-sm ${tab === t.value ? "bg-ink-700 text-star-100" : "text-star-500 hover:text-star-300"}`}>{t.label}</button>
@@ -82,6 +84,7 @@ export default function App() {
                 {tab === "observatory" && <Suspense fallback={null}><ObservatoryPanel /></Suspense>}
                 {tab === "stargaze" && <Suspense fallback={null}><StargazePanel /></Suspense>}
                 {tab === "brief" && <BriefPanel />}
+                {tab === "traffic" && <Suspense fallback={null}><TrafficPanel /></Suspense>}
               </ErrorBoundary>
             </div>
           </aside>

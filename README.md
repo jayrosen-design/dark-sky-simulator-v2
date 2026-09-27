@@ -18,7 +18,7 @@ python -m uv venv --python 3.12 .venv
 python -m uv pip install --python .venv -e ".[dev,ml,viirs]"
 .venv/Scripts/python -m pipeline.ingest_all      # pull public sources into data_raw/ (cached)
 .venv/Scripts/python -m pipeline.build           # precompute web/public/data/ and docs/sanity_check.md
-.venv/Scripts/python -m pytest                   # 49 tests
+.venv/Scripts/python -m pytest                   # 54 tests
 
 # Web client
 cd web
@@ -82,6 +82,13 @@ heads and light pools: mapped streetlights where they stand, modeled ones spread
 sports towers at real venues; equipped cards recolor their share. In the Sites sky view, **Terrain & lights** puts the
 same scene under the stars (eye height 2 m to 600 m), and **Indicators** / **Luminance map** add a sky-glow curve,
 a luminance readout (mag/arcsec², mcd/m²) and a false-color sky ([ADR 0009](docs/adr/0009-3d-terrain-lights-skyglow.md)).
+**Traffic Insights** tab (with [WildSight](https://github.com/jayrosen-design/wildsight), the same creator's roadside AI
+wildlife-detection unit): roads colored by expected animal-crash risk from a back-tested negative-binomial / Empirical Bayes
+model on 2014-2024 crash reports; pick the riskiest miles, UF hotspots or all two-lane roads to size WildSight units
+(17 m motion range, both shoulders) and LoRa gateways, with CAPEX, running cost, crashes avoided, benefit/cost, break-even
+unit price and a scaling table; plus a recreated "With WildSight / Today" corridor simulation and the beacon
+stopping-distance demo ([ADR 0010](docs/adr/0010-traffic-insights-wildsight.md)). Refresh its data with
+`python -m pipeline.wildsight`.
 A **Budget** readout on the map (every tab but Observatory) keeps public cost, yearly savings, payback, 15-year ROI
 and a cumulative cash chart in view for the current scenario; it collapses to one line and links to the Costs tab.
 
@@ -161,6 +168,9 @@ midnight it is +0.15 mag. See
 | OSM sports venues | 2,304 candidates; 1,229 modeled inside the eight counties (lit-tagged, stadiums, untagged at 50%) |
 | Florida DOR 2025 parcels (FGIO statewide centroids) | 91,929 parcels ≥ 5 acres in the 11 region counties; 1,205 qualified vacant-land sales 2021–2025 |
 | DarkSky Approved luminaires | searchable list only, no prices or data feed; cards are generic types that link to it |
+| UF CLCP animal-related vehicle crashes 2014-2024 (Signal Four) + UF/FDOT Gi* hotspots | 6,917 crash reports in the eight counties, species-coded; 179 hotspot zones |
+| FDOT Annual Average Daily Traffic (2025) | 1,201 state-highway sections in the eight counties |
+| OpenStreetMap roads with class, speed, lanes (Traffic Insights) | 19,037 ways, 15,747 segments, 8,555 km |
 | AWS Terrain Tiles (3D terrain, live in the browser) | Terrarium DEM tiles (USGS 3DEP and other public DEMs), no key |
 | OpenFreeMap / OpenMapTiles buildings and roads (3D, live) | building heights (`render_height`); roads carry modeled lamp positions |
 | Open-Meteo forecast + air quality (Stargaze, live in the browser) | hourly cloud (0.2° grid), humidity, dew point, wind, 250 hPa wind, aerosol optical depth; CC BY 4.0, free for non-commercial use |
@@ -179,6 +189,7 @@ See [docs/adr/](docs/adr/). In short:
 7. Build mode catalog, sports lighting source, and evening viewing time (not PRD requirements; added on request). ([ADR 0007](docs/adr/0007-build-mode-catalog-sports.md))
 8. Stargaze mode with live Open-Meteo weather (not a PRD requirement; added on request). ([ADR 0008](docs/adr/0008-stargaze-mode.md))
 9. 3D terrain, light-source structures, Sites ground view and sky-glow indicators (added on request). ([ADR 0009](docs/adr/0009-3d-terrain-lights-skyglow.md))
+10. Traffic Insights tab for WildSight roadside wildlife detection (added on request). ([ADR 0010](docs/adr/0010-traffic-insights-wildsight.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
