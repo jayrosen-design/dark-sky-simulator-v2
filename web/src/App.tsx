@@ -14,10 +14,11 @@ import CostHud from "./components/CostHud";
 const MapView = lazy(() => import("./components/MapView"));
 const ObservatoryPanel = lazy(() => import("./components/ObservatoryPanel"));
 const BuildTray = lazy(() => import("./components/BuildTray"));
+const StargazePanel = lazy(() => import("./components/StargazePanel"));
 
 const TABS: { value: Tab; label: string }[] = [
   { value: "scenario", label: "Scenario" }, { value: "sites", label: "Sites" }, { value: "economics", label: "Costs" },
-  { value: "observatory", label: "Observatory" }, { value: "brief", label: "Brief" },
+  { value: "observatory", label: "Observatory" }, { value: "stargaze", label: "Stargaze" }, { value: "brief", label: "Brief" },
 ];
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
   const setTab = useStore((s) => s.setTab);
   const buildOpen = useStore((s) => s.buildOpen);
   const setBuildOpen = useStore((s) => s.setBuildOpen);
+  const planner = tab !== "observatory" && tab !== "stargaze"; // lighting-scenario tabs (budget + build mode)
 
   useEffect(() => {
     (async () => {
@@ -56,20 +58,20 @@ export default function App() {
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
           <div className="relative h-[42dvh] shrink-0 md:order-2 md:h-auto md:flex-1">
             <ErrorBoundary label="map"><Suspense fallback={<div className="h-full w-full bg-ink-900" />}><MapView /></Suspense></ErrorBoundary>
-            {!buildOpen && tab !== "observatory" && (
+            {!buildOpen && planner && (
               <button onClick={() => setBuildOpen(true)}
                 className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-amber-400 bg-ink-950/90 px-4 py-1.5 text-sm font-semibold text-amber-400 shadow-lg backdrop-blur hover:bg-amber-400 hover:text-ink-950">
                 Build mode · choose fixtures
               </button>
             )}
-            {tab !== "observatory" && data.basis && <ErrorBoundary label="budget"><CostHud /></ErrorBoundary>}
-            {buildOpen && tab !== "observatory" && <ErrorBoundary label="build"><Suspense fallback={null}><BuildTray /></Suspense></ErrorBoundary>}
+            {planner && data.basis && <ErrorBoundary label="budget"><CostHud /></ErrorBoundary>}
+            {buildOpen && planner && <ErrorBoundary label="build"><Suspense fallback={null}><BuildTray /></Suspense></ErrorBoundary>}
           </div>
           <aside className="flex min-h-0 flex-1 flex-col border-ink-700 md:order-1 md:w-[420px] md:flex-none md:border-r">
             <nav className="flex shrink-0 gap-1 overflow-x-auto border-b border-ink-700 bg-ink-950 px-2 py-1.5" role="tablist" aria-label="Modules">
               {TABS.map((t) => (
                 <button key={t.value} role="tab" aria-selected={tab === t.value} onClick={() => setTab(t.value)}
-                  className={`whitespace-nowrap rounded-md px-3 py-1 text-sm ${tab === t.value ? "bg-ink-700 text-star-100" : "text-star-500 hover:text-star-300"}`}>{t.label}</button>
+                  className={`whitespace-nowrap rounded-md px-2 py-1 text-sm ${tab === t.value ? "bg-ink-700 text-star-100" : "text-star-500 hover:text-star-300"}`}>{t.label}</button>
               ))}
             </nav>
             <div className="min-h-0 flex-1 overflow-y-auto p-3" role="tabpanel">
@@ -78,6 +80,7 @@ export default function App() {
                 {tab === "sites" && <SitesPanel />}
                 {tab === "economics" && <EconomicsPanel />}
                 {tab === "observatory" && <Suspense fallback={null}><ObservatoryPanel /></Suspense>}
+                {tab === "stargaze" && <Suspense fallback={null}><StargazePanel /></Suspense>}
                 {tab === "brief" && <BriefPanel />}
               </ErrorBoundary>
             </div>

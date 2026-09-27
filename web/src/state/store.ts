@@ -3,7 +3,7 @@ import { DEFAULT_PARAMS, type ScenarioParams } from "../engine/scenario";
 import type { Mode } from "../engine/types";
 import type { Weights } from "../engine/mcda";
 
-export type Tab = "scenario" | "sites" | "economics" | "observatory" | "brief";
+export type Tab = "scenario" | "sites" | "economics" | "observatory" | "stargaze" | "brief";
 export type MapView = "scenario" | "delta" | "baseline" | "fixtures" | "viirs" | "trend";
 
 interface State {

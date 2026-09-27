@@ -5,10 +5,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { useModel } from "../state/model";
-import { useStore } from "../state/store";
 import { formatSky, nelmFromSqm } from "../engine/bortle";
 import { BRIGHT_STARS, dirFromAltAz, eqUnit, equatorialToScene, GALACTIC_POLE, SITE_TZ, skyNow, skyState, utcToZoned, zonedToUtc, type SkyState } from "../engine/sky";
-import type { SiteMetric } from "../engine/scenario";
 
 const R_STARS = 45;
 const MOON_SCALE = 3; // Moon drawn 3x its 0.52° size so the phase is readable
@@ -58,21 +56,28 @@ function nightOf(t: number) {
   return { y: p.getUTCFullYear(), mo: p.getUTCMonth() + 1, d: p.getUTCDate(), minute: minutes + 720, z };
 }
 
+/** Any place the dome can show: a named site, or a spot picked in Stargaze mode. */
+export interface DomePlace { id: string; name: string; lat: number; lon: number; modelMag: number; baseMag?: number; note?: string }
+
 interface Overlays { directions: boolean; names: boolean }
 interface Frame { st: SkyState; modelMag: number; twilightMag: number; moonMag: number; nelm: number; ov: Overlays }
 
-export default function SkyDome({ site }: { site: SiteMetric }) {
+export default function SkyDome({ place, sites, onPickSite, initialTime, startFull, onExitFull }: {
+  place: DomePlace; sites?: { id: string; name: string }[]; onPickSite?: (id: string) => void;
+  initialTime?: number; startFull?: boolean; onExitFull?: () => void;
+}) {
   const m = useModel();
   const ref = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
-  const [full, setFull] = useState(false);
-  const [t, setT] = useState(() => defaultTime(m.params.view_window));
+  const [full, setFull] = useState(!!startFull);
+  const [t, setT] = useState(() => initialTime ?? defaultTime(m.params.view_window));
+  const exitRef = useRef(onExitFull);
+  exitRef.current = onExitFull;
   const [ov, setOv] = useState<Overlays>({ directions: true, names: false });
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const setFocus = useStore((s) => s.setFocusSite);
-  const modelMag = m.growthOn && site.futureScnMag !== null ? site.futureScnMag : site.scnMag;
-  const siteDef = m.e.sites.find((s) => s.id === site.id)!;
+  const modelMag = place.modelMag;
+  const siteDef = useMemo(() => ({ lat: place.lat, lon: place.lon }), [place.lat, place.lon]);
 
   const st = useMemo(() => skyState(t, siteDef.lat, siteDef.lon), [t, siteDef]);
   const now = useMemo(() => skyNow(modelMag, st), [modelMag, st]);
@@ -298,17 +303,19 @@ export default function SkyDome({ site }: { site: SiteMetric }) {
 
   // Full screen: the browser Fullscreen API where available, else a fixed overlay (e.g. iPhone Safari). Esc exits either.
   useEffect(() => {
-    const sync = () => { if (!document.fullscreenElement) { setFull(false); setPlaying(false); } };
-    const esc = (ev: KeyboardEvent) => { if (ev.key === "Escape") { setFull(false); setPlaying(false); } };
+    const sync = () => { if (!document.fullscreenElement) { setFull(false); setPlaying(false); exitRef.current?.(); } };
+    const esc = (ev: KeyboardEvent) => { if (ev.key === "Escape") { setFull(false); setPlaying(false); exitRef.current?.(); } };
+    if (startFull) box.current?.requestFullscreen?.().catch(() => undefined);
     document.addEventListener("fullscreenchange", sync);
     window.addEventListener("keydown", esc);
     return () => { document.removeEventListener("fullscreenchange", sync); window.removeEventListener("keydown", esc); };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const toggle = () => {
     if (full) {
       if (document.fullscreenElement) document.exitFullscreen();
       setFull(false);
       setPlaying(false);
+      exitRef.current?.();
     } else {
       setFull(true);
       box.current?.requestFullscreen?.().catch(() => undefined);
@@ -336,21 +343,25 @@ export default function SkyDome({ site }: { site: SiteMetric }) {
   return (
     <div>
       <div ref={box} className={full ? "fixed inset-0 z-50 bg-black" : "relative"}>
-        <div ref={ref} className={`relative w-full touch-none overflow-hidden ${full ? "h-full" : "h-64 rounded-lg"}`} aria-label={`Illustrative all-sky view at ${site.name}`} role="img" />
+        <div ref={ref} className={`relative w-full touch-none overflow-hidden ${full ? "h-full" : "h-64 rounded-lg"}`} aria-label={`Illustrative all-sky view at ${place.name}`} role="img" />
         <button onClick={toggle} className="absolute right-2 top-2 rounded bg-ink-950/70 px-2 py-0.5 text-[11px] text-star-300 hover:bg-ink-800"
           aria-label={full ? "Exit full screen" : "Full screen sky view"} title={full ? "Exit full screen (Esc)" : "Full screen"}>
           {full ? "✕ Exit full screen" : "⛶ Full screen"}
         </button>
         {full && (
           <div className="absolute left-3 top-3 max-w-[calc(100%-10rem)] rounded-lg bg-ink-950/75 p-2 text-xs text-star-300 backdrop-blur">
-            <label className="flex items-center gap-2">
-              <span className="sr-only">Site</span>
-              <select value={site.id} onChange={(ev) => setFocus(ev.target.value)} className="rounded bg-ink-800 px-1 py-0.5 text-sm font-semibold text-star-100">
-                {m.sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </label>
-            <div className="mt-1">Modeled sky: {formatSky(modelMag, m.table)}{m.growthOn && site.futureScnMag !== null ? ` (${2024 + m.years})` : ""}</div>
-            <div className="text-star-500">Today {site.baseMag.toFixed(2)} · Δ {(modelMag - site.baseMag >= 0 ? "+" : "") + (modelMag - site.baseMag).toFixed(2)} mag</div>
+            {sites && onPickSite ? (
+              <label className="flex items-center gap-2">
+                <span className="sr-only">Site</span>
+                <select value={place.id} onChange={(ev) => onPickSite(ev.target.value)} className="rounded bg-ink-800 px-1 py-0.5 text-sm font-semibold text-star-100">
+                  {sites.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </label>
+            ) : <div className="text-sm font-semibold text-star-100">{place.name}</div>}
+            <div className="mt-1">Modeled sky: {formatSky(modelMag, m.table)}{place.note ? ` (${place.note})` : ""}</div>
+            {place.baseMag !== undefined && (
+              <div className="text-star-500">Today {place.baseMag.toFixed(2)} · Δ {(modelMag - place.baseMag >= 0 ? "+" : "") + (modelMag - place.baseMag).toFixed(2)} mag</div>
+            )}
             <div className="mt-1">Sky at this time: {now.mag.toFixed(2)} mag/arcsec²</div>
             <div className="text-star-500">{conditions}</div>
           </div>

@@ -207,3 +207,47 @@ export const BRIGHT_STARS: BrightStar[] = [
   { name: "Ruchbah", ra: 21.45, dec: 60.24, mag: 2.68 },
   { name: "Segin", ra: 28.60, dec: 63.67, mag: 3.37 },
 ];
+
+// ---------------------------------------------------------------- night summary
+
+export interface NightSummary {
+  noon: number;              // local noon starting this night (UTC ms)
+  dusk: number | null;       // Sun reaches -18° (astronomical dusk)
+  dawn: number | null;       // Sun back to -18°
+  moonRise: number | null; moonSet: number | null;
+  moonIllum: number; moonName: string;
+  darkMoonlessHours: number; // Sun < -18° and Moon down (or < 5% lit)
+}
+
+/** Scan a night (local noon to noon, site clock) in 5-minute steps. */
+export function nightSummary(y: number, mo: number, d: number, latDeg: number, lonDeg: number, tz = SITE_TZ): NightSummary {
+  const noon = zonedToUtc(y, mo, d, 720, tz);
+  const step = 5 * 60000;
+  let dusk: number | null = null, dawn: number | null = null, rise: number | null = null, set: number | null = null, dark = 0;
+  let prev = skyState(noon, latDeg, lonDeg), mid = prev;
+  for (let k = 1; k <= 288; k++) {
+    const t = noon + k * step, st = skyState(t, latDeg, lonDeg);
+    if (dusk === null && prev.sun.alt > -18 && st.sun.alt <= -18) dusk = t;
+    if (dusk !== null && prev.sun.alt <= -18 && st.sun.alt > -18) dawn = t;
+    if (rise === null && prev.moon.alt <= 0 && st.moon.alt > 0) rise = t;
+    if (set === null && prev.moon.alt > 0 && st.moon.alt <= 0) set = t;
+    if (st.sun.alt < -18 && (st.moon.alt <= 0 || st.moon.illum < 0.05)) dark += 5 / 60;
+    if (k === 144) mid = st;
+    prev = st;
+  }
+  return { noon, dusk, dawn, moonRise: rise, moonSet: set, moonIllum: mid.moon.illum, moonName: mid.moon.name, darkMoonlessHours: dark };
+}
+
+/** Short site-clock label, e.g. "Sat 23:00". */
+export function siteTimeLabel(ms: number, withDate = false, tz = SITE_TZ) {
+  return new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    ...(withDate ? { month: "numeric", day: "numeric" } : {}) }).format(ms);
+}
+
+/** The evening date (site clock) of the night containing `ms`: times before local noon belong to the previous evening. */
+export function nightDateOf(ms: number, tz = SITE_TZ) {
+  const z = parts(ms, tz);
+  if (z.h >= 12) return { y: z.y, mo: z.mo, d: z.d };
+  const p = new Date(Date.UTC(z.y, z.mo - 1, z.d - 1));
+  return { y: p.getUTCFullYear(), mo: p.getUTCMonth() + 1, d: p.getUTCDate() };
+}

@@ -8,7 +8,10 @@ import { useStore, type MapView as View } from "../state/store";
 import { useMcda } from "../state/mcda";
 import { deltaColor, scoreColor, SKY_LEGEND, skyColor } from "../engine/colors";
 import { bortleClass, bortleLabel } from "../engine/bortle";
-import { landEstimate, type Candidate } from "../engine/mcda";
+import { cellLonLat, landEstimate, type Candidate } from "../engine/mcda";
+import { useStargaze } from "../state/stargaze";
+import { cloudAt, darknessFactor, hourIndex, WX_ATTRIBUTION } from "../engine/weather";
+import { siteTimeLabel, skyState } from "../engine/sky";
 import type { GridMeta } from "../engine/types";
 import type { FeatureCollection } from "geojson";
 import { fetchJson, loadLin16, loadLog16 } from "../data/load";
@@ -72,11 +75,14 @@ export default function MapView() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const observatory = tab === "observatory";
+  const stargaze = tab === "stargaze";
+  const planner = !observatory && !stargaze;
+  const sg = useStargaze();
   const showInstalls = useStore((s) => s.showInstalls);
-  const buildOpen = useStore((s) => s.buildOpen) && tab !== "observatory";
+  const buildOpen = useStore((s) => s.buildOpen) && planner;
   const lift = buildOpen ? "md:bottom-[19rem]" : "";
   const [venues, setVenues] = useState<FeatureCollection | null>(null);
-  const wasObservatory = useRef(false);
+  const prevMode = useRef<"planner" | "observatory" | "stargaze">("planner");
   const [hover, setHover] = useState<{ rank: number; x: number; y: number } | null>(null);
   const [priceView, setPriceView] = useState(false);   // Observatory: land-price overlay instead of suitability
   const acres = mc.acres ?? e.seed.mcda.land_pricing?.target_site_acres.value ?? 80;
@@ -108,6 +114,11 @@ export default function MapView() {
       map.addLayer({ id: "score", type: "raster", source: "score", layout: { visibility: "none" }, paint: { "raster-opacity": 0.8, "raster-fade-duration": 0 } }, firstSymbol);
       map.addSource("price", { type: "image", url: blank, coordinates: corners(e.grids.b) });
       map.addLayer({ id: "price", type: "raster", source: "price", layout: { visibility: "none" }, paint: { "raster-opacity": 0.75, "raster-fade-duration": 0 } }, firstSymbol);
+      // Stargaze: modeled sky over the 11-county region, and the weather overlay on top of it.
+      map.addSource("skyb", { type: "image", url: blank, coordinates: corners(e.grids.b) });
+      map.addLayer({ id: "skyb", type: "raster", source: "skyb", layout: { visibility: "none" }, paint: { "raster-opacity": 0.82, "raster-resampling": "linear", "raster-fade-duration": 0 } }, firstSymbol);
+      map.addSource("wx", { type: "image", url: blank, coordinates: corners(e.grids.b) });
+      map.addLayer({ id: "wx", type: "raster", source: "wx", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-resampling": "linear", "raster-fade-duration": 0 } }, firstSymbol);
       const [counties, towns] = await Promise.all([fetchJson<FeatureCollection>("counties.geojson"), fetchJson<FeatureCollection>("towns.geojson")]);
       map.addSource("counties", { type: "geojson", data: counties });
       map.addLayer({ id: "counties", type: "line", source: "counties", paint: { "line-color": "#d9d2bd", "line-opacity": 0.45, "line-width": 1 } });
@@ -131,6 +142,22 @@ export default function MapView() {
         "text-font": ["Noto Sans Regular"], "text-variable-anchor": ["bottom", "left", "right", "top"], "text-radial-offset": 0.9,
         "symbol-sort-key": ["to-number", ["get", "rank"]], "text-padding": 1 },
         paint: { "text-color": "#f6d28b", "text-halo-color": "#05070d", "text-halo-width": 1.6 } });
+      map.addSource("spots", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "spots", type: "circle", source: "spots", layout: { visibility: "none" }, paint: { "circle-radius": 7, "circle-color": "#8fe38f", "circle-stroke-color": "#05070d", "circle-stroke-width": 1.5 } });
+      map.addLayer({ id: "spot-labels", type: "symbol", source: "spots", layout: { visibility: "none", "text-field": ["get", "rank"], "text-size": 10, "text-font": ["Noto Sans Regular"], "text-allow-overlap": true }, paint: { "text-color": "#05070d" } });
+      map.addSource("spot-sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "spot-sel", type: "circle", source: "spot-sel", layout: { visibility: "none" }, paint: { "circle-radius": 11, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#f6b44b", "circle-stroke-width": 2.5 } });
+      map.on("click", (ev) => {
+        if (useStore.getState().tab !== "stargaze") return;
+        const f = map.queryRenderedFeatures(ev.point, { layers: ["spots"] })[0];
+        if (f) {
+          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+          const sp = useStargaze.getState().spots.find((x) => String(x.rank) === String(f.properties?.rank));
+          useStargaze.getState().setSpot({ lat, lon, name: sp ? `${e.region_county_names[sp.county] ?? sp.county} #${sp.rank}` : undefined });
+        } else useStargaze.getState().setSpot({ lat: +ev.lngLat.lat.toFixed(4), lon: +ev.lngLat.lng.toFixed(4) });
+      });
+      map.on("mouseenter", "spots", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "spots", () => { map.getCanvas().style.cursor = ""; });
       // Catalog install markers (Build tab): clustered by count, colored by slot.
       map.addSource("installs", { type: "geojson", data: { type: "FeatureCollection", features: [] }, cluster: true, clusterRadius: 45,
         clusterMaxZoom: 13, clusterProperties: { units: ["+", ["get", "units"]] } });
@@ -234,7 +261,7 @@ export default function MapView() {
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    const show = view === "fixtures";
+    const show = view === "fixtures" && !stargaze;
     map.setLayoutProperty("fixtures", "visibility", show ? "visible" : "none");
     if (show && !(map.getSource("fixtures") as GeoJSONSource & { _loaded?: boolean })._loaded) {
       fetchJson<FeatureCollection>("fixtures_surveyed.geojson").then((fc) => {
@@ -243,7 +270,7 @@ export default function MapView() {
         src._loaded = true;
       });
     }
-  }, [ready, view]);
+  }, [ready, view, stargaze]);
 
   // ---- catalog install markers
   const params = m.params;
@@ -284,8 +311,8 @@ export default function MapView() {
     const map = mapRef.current;
     if (!ready || !map || !map.getSource("installs")) return;
     (map.getSource("installs") as GeoJSONSource).setData(installs);
-    for (const id of ["install-clusters", "install-count", "install-points"]) map.setLayoutProperty(id, "visibility", observatory ? "none" : "visible");
-  }, [ready, installs, observatory]);
+    for (const id of ["install-clusters", "install-count", "install-points"]) map.setLayoutProperty(id, "visibility", planner ? "visible" : "none");
+  }, [ready, installs, planner]);
 
   // ---- Module B heatmap and candidates
   useEffect(() => {
@@ -294,13 +321,78 @@ export default function MapView() {
     map.setLayoutProperty("score", "visibility", observatory && mc.score && !priceView ? "visible" : "none");
     map.setLayoutProperty("price", "visibility", observatory && priceView ? "visible" : "none");
     map.setLayoutProperty("candidate-price", "visibility", observatory && priceView ? "visible" : "none");
-    map.setLayoutProperty("sky", "visibility", observatory ? "none" : "visible");
+    map.setLayoutProperty("sky", "visibility", planner ? "visible" : "none");
     for (const id of ["candidates", "candidate-labels"]) map.setLayoutProperty(id, "visibility", observatory ? "visible" : "none");
-    for (const id of ["rings"]) map.setLayoutProperty(id, "visibility", observatory ? "none" : "visible");
-    if (observatory && !wasObservatory.current) map.fitBounds([[e.grids.b.west, e.grids.b.south], [e.grids.b.east, e.grids.b.north]], { padding: 20, duration: 600 });
-    else if (!observatory && wasObservatory.current) map.fitBounds([[e.grids.a15.west, e.grids.a15.south], [e.grids.a15.east, e.grids.a15.north]], { padding: 10, duration: 600 });
-    wasObservatory.current = observatory;
-  }, [ready, observatory, mc.score, priceView, e]);
+    for (const id of ["rings"]) map.setLayoutProperty(id, "visibility", planner ? "visible" : "none");
+    for (const id of ["skyb", "spots", "spot-labels", "spot-sel"]) map.setLayoutProperty(id, "visibility", stargaze ? "visible" : "none");
+    map.setLayoutProperty("wx", "visibility", stargaze && sg.overlay !== "none" ? "visible" : "none");
+    const modeNow = observatory ? "observatory" : stargaze ? "stargaze" : "planner";
+    if (modeNow !== prevMode.current) {
+      const g = modeNow === "planner" ? e.grids.a15 : e.grids.b;
+      map.fitBounds([[g.west, g.south], [g.east, g.north]], { padding: modeNow === "planner" ? 10 : 20, duration: 600 });
+    }
+    prevMode.current = modeNow;
+  }, [ready, observatory, stargaze, planner, mc.score, priceView, sg.overlay, e]);
+
+  // ---- Stargaze layers
+  useEffect(() => {
+    const map = mapRef.current;
+    const r = mc.data?.raw;
+    if (!ready || !map || !stargaze || !r?.sky) return;
+    const url = paint(e.grids.b, (i) => { const v = r.sky[i]; if (!Number.isFinite(v) || !(mc.data!.county[i] >= 0)) return [0, 0, 0, 0]; const [cr, cg, cb] = skyColor(v); return [cr, cg, cb, 255]; });
+    (map.getSource("skyb") as ImageSource).updateImage({ url, coordinates: corners(e.grids.b) });
+  }, [ready, stargaze, mc.data, e]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const g = sg.grid;
+    if (!ready || !map || !stargaze || !g || sg.hour === null || sg.overlay === "none") return;
+    const h = hourIndex(g.times, sg.hour);
+    if (sg.overlay === "clouds") {
+      // Upsample the forecast grid 8x with bilinear interpolation; white with opacity = cloud cover.
+      const W = (g.nx - 1) * 8, H = (g.ny - 1) * 8, east = g.west + (g.nx - 1) * g.step, north = g.south + (g.ny - 1) * g.step;
+      const url = paint({ west: g.west, south: g.south, east, north, res_deg: g.step / 8, nx: W, ny: H, dx_km: 0, dy_km: 0 }, (i) => {
+        const lon = g.west + ((i % W) + 0.5) * (g.step / 8), lat = north - (Math.floor(i / W) + 0.5) * (g.step / 8);
+        const c = cloudAt(g, h, lat, lon);
+        return [236, 240, 247, Math.round(Math.min(1, Math.max(0, c / 100)) ** 0.8 * 215)];
+      });
+      (map.getSource("wx") as ImageSource).updateImage({ url, coordinates: [[g.west, north], [east, north], [east, g.south], [g.west, g.south]] });
+    } else if (mc.data) {
+      // Dark & clear: modeled darkness x forecast clear sky x usable darkness (Sun/Moon) at that hour.
+      const st = skyState(g.times[h], 29.6, -82.5);
+      const dark = darknessFactor(st.sun.alt, st.moon.alt, st.moon.illum);
+      const d = mc.data;
+      const url = paint(e.grids.b, (i) => {
+        const v = d.raw.sky[i];
+        if (!Number.isFinite(v) || !(d.county[i] >= 0) || !Number.isFinite(d.raw.elevation?.[i])) return [0, 0, 0, 0];
+        const [lon, lat] = cellLonLat(e.grids.b, i);
+        const s = Math.min(1, Math.max(0, (v - 20) / 2)) * (1 - cloudAt(g, h, lat, lon) / 100) * dark;
+        const [cr, cg, cb] = scoreColor(s);
+        return [cr, cg, cb, 200];
+      });
+      (map.getSource("wx") as ImageSource).updateImage({ url, coordinates: corners(e.grids.b) });
+    }
+  }, [ready, stargaze, sg.grid, sg.hour, sg.overlay, mc.data, e]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !map.getSource("spots")) return;
+    (map.getSource("spots") as GeoJSONSource).setData({ type: "FeatureCollection", features: sg.spots.map((s) => ({
+      type: "Feature", properties: { rank: String(s.rank) }, geometry: { type: "Point", coordinates: [s.lon, s.lat] } })) });
+  }, [ready, sg.spots]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !map.getSource("spot-sel")) return;
+    (map.getSource("spot-sel") as GeoJSONSource).setData({ type: "FeatureCollection", features: sg.spot
+      ? [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [sg.spot.lon, sg.spot.lat] } }] : [] });
+  }, [ready, sg.spot]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !sg.spot || !sg.fly) return;
+    map.easeTo({ center: [sg.spot.lon, sg.spot.lat], zoom: Math.max(map.getZoom(), 9.5), duration: 700 });
+  }, [ready, sg.fly]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Land-price surface: market $/acre from nearby qualified vacant-land sales; mostly-public parcels in blue.
   useEffect(() => {
@@ -346,7 +438,7 @@ export default function MapView() {
   return (
     <div className="relative h-full w-full">
       <div ref={ref} className="h-full w-full" role="application" aria-label="Map of projected zenith sky brightness" />
-      {!observatory && (
+      {planner && (
         <div className="absolute left-2 top-2 flex flex-wrap gap-1 rounded-lg bg-ink-950/80 p-1 backdrop-blur" role="radiogroup" aria-label="Map layer">
           {[...VIEWS, ...(e.viirs ? VIIRS_VIEWS : [])].map((v) => (
             <button key={v.value} role="radio" aria-checked={view === v.value} onClick={() => setView(v.value)}
@@ -362,8 +454,9 @@ export default function MapView() {
           ))}
         </div>
       )}
-      <Legend view={observatory ? (priceView ? "price" : "score") : view} mode={mode} lift={lift} anchor={costAnchor} />
-      {view === "viirs" && e.viirs && !observatory && (
+      {stargaze && <StargazeControls />}
+      <Legend view={observatory ? (priceView ? "price" : "score") : stargaze ? `stargaze-${sg.overlay}` : view} mode={mode} lift={lift} anchor={costAnchor} />
+      {view === "viirs" && e.viirs && planner && (
         <label className="absolute left-2 top-12 flex items-center gap-2 rounded-lg bg-ink-950/80 px-2 py-1 text-xs text-star-300 backdrop-blur">
           VNP46A2 {year}
           <input type="range" min={e.viirs.years[0]} max={e.viirs.years[e.viirs.years.length - 1]} value={year} onChange={(ev) => setYear(Number(ev.target.value))} className="accent-amber-400" aria-label="VIIRS year" />
@@ -374,7 +467,38 @@ export default function MapView() {
         const c = mc.candidates.find((x) => x.rank === hover.rank);
         return c ? <CandidateLabel c={c} x={hover.x} y={hover.y} width={ref.current?.clientWidth ?? 0} /> : null;
       })()}
-      {!d.basis && !observatory && <div className="absolute right-12 top-2 rounded bg-ink-900/90 px-2 py-1 text-[11px] text-star-300">Loading scenario layers…</div>}
+      {!d.basis && planner && <div className="absolute right-12 top-2 rounded bg-ink-900/90 px-2 py-1 text-[11px] text-star-300">Loading scenario layers…</div>}
+    </div>
+  );
+}
+
+/** Stargaze map controls: overlay choice and the forecast time slider. */
+function StargazeControls() {
+  const sg = useStargaze();
+  const g = sg.grid;
+  const idx = g && sg.hour !== null ? hourIndex(g.times, sg.hour) : 0;
+  const t = g?.times[idx];
+  const st = t ? skyState(t, 29.6, -82.5) : null;
+  return (
+    <div className="absolute left-2 top-2 w-[min(22rem,calc(100%-4rem))] rounded-lg bg-ink-950/85 p-2 text-[11px] text-star-300 backdrop-blur">
+      <div className="flex flex-wrap items-center gap-1" role="radiogroup" aria-label="Weather overlay">
+        {([["clouds", "Clouds"], ["score", "Dark & clear"], ["none", "Off"]] as const).map(([v, label]) => (
+          <button key={v} role="radio" aria-checked={sg.overlay === v} onClick={() => sg.setOverlay(v)}
+            className={`rounded px-2 py-0.5 ${sg.overlay === v ? "bg-amber-400 text-ink-950" : "hover:bg-ink-800"}`}>{label}</button>
+        ))}
+        <span className={`ml-auto rounded px-1.5 text-[10px] ${g?.source === "sim" ? "bg-amber-400/20 text-amber-400" : "bg-glow-400/15 text-glow-400"}`}>
+          {g ? (g.source === "sim" ? "SIMULATED" : "LIVE forecast") : "loading…"}</span>
+      </div>
+      {g && t !== undefined && (
+        <>
+          <input type="range" min={0} max={g.times.length - 1} value={idx} onChange={(ev) => sg.setHour(g.times[Number(ev.target.value)])}
+            className="mt-1 w-full accent-amber-400" aria-label="Forecast hour" />
+          <div className="flex justify-between">
+            <span className="font-semibold text-star-100">{siteTimeLabel(t, true)}</span>
+            <span className="text-star-500">{st?.twilight}{st && st.moon.alt > 0 ? ` · Moon ${Math.round(st.moon.illum * 100)}% up` : ""}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -433,7 +557,14 @@ function exportPng(map: maplibregl.Map | null) {
 
 function Legend({ view, mode, lift, anchor }: { view: string; mode: string; lift: string; anchor?: { best: number; worst: number } }) {
   let body;
-  if (view === "price" && anchor) {
+  const skyBar = <><div className="flex h-2 w-44 overflow-hidden rounded">{[...SKY_LEGEND].reverse().map((s) => <div key={s.mag} className="flex-1" style={{ background: s.css }} />)}</div>
+    <div className="flex justify-between text-[10px]"><span>17.8 urban</span><span>modeled sky</span><span>22.0 natural</span></div></>;
+  if (view.startsWith("stargaze")) {
+    body = <>{view === "stargaze-score" ? <><div className="h-2 w-44 rounded" style={{ background: "linear-gradient(90deg, rgb(30,40,70), rgb(90,140,140), rgb(255,240,120))" }} />
+      <div className="flex justify-between text-[10px]"><span>poor</span><span>dark &amp; clear now</span><span>best</span></div></> : <>{skyBar}
+      {view === "stargaze-clouds" && <div className="mt-1 flex items-center gap-1 text-[10px]"><span className="inline-block h-2 w-8 rounded-sm" style={{ background: "linear-gradient(90deg, rgba(236,240,247,0.1), rgba(236,240,247,0.9))" }} /> forecast cloud cover</div>}</>}
+      <div className="mt-1 text-[10px] text-star-500">{WX_ATTRIBUTION}</div></>;
+  } else if (view === "price" && anchor) {
     const css = (v: number) => `rgb(${priceColor(v, anchor.best, anchor.worst).map(Math.round).join(",")})`;
     body = <><div className="h-2 w-44 rounded" style={{ background: `linear-gradient(90deg, ${css(anchor.best)}, ${css(Math.sqrt(anchor.best * anchor.worst))}, ${css(anchor.worst)})` }} />
       <div className="flex justify-between text-[10px]"><span>${fmtInt(anchor.best)}</span><span>market $/acre</span><span>${fmtInt(anchor.worst)}+</span></div>

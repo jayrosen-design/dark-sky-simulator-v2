@@ -55,7 +55,11 @@ export default function SitesPanel() {
       <Card title={`All-sky view · ${focused.name}`}>
         <p className="mb-2 text-xs text-star-300">Scenario: {formatSky(m.growthOn && focused.futureScnMag !== null ? focused.futureScnMag : focused.scnMag, m.table)}</p>
         <Suspense fallback={<div className="h-64 animate-pulse rounded-lg bg-ink-800" />}>
-          <SkyDome site={focused} />
+          <SkyDome sites={m.sites} onPickSite={setFocus} place={{
+            id: focused.id, name: focused.name, lat: m.e.sites.find((s) => s.id === focused.id)!.lat, lon: m.e.sites.find((s) => s.id === focused.id)!.lon,
+            modelMag: m.growthOn && focused.futureScnMag !== null ? focused.futureScnMag : focused.scnMag, baseMag: focused.baseMag,
+            note: m.growthOn && focused.futureScnMag !== null ? String(2024 + m.years) : undefined,
+          }} />
         </Suspense>
         <p className="mt-1 text-[11px] text-star-500">Drag to look around, scroll to zoom. Stars, Milky Way, Sun and Moon are placed for the chosen date and site time; named bright stars are at catalog positions, fainter ones are a synthetic field. Star count follows the naked-eye limiting magnitude from the modeled zenith value plus twilight and moonlight (Krisciunas &amp; Schaefer 1991); horizon glow points at the regional light domes; the Moon is drawn 3× size. The modeled artificial light is the scenario's viewing-window value at every hour. Illustrative, not a photograph.</p>
       </Card>

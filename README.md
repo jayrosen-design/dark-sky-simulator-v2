@@ -72,6 +72,11 @@ market and tax-roll estimates for a chosen site size, public/private ownership, 
 existing buildings ([ADR 0006](docs/adr/0006-land-pricing.md)). A *Land prices* map toggle swaps the suitability
 heatmap for a market $/acre surface (mostly-public land in blue) and labels each candidate with its price range;
 hovering a candidate shows its score, sky, land and location.
+**Stargaze** tab for astronomers, astrophotographers, campers and land buyers: pick a use (grab & go, camp /
+star party, deep-sky imaging, buy property) for ranked spots; a live cloud forecast (or a labeled simulation) and a
+"dark & clear" layer on the map with an hour slider; click anywhere for a spot report (sky, light domes, horizon,
+access, ownership, land price, tonight's darkness and Moon, an hourly Clear-Sky-Chart-style forecast with
+transparency/seeing proxies and dew risk), a sky view at that spot, saved spots and directions ([ADR 0008](docs/adr/0008-stargaze-mode.md)).
 A **Budget** readout on the map (every tab but Observatory) keeps public cost, yearly savings, payback, 15-year ROI
 and a cumulative cash chart in view for the current scenario; it collapses to one line and links to the Costs tab.
 
@@ -151,6 +156,7 @@ midnight it is +0.15 mag. See
 | OSM sports venues | 2,304 candidates; 1,229 modeled inside the eight counties (lit-tagged, stadiums, untagged at 50%) |
 | Florida DOR 2025 parcels (FGIO statewide centroids) | 91,929 parcels ≥ 5 acres in the 11 region counties; 1,205 qualified vacant-land sales 2021–2025 |
 | DarkSky Approved luminaires | searchable list only, no prices or data feed; cards are generic types that link to it |
+| Open-Meteo forecast + air quality (Stargaze, live in the browser) | hourly cloud (0.2° grid), humidity, dew point, wind, 250 hPa wind, aerosol optical depth; CC BY 4.0, free for non-commercial use |
 | Census | TIGERweb 2020 counts (the ACS API now needs a key, so the private stock uses the Alachua structure blend, 1.379 fixtures per housing unit) |
 | 3DEP, FNAI, Globe at Night | pulled |
 
@@ -164,6 +170,7 @@ See [docs/adr/](docs/adr/). In short:
 5. Lighter Python stack: NumPy/SciPy/Shapely/tifffile instead of GeoPandas/rasterio/rio-pmtiles/tippecanoe. ([ADR 0005](docs/adr/0005-python-stack.md))
 6. Land and facility pricing from the DOR tax roll and recorded sales; land-cost criterion at weight 0 by default. ([ADR 0006](docs/adr/0006-land-pricing.md))
 7. Build mode catalog, sports lighting source, and evening viewing time (not PRD requirements; added on request). ([ADR 0007](docs/adr/0007-build-mode-catalog-sports.md))
+8. Stargaze mode with live Open-Meteo weather (not a PRD requirement; added on request). ([ADR 0008](docs/adr/0008-stargaze-mode.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
