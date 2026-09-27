@@ -86,6 +86,7 @@ export default function MapView() {
   const [venues, setVenues] = useState<FeatureCollection | null>(null);
   const prevMode = useRef<"planner" | "observatory" | "stargaze">("planner");
   const [is3D, setIs3D] = useState(false);              // planner tabs: terrain, buildings and light sources in 3D
+  const [lightOpacity, setLightOpacity] = useState(0.55); // 3D: transparency of the sky-brightness (light) map over the terrain
   const [zoom, setZoom] = useState(8);
   const [surveyed, setSurveyed] = useState<FeatureCollection | null>(null);
   const [hover, setHover] = useState<{ rank: number; x: number; y: number } | null>(null);
@@ -347,12 +348,11 @@ export default function MapView() {
     const map = mapRef.current;
     if (!ready || !map) return;
     set3D(map, show3D, 3);
-    // The ~450 m sky-brightness cells look blotchy at street level: fade them out as you zoom in in 3D.
-    map.setPaintProperty("sky", "raster-opacity", show3D ? ["interpolate", ["linear"], ["zoom"], 11, 0.6, 14, 0.12] : 0.82);
     if (show3D) {
       map.setMaxPitch(75);
       map.dragRotate.enable();
       map.touchZoomRotate.enableRotation();
+      map.keyboard.enableRotation();
       map.easeTo({ pitch: 60, duration: 800 });
       if (!surveyed) fetchJson<FeatureCollection>("fixtures_surveyed.geojson").then(setSurveyed);
       if (!venues) fetchJson<FeatureCollection>("sports_venues.geojson").then(setVenues);
@@ -362,6 +362,30 @@ export default function MapView() {
       map.touchZoomRotate.disableRotation();
     }
   }, [ready, show3D]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (ready && map) map.setPaintProperty("sky", "raster-opacity", show3D ? lightOpacity : 0.82);
+  }, [ready, show3D, lightOpacity]);
+
+  // Trackpad navigation in 3D: two-finger swipe pans, pinch (reported as Ctrl + wheel) zooms at the pointer,
+  // Shift/Alt + swipe rotates and tilts; a mouse wheel still zooms.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !show3D) return;
+    const box = map.getCanvasContainer();
+    const onWheel = (ev: WheelEvent) => {
+      ev.preventDefault();
+      const r = box.getBoundingClientRect(), at = map.unproject([ev.clientX - r.left, ev.clientY - r.top]);
+      const mouseWheel = ev.deltaMode === 1 || (ev.deltaX === 0 && Math.abs(ev.deltaY) >= 50 && Number.isInteger(ev.deltaY));
+      if (ev.ctrlKey || mouseWheel) map.easeTo({ zoom: map.getZoom() - ev.deltaY * (ev.ctrlKey ? 0.012 : 0.0025), around: at, duration: 0 });
+      else if (ev.shiftKey || ev.altKey) map.easeTo({ bearing: map.getBearing() + ev.deltaX * 0.3, pitch: Math.min(75, Math.max(0, map.getPitch() - ev.deltaY * 0.25)), duration: 0 });
+      else map.panBy([ev.deltaX, ev.deltaY], { duration: 0 });
+    };
+    map.scrollZoom.disable();
+    box.addEventListener("wheel", onWheel, { passive: false });
+    return () => { box.removeEventListener("wheel", onWheel); map.scrollZoom.enable(); };
+  }, [ready, show3D]);
 
   const lampInputs = useRef<() => void>(() => undefined);
   lampInputs.current = () => {
@@ -506,11 +530,18 @@ export default function MapView() {
         </div>
       )}
       {show3D && (
-        <div className={`pointer-events-none absolute bottom-24 left-2 max-w-[17rem] rounded-lg bg-ink-950/80 p-2 text-[10px] text-star-300 backdrop-blur ${lift}`}>
-          <b className="text-star-100">3D</b> · terrain ×3 · right-drag or Ctrl-drag to tilt and turn.
-          {zoom < 14 ? " Zoom in to street level to see buildings and each modeled light." : " Mapped streetlights at their surveyed spots; modeled lights spread along the roads of their ~450 m cell (streetlights on the road, business and porch lights set back from it). Lamp color = fixture type (equipped cards recolor their share); sports towers light up in the evening view."}
+        <div className={`absolute bottom-24 left-2 max-w-[17rem] rounded-lg bg-ink-950/85 p-2 text-[10px] text-star-300 backdrop-blur ${lift}`}>
+          <b className="text-star-100">3D</b> · terrain ×3
+          <label className="mt-1 flex items-center gap-2">Light map
+            <input type="range" min={0} max={100} value={Math.round(lightOpacity * 100)} onChange={(ev) => setLightOpacity(Number(ev.target.value) / 100)}
+              className="w-24 accent-amber-400" aria-label="Light map transparency" />
+            <span className="tabular-nums">{Math.round(lightOpacity * 100)}%</span>
+          </label>
+          <div className="mt-1 text-star-500">Trackpad: two-finger swipe pans · pinch zooms · Shift + swipe turns and tilts. Mouse: wheel zooms, right-drag tilts. Keys: arrows pan, Shift + arrows turn/tilt, +/− zoom.</div>
+          <div className="mt-1">{zoom < 14 ? "Zoom in to street level to see buildings and each modeled light." : "Mapped streetlights at their surveyed spots; modeled lights spread along the roads of their ~450 m cell (streetlights on the road, business and porch lights set back from it). Lamp color = fixture type (equipped cards recolor their share); sports towers light up in the evening view."}</div>
         </div>
       )}
+      {show3D && <CameraPad map={mapRef.current} lift={lift} />}
       {observatory && e.land && (
         <div className="absolute left-2 top-2 flex gap-1 rounded-lg bg-ink-950/80 p-1 backdrop-blur" role="radiogroup" aria-label="Observatory overlay">
           {[{ v: false, label: "Suitability" }, { v: true, label: `Land prices (${acres} ac)` }].map((o) => (
@@ -533,6 +564,25 @@ export default function MapView() {
         return c ? <CandidateLabel c={c} x={hover.x} y={hover.y} width={ref.current?.clientWidth ?? 0} /> : null;
       })()}
       {!d.basis && planner && <div className="absolute right-12 top-2 rounded bg-ink-900/90 px-2 py-1 text-[11px] text-star-300">Loading scenario layers…</div>}
+    </div>
+  );
+}
+
+/** On-screen camera buttons for 3D (for trackpads and touch screens without right-drag). */
+function CameraPad({ map, lift }: { map: maplibregl.Map | null; lift: string }) {
+  if (!map) return null;
+  const btn = "flex h-7 w-7 items-center justify-center rounded bg-ink-950/85 text-sm text-star-100 hover:bg-ink-800";
+  const turn = (d: number) => map.easeTo({ bearing: map.getBearing() + d, duration: 300 });
+  const tilt = (d: number) => map.easeTo({ pitch: Math.min(75, Math.max(0, map.getPitch() + d)), duration: 300 });
+  return (
+    <div className={`absolute bottom-14 right-2 grid grid-cols-3 gap-1 rounded-lg bg-ink-950/60 p-1 backdrop-blur ${lift}`} role="group" aria-label="3D camera">
+      <button className={btn} onClick={() => turn(-20)} aria-label="Turn left" title="Turn left">⟲</button>
+      <button className={btn} onClick={() => tilt(10)} aria-label="Tilt toward horizon" title="Tilt toward horizon">▲</button>
+      <button className={btn} onClick={() => turn(20)} aria-label="Turn right" title="Turn right">⟳</button>
+      <button className={btn} onClick={() => map.zoomOut({ duration: 300 })} aria-label="Zoom out" title="Zoom out">−</button>
+      <button className={btn} onClick={() => tilt(-10)} aria-label="Tilt toward overhead" title="Tilt toward overhead">▼</button>
+      <button className={btn} onClick={() => map.zoomIn({ duration: 300 })} aria-label="Zoom in" title="Zoom in">+</button>
+      <button className={`${btn} col-span-3 w-auto text-[10px]`} onClick={() => map.easeTo({ bearing: 0, pitch: 60, duration: 500 })} aria-label="Reset view to north">Reset north</button>
     </div>
   );
 }

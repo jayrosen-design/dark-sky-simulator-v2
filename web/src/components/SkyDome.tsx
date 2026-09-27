@@ -321,10 +321,17 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       redraw();
     };
     const up = () => { drag = null; };
+    // Pinch (Ctrl + wheel) or a mouse wheel zooms; a two-finger trackpad swipe looks around.
     const wheel = (ev: WheelEvent) => {
       ev.preventDefault();
-      camera.fov = Math.min(100, Math.max(25, camera.fov * (ev.deltaY > 0 ? 1.08 : 1 / 1.08)));
-      camera.updateProjectionMatrix();
+      const mouseWheel = ev.deltaMode === 1 || (ev.deltaX === 0 && Math.abs(ev.deltaY) >= 50 && Number.isInteger(ev.deltaY));
+      if (ev.ctrlKey || mouseWheel) {
+        camera.fov = Math.min(100, Math.max(25, camera.fov * Math.exp(ev.deltaY * (ev.ctrlKey ? 0.01 : 0.0008))));
+        camera.updateProjectionMatrix();
+      } else {
+        yaw -= ev.deltaX * 0.003;
+        pitch = Math.min(1.5, Math.max(frame.current.ov.ground ? -1.2 : -0.1, pitch - ev.deltaY * 0.003));
+      }
       redraw();
     };
     el.addEventListener("pointerdown", down); el.addEventListener("pointermove", move); el.addEventListener("pointerup", up);

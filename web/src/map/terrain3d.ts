@@ -24,10 +24,10 @@ export function add3DLayers(map: MlMap, beforeId?: string) {
   map.addSource("dem", DEM);
   map.addSource("dem-hs", DEM); // hillshade on its own source, as MapLibre recommends alongside terrain
   map.addLayer({ id: "hillshade-3d", type: "hillshade", source: "dem-hs", layout: { visibility: "none" },
-    paint: { "hillshade-exaggeration": 0.6, "hillshade-shadow-color": "#000000", "hillshade-highlight-color": "#3a4460", "hillshade-accent-color": "#10131c" } }, beforeId);
+    paint: { "hillshade-exaggeration": 0.5, "hillshade-shadow-color": "#05070d", "hillshade-highlight-color": "#5a6682", "hillshade-accent-color": "#1a1f2c" } }, beforeId);
   map.addLayer({ id: "buildings-3d", type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
     filter: ["!=", ["get", "hide_3d"], true], layout: { visibility: "none" },
-    paint: { "fill-extrusion-color": "#1c2230", "fill-extrusion-opacity": 0.92,
+    paint: { "fill-extrusion-color": "#34405a", "fill-extrusion-opacity": 0.85, "fill-extrusion-vertical-gradient": true,
       "fill-extrusion-height": ["coalesce", ["get", "render_height"], 6], "fill-extrusion-base": ["coalesce", ["get", "render_min_height"], 0] } });
   map.addSource("lamp-pools", { type: "geojson", data: emptyFC<Point>() });
   map.addLayer({ id: "lamp-pools", type: "circle", source: "lamp-pools", layout: { visibility: "none" },
