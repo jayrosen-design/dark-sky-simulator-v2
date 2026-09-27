@@ -1,0 +1,125 @@
+# County data package manifest — Alachua (12001). Data only, never code (PRD 0B).
+fips: "12001"
+name: Alachua
+package_version: 2.0.0-seed
+# Fixture stocks. Each stock belongs to one selection group (GRU, Municipal, Utility, FDOT, Private).
+# Counts: PRD 6.5 [GNV-ASSESS] (modeled, confidence 0.4). lm: "public" = typical 185 W HPS system at 90 lm/W for
+# HPS/MH and x retrofit_lumen_ratio for LED (seed/engine_defaults.yaml); "residential"/"commercial" = private rows.
+# Tech mix: GRU from 6.5; other public stocks reuse the Levy corpus mix (65% HPS / 35% LED 4000K, [ECON-RETRO]).
+stocks:
+  - id: gru
+    group: GRU
+    owners: {GRU: 30000}
+    n: 30000
+    public: true
+    confidence: 0.4
+    lm: public
+    spd_mix: {HPS: 0.40, LED3000: 0.60}
+    spd_mix_provenance: corpus (6.5 GRU HPS/3000K LED mix 40/60)
+    u_mix: {HPS: {3: 1.0}, LED3000: {0: 1.0}}
+    tariff: {GRU: 1.0}
+    placement: {roads_in_places: [Gainesville]}
+  - id: municipal
+    group: Municipal
+    owners: {City of Newberry: 1000, City of Alachua: 1750}
+    n: 2750
+    public: true
+    confidence: 0.4
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: design_assumption (Levy corpus mix reused)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    placement: {roads_in_places: [Newberry, Alachua], split_by_place: {Newberry: 1000, Alachua: 1750}}
+  - id: gnv_public_works
+    group: Municipal
+    owners: {City of Gainesville Public Works: surveyed}
+    n: surveyed          # Socrata tk33-9jw3 points (not part of the 43,250 in 6.5)
+    public: true
+    confidence: 0.9
+    lm: public
+    spd_mix: {LED4000: 1.0}
+    spd_mix_provenance: "Socrata led_type FLED; CCT not published, worst-case 4000K per 2.2"
+    u_mix: {LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    placement: {surveyed_points: socrata}
+  - id: utility
+    group: Utility
+    owners: {Duke: 4000, Clay: 5000}
+    n: 9000
+    public: true
+    confidence: 0.4
+    lm: public
+    spd_mix: {HPS: 0.80, LED4000: 0.20}
+    spd_mix_provenance: design_assumption (Clay "mostly HPS security lights, U4" per 6.5; Duke share uses Levy mix)
+    u_mix: {HPS: {3: 0.45, 4: 0.55}, LED4000: {0: 1.0}}
+    tariff: {Duke: 0.444, Clay: 0.556}
+    placement: {roads_outside_places: [Gainesville, Newberry, Alachua]}
+  - id: fdot
+    group: FDOT
+    owners: {FDOT D2: 1500}
+    n: 1500
+    public: true
+    confidence: 0.3
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: design_assumption (Levy corpus mix reused)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    placement: {major_roads: true}
+    note: "FDOT RCI Feature 341 (District 2) is not published at the PRD endpoint (checked 2026-09-26); count spread along TIGER primary/secondary roads."
+  - id: private_residential
+    group: Private
+    owners: {private: census}
+    n: census_housing     # housing units x private_fixtures_per_hu_blended
+    public: false
+    confidence: 0.3
+    lm: residential
+    spd_mix: {LED3000: 0.45, LED4000: 0.45, HPS: 0.10}
+    spd_mix_provenance: design_assumption (no corpus SPD mix for private stock; research prompt D4)
+    u_mix: {LED3000: {0: 0.2, 3: 0.5, 4: 0.3}, LED4000: {0: 0.2, 3: 0.5, 4: 0.3}, HPS: {3: 0.6, 4: 0.4}}
+    tariff: {}
+    placement: {housing: all}
+  - id: private_commercial
+    group: Private
+    owners: {private: census}
+    n: commercial_flux    # total flux = residential flux x commercial_to_residential_flux, at commercial_fixture_lm
+    public: false
+    confidence: 0.3
+    lm: commercial
+    spd_mix: {LED4000: 0.50, MH: 0.30, HPS: 0.20}
+    spd_mix_provenance: design_assumption (no corpus SPD mix for commercial stock; research prompt D4)
+    u_mix: {LED4000: {0: 0.5, 3: 0.2, 4: 0.3}, MH: {0: 0.3, 4: 0.7}, HPS: {0: 0.3, 3: 0.4, 4: 0.3}}
+    tariff: {}
+    placement: {housing: towns}   # housing units in incorporated places or urban block groups
+  - id: sports
+    group: Sports
+    owners: {"schools, parks, clubs (OSM venues)": osm}
+    n: osm_sports          # venues x fixtures per venue type x lit probability (seed/engine_defaults.yaml)
+    public: true           # mostly school boards and parks; costs counted as public
+    confidence: 0.3
+    lm: sports
+    hours: sports          # seed sports_hours: off in the 01:00-04:00 SQM window
+    burn_hours: sports
+    spd_mix: {MH: 0.6, LED4000: 0.4}
+    spd_mix_provenance: design_assumption (legacy metal halide still common on fields; no inventory)
+    u_mix: {MH: {3: 0.3, 4: 0.7}, LED4000: {1: 0.5, 3: 0.5}}
+    tariff: {generic: 1.0}
+    placement: {osm_sports: true}
+ordinance_seed: "ULDC Art. XIV, trespass 0.5 fc, single-family exemption < 2,250 lm, no CCT cap; Gainesville Sec. 30-6.12 full cutoff, exemption < 1,800 lm (6.5)"
+trend_seed:   # [AC-EPAC] measured VIIRS 2012-2024, corpus values shown until the VIIRS stack is loaded
+  county_pct: 19
+  lit_area_pct: [16, 21]
+  gainesville_pct: 6
+  city_of_alachua_pct: 10
+  paynes_prairie_vicinity_pct: 15
+sites:
+  - {id: GNV-Downtown,  name: Downtown Gainesville,        lat: 29.652, lon: -82.325, seed_mag: 18.3, seed_bortle: "8-9", role: Urban core}
+  - {id: GNV-Suburban,  name: Suburban Gainesville,        lat: 29.680, lon: -82.380, seed_mag: 19.3, seed_bortle: "6",   role: Suburban}
+  - {id: PP-Overlook,   name: Paynes Prairie Overlook,     lat: 29.580, lon: -82.300, seed_mag: 20.9, seed_bortle: "4",   role: Protected asset; SQM station}
+  - {id: SF-Entrance,   name: San Felasco Hammock entrance, lat: 29.680, lon: -82.420, seed_mag: 20.4, seed_bortle: "5",  role: SQM station}
+  - {id: NB-Rural,      name: Newberry rural control,      lat: 29.646, lon: -82.606, seed_mag: 21.0, seed_bortle: "4",   role: SQM control}
+sources:
+  socrata_gnv_lights: {url: "https://data.cityofgainesville.org/resource/tk33-9jw3.geojson?$limit=50000", confidence: 0.9}
+  cityworks_test:     {url: "https://gis.alachuacounty.us/arcgis/rest/services/CityWorks/AlachuaCountyAssets_for_test_site/FeatureServer/0", confidence: 0.9}
+  osm: "Overpass bbox query over the Module A grid (highway=street_lamp, utility=street_lighting)"

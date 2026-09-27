@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+data_raw/
+web/node_modules/
+web/dist/
+web/coverage/
+*.tsbuildinfo
+.vercel/

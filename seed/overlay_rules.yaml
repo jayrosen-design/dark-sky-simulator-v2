@@ -1,0 +1,22 @@
+# Dark Sky Overlay Zone rules applied to every fixture inside a zone (the zone itself is the selection, A-01).
+# Source: [LEVY-OVERLAY] Levy County Dark Sky Overlay Strategy, Phase 2 (Research/Levy.md).
+version: 2.0.0
+lz0:
+  default_radius_mi: 2
+  radius_options_mi: [1, 2, 3]
+  shielding_target_u: 0          # "fully shielded (U0 BUG rating)"
+  spd: NBA                       # "narrow-spectrum amber LEDs"
+  motion_only: true              # "exclusively on heavily calibrated motion sensors"
+  provenance: corpus [LEVY-OVERLAY]
+lz1:
+  default_radius_mi: 5
+  radius_options_mi: [3, 5, 7, 10]
+  shielding_target_u: 0          # "Zero uplight is permitted in Zones LZ0 and LZ1"
+  cct_cap: LED2700               # "correlated color temperature must be statutorily capped at 2,700 Kelvin"
+  lm_per_net_acre_cap: 17500     # shown as an ordinance parameter; parcel-level caps are not modeled in v2.0 (no parcels loaded)
+  provenance: corpus [LEVY-OVERLAY]
+# Motion-only operation has no measured duty cycle in the corpus. v2.0 models it as the lowest dim level
+# in the PRD curfew range (30%) for the whole night: a conservative (under-crediting) assumption.
+motion_only_equivalent_dim_pct: {value: 30, provenance: design_assumption, ref: "PRD 3 curfew dim range 30-70%"}
+# Ring edges (miles) used to precompute overlay basis layers; every radius option must be an edge.
+ring_edges_mi: [1, 2, 3, 5, 7, 10]

@@ -1,0 +1,78 @@
+# core.engine_defaults — PRD/TRD Section 6.1 (+ v2.0 derived rows marked).
+# Every constant the engine or client uses must trace to a row here or in another seed/ file.
+# provenance: literature | corpus | corpus_estimate | design | derived | design_assumption | v1_heuristic
+version: 2.0.0
+params:
+  natural_zenith_mag:        {value: 22.0, unit: mag/arcsec2, provenance: literature, ref: "6.1; [GIS-CAL]"}
+  mag_zero_point:            {value: 12.6, unit: mag, provenance: literature, ref: "6.1 m = 12.6 - 2.5 log10(L_v)"}
+  lux_to_mag_offset:         {value: -14.18, unit: mag, provenance: corpus, ref: "6.1 node fallback (HARD)"}
+  hg_g:                      {value: 0.80, min: 0.70, max: 0.90, provenance: literature, ref: "6.1; [DSP-3D]"}
+  turbidity_summer:          {value: 3.5, provenance: corpus_estimate, ref: "6.1 (May-Oct)"}
+  turbidity_winter:          {value: 2.5, provenance: corpus_estimate, ref: "6.1"}
+  source_grid_m:             {value: 500, provenance: design, ref: "6.1"}
+  cutoff_radius_km:          {value: 100, provenance: design, ref: "6.1"}
+  dnb_noise_floor_w_cm2_sr:  {value: 2.5e-10, provenance: literature, ref: "6.1"}
+  viirs_overpass_local:      {value: "01:30", provenance: literature, ref: "6.1 (+/- 30 min)"}
+  sqm_window_start:          {value: "01:00", provenance: design, ref: "6.1"}
+  sqm_window_end:            {value: "04:00", provenance: design, ref: "6.1"}
+  albedo_new_asphalt:        {value: 0.08, provenance: corpus, ref: "6.1 (FDOT)"}
+  albedo_aged_asphalt:       {value: 0.15, provenance: corpus, ref: "6.1 (FDOT)"}
+  albedo_concrete:           {value: 0.37, provenance: corpus, ref: "6.1 (FDOT)"}
+  albedo_vegetation:         {value: 0.05, provenance: corpus, ref: "6.1"}
+  albedo_water:              {value: 0.05, provenance: corpus, ref: "6.1"}
+  albedo_bare_soil:          {value: 0.20, provenance: corpus, ref: "6.1"}
+  # v2.0 has no LULC raster loaded, so the reflected-light term uses one effective albedo.
+  albedo_effective_v2:       {value: 0.15, provenance: design, ref: "v2.0: aged asphalt row used for all lit ground until NLCD is loaded"}
+  pole_height_arterial_m:    {value: 12, provenance: corpus, ref: "6.1 (DSP, GV)"}
+  pole_height_collector_m:   {value: 9, provenance: corpus, ref: "6.1"}
+  pole_height_residential_m: {value: 7, provenance: corpus, ref: "6.1"}
+  pole_height_high_mast_m:   {value: 30, provenance: corpus, ref: "6.1"}
+  burn_hours_per_year:       {value: 4100, provenance: corpus, ref: "6.1 (ECON)"}
+  night_hours:               {value: 11.5, provenance: corpus, ref: "6.4 dimming worked case (5 h of 11.5 h)"}
+  hps_ballast_factor:        {value: 1.18, provenance: corpus, ref: "6.1 (ECON)"}
+  efficacy_hps_lm_w:         {value: 90, provenance: corpus, ref: "6.1"}
+  efficacy_mh_lm_w:          {value: 80, provenance: design_assumption, ref: "not in 6.1; MH row needed for spd_class MH; set between HPS and NBA"}
+  efficacy_led4000_lm_w:     {value: 110, provenance: corpus, ref: "6.1"}
+  efficacy_led3000_lm_w:     {value: 100, provenance: corpus, ref: "6.1"}
+  efficacy_led2700_lm_w:     {value: 100, provenance: design_assumption, ref: "not in 6.1; LED3000 value reused"}
+  efficacy_pca590_lm_w:      {value: 120, provenance: corpus, ref: "6.1"}
+  efficacy_nba_lm_w:         {value: 60, provenance: corpus, ref: "6.1"}
+  # Typical public fixture: 150 W HPS lamp -> 185 W system (6.1 example) at 90 lm/W system efficacy.
+  typical_public_system_w_hps: {value: 185, provenance: corpus, ref: "6.1 HPS ballast example 150 W -> 185 W"}
+  # LED replacement delivers the same task illuminance with fewer lumens. Derived from 6.4:
+  # 450 kWh saved of 185 W x 4100 h = 758 kWh (59%) -> LED system W ~0.41-0.45 of HPS; x efficacy ratio -> ~0.5 lumens.
+  retrofit_lumen_ratio:      {value: 0.50, provenance: derived, ref: "6.4 energy saved HPS->LED 450 kWh/fixture/yr with 6.1 efficacies"}
+  private_residential_lm:    {value: 800, provenance: corpus, ref: "[GNV-ASSESS] 'standard residential porch light is typically 800 lumens'"}
+  commercial_to_residential_flux: {value: 1.0, provenance: corpus_estimate, ref: "[GNV-ASSESS] commercial sites 'contribute a total luminous flux comparable to the entire residential sector'"}
+  private_fixtures_per_sf_unit: {value: 3.0, provenance: corpus, ref: "6.5 / [GNV-ASSESS] 46,259 x 3.0"}
+  private_fixtures_per_other_unit: {value: 0.5, provenance: corpus, ref: "6.5 / [GNV-ASSESS] 85,289 x 0.5"}
+  # Census 2020 counts via TIGERweb carry total housing units only (no structure-type split without an API key),
+  # so v2.0 applies the Alachua blend: (46,259 x 3.0 + 85,289 x 0.5) / 131,548 = 1.379 fixtures per unit.
+  private_fixtures_per_hu_blended: {value: 1.379, provenance: derived, ref: "6.5 [GNV-ASSESS] structure mix"}
+  # Public fixtures sit on lit road length: OSM lit=yes segments count fully; other public roads count in proportion
+  # to housing density, reaching fully lit at this density (typical Gainesville urban block groups). PRD 2.2
+  # "distributed along the served road network".
+  lit_road_full_density_hu_km2: {value: 500, provenance: design, ref: "v2.0 road-network placement of modeled public fixtures"}
+  commercial_fixture_lm:     {value: 20000, provenance: corpus, ref: "[GNV-ASSESS] 'A single parking lot shoebox fixture (20,000 lumens)'"}
+  # U-rating -> upward light output ratio (6.2)
+  ulor_u0: {value: 0.000, provenance: corpus, ref: "6.2"}
+  ulor_u1: {value: 0.003, provenance: corpus, ref: "6.2"}
+  ulor_u2: {value: 0.012, provenance: corpus, ref: "6.2"}
+  ulor_u3: {value: 0.060, provenance: corpus, ref: "6.2"}
+  ulor_u4: {value: 0.180, provenance: corpus, ref: "6.2"}
+  ulor_u5: {value: 0.300, provenance: corpus, ref: "6.2"}
+  seed_growth_rate_per_yr:   {value: 0.015, provenance: corpus, ref: "6.6 (Alachua mean ~1.46%/yr from +19% over 12 yr)"}
+  # Viewing time. Magnitudes default to the SQM window (01:00-04:00, row above); the evening window covers public
+  # star parties, when sports and evening-only lighting are still on.
+  evening_window_start:      {value: "20:30", provenance: design, ref: "v2.0 viewing-time switch"}
+  evening_window_end:        {value: "22:30", provenance: design, ref: "v2.0 viewing-time switch"}
+  # Sports venues (OSM lit pitches, tracks, stadiums). Web survey 2026-09-26, low confidence.
+  sports_fixture_lm:         {value: 157500, provenance: web_survey, ref: "high school football field needs ~3.15M lm (Logos Lighting, 'How many lumens and watts do I really need for football field lighting') over ~20 fixtures"}
+  sports_fixtures_field:     {value: 20, provenance: web_survey, ref: "16-24 fixtures on 4-6 poles per football field (LED Lighting Supply football stadium lights); used for football, soccer, lacrosse, baseball, softball"}
+  sports_fixtures_court:     {value: 6, provenance: web_survey, ref: "4-8 fixtures per tennis court (sportsvenuecalculator.com tennis court lighting guide); used for tennis, pickleball, basketball"}
+  sports_fixtures_track:     {value: 12, provenance: design_assumption, ref: "between court and field"}
+  sports_fixtures_stadium:   {value: 60, provenance: design_assumption, ref: "3x a field; large venues (e.g. UF Ben Hill Griffin) have far more"}
+  sports_untagged_lit_probability: {value: 0.5, provenance: design_assumption, ref: "OSM: 371 venues tagged lit=yes vs 1,665 main-sport pitches in the 8 counties (2026-09-26); untagged ones counted at half"}
+  sports_hours:              {value: "18:00-22:30", provenance: design_assumption, ref: "typical school/park field curfew; lights off in the 01:00-04:00 SQM window"}
+  sports_burn_hours_per_year: {value: 1000, provenance: design_assumption, ref: "~3-4 h on ~300 nights"}
+  efficacy_sports_led_lm_w:  {value: 150, provenance: web_survey, ref: "3.15M lm at 21 kW per field (Logos Lighting)"}

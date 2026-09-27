@@ -1,0 +1,24 @@
+# Module B candidate region and simulation domains. Data only.
+region_name: North Central Florida Regional Planning Council (11 counties)
+region_fips: ["12001", "12007", "12023", "12029", "12041", "12047", "12067", "12075", "12079", "12121", "12125"]
+# Alachua, Bradford, Columbia, Dixie, Gilchrist, Hamilton, Lafayette, Levy, Madison, Suwannee, Union
+# Florida DOR county numbers (alphabetical 11-77) for the parcel roll, keyed by FIPS.
+dor_county_no: {"12001": 11, "12007": 14, "12023": 22, "12029": 25, "12041": 31, "12047": 34, "12067": 44, "12075": 48, "12079": 50, "12121": 71, "12125": 73}
+# Counties modeled fixture by fixture and adjustable in Module A scenarios. Alachua and Levy carry the PRD 6.5
+# seed inventories; the six neighbors use rates derived from them (see their manifests). Everything farther away
+# is a fixed external source.
+model_counties: ["12001", "12075", "12083", "12041", "12107", "12019", "12007", "12125"]
+# Alachua, Levy, Marion, Gilchrist, Putnam, Clay, Bradford, Union
+reference_counties: ["12001", "12075"]   # their public counts define the neighbor per-housing-unit rates
+grids:
+  # Module A detail grid: 15 arc-seconds (VIIRS native, ~500 m), the eight model counties.
+  module_a: {west: -83.40, east: -81.40, south: 28.90, north: 30.25, res_deg: 0.004166666666666667}
+  # Region / source grid: 30 arc-seconds (~1 km). Covers every source within ~100 km of the NCFRPC region edge.
+  region:   {west: -84.60, east: -81.20, south: 28.20, north: 31.00, res_deg: 0.008333333333333333}
+# Regional light domes (6.5 seed), used for 30-degree brightness and as a check on the census emission model.
+light_domes:
+  - {name: Gainesville,  lat: 29.65, lon: -82.32, population: 145000}
+  - {name: Ocala,        lat: 29.19, lon: -82.14, population: 65000}
+  - {name: Jacksonville, lat: 30.33, lon: -81.66, population: 985000}
+  - {name: Tampa,        lat: 27.95, lon: -82.46, population: 400000}
+  - {name: Tallahassee,  lat: 30.44, lon: -84.28, population: 200000}

@@ -1,0 +1,27 @@
+# Scenario presets. PRD 3 A-04 defines both presets; A-04 itself is a v3.0 requirement, but the
+# Groveland-style ordinance is the AI Days headline scenario (0A.5), so v2.0 ships it as a control preset.
+version: 2.0.0
+groveland:
+  label: "Groveland-style ordinance"
+  ref: "PRD 3 A-04; Groveland Ord. 2022-26 [GV-ORD]"
+  params:
+    selection: {groups: [GRU, Municipal, Utility, FDOT, Private], counties: ["12001", "12075"]}
+    shielding: {pct_converted: 100, target_u: 0}
+    cct_cap: LED3000
+    intensity: {pct_reduction: 0}
+    curfew: {enabled: true, start: "22:00", end: "06:30", dim_level_pct: 50, motion_only: false}
+    amortization: {years: 10, public_deadline_years: 5}
+    overlays: {enabled: false, lz0_radius_mi: 2, lz1_radius_mi: 5}
+  notes: "'22:00-sunrise' is modeled as 22:00-06:30 (annual-mean Florida sunrise, design_assumption)."
+flagstaff_lz1:
+  label: "Flagstaff LZ1 overlay"
+  ref: "PRD 3 A-04 (17,500 lm/acre, 2.5-mi core); [LEVY-OVERLAY]"
+  params:
+    selection: {groups: [GRU, Municipal, Utility, FDOT, Private], counties: ["12075"]}
+    shielding: {pct_converted: 0, target_u: 0}
+    cct_cap: null
+    intensity: {pct_reduction: 0}
+    curfew: {enabled: false, start: "00:00", end: "05:00", dim_level_pct: 50, motion_only: false}
+    amortization: {years: 10, public_deadline_years: 5}
+    overlays: {enabled: true, lz0_radius_mi: 3, lz1_radius_mi: 5}
+  notes: "PRD core radius is 2.5 mi; ring edges are whole miles, so v2.0 uses the 3-mi ring (nearest conservative edge)."

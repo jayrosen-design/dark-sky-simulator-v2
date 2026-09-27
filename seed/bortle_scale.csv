@@ -1,0 +1,9 @@
+bortle,min_mag,max_mag,label,provenance
+1,21.99,,Excellent dark site,literature (2.1 Clear Dark Sky scale [AC-RESEARCH])
+2,21.89,21.99,Typical truly dark site,literature (2.1)
+3,21.69,21.89,Rural sky,literature (2.1)
+4,20.49,21.69,Rural/suburban transition,literature (2.1)
+5,19.50,20.49,Suburban sky,literature (2.1)
+6,18.94,19.50,Bright suburban sky,literature (2.1)
+7,18.38,18.94,Suburban/urban transition,literature (2.1)
+8,,18.38,City sky (8-9),literature (2.1; table merges 8-9 below 18.38)

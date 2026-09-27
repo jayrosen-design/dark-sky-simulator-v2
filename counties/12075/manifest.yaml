@@ -1,0 +1,82 @@
+# County data package manifest — Levy (12075). Data only, never code (PRD 0B).
+fips: "12075"
+name: Levy
+package_version: 2.0.0-seed
+# 3,135 fixtures, Chiefland 285, unincorporated 2,850; 65% HPS, 35% LED 4000-5000K (PRD 6.5, [ECON-RETRO]).
+# lm conventions as in counties/12001/manifest.yaml.
+stocks:
+  - id: municipal
+    group: Municipal
+    owners: {City of Chiefland: 285}
+    n: 285
+    public: true
+    confidence: 0.5
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: corpus (6.5)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    placement: {roads_in_places: [Chiefland]}
+  - id: utility
+    group: Utility
+    # The corpus gives no owner split for the 2,850 unincorporated fixtures (Duke, Clay, CFEC, FDOT D2 on US 19/27/27A/SR 24).
+    owners: {"Duke, Clay, CFEC, FDOT D2 (unsplit)": 2850}
+    n: 2850
+    public: true
+    confidence: 0.5
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: corpus (6.5)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {Duke: 0.3334, Clay: 0.3333, CFEC: 0.3333}
+    tariff_provenance: design_assumption (equal split; corpus has no Levy owner split)
+    placement: {roads_outside_places: [Chiefland]}
+  - id: private_residential
+    group: Private
+    owners: {private: census}
+    n: census_housing
+    public: false
+    confidence: 0.3
+    lm: residential
+    spd_mix: {LED3000: 0.45, LED4000: 0.45, HPS: 0.10}
+    spd_mix_provenance: design_assumption (no corpus SPD mix for private stock; research prompts D4/D5)
+    u_mix: {LED3000: {0: 0.2, 3: 0.5, 4: 0.3}, LED4000: {0: 0.2, 3: 0.5, 4: 0.3}, HPS: {3: 0.6, 4: 0.4}}
+    tariff: {}
+    placement: {housing: all}
+  - id: private_commercial
+    group: Private
+    owners: {private: census}
+    n: commercial_flux
+    public: false
+    confidence: 0.3
+    lm: commercial
+    spd_mix: {LED4000: 0.50, MH: 0.30, HPS: 0.20}
+    spd_mix_provenance: design_assumption (no corpus SPD mix for commercial stock; research prompt D4)
+    u_mix: {LED4000: {0: 0.5, 3: 0.2, 4: 0.3}, MH: {0: 0.3, 4: 0.7}, HPS: {0: 0.3, 3: 0.4, 4: 0.3}}
+    tariff: {}
+    placement: {housing: towns}   # housing units in incorporated places or urban block groups
+  - id: sports
+    group: Sports
+    owners: {"schools, parks, clubs (OSM venues)": osm}
+    n: osm_sports          # venues x fixtures per venue type x lit probability (seed/engine_defaults.yaml)
+    public: true           # mostly school boards and parks; costs counted as public
+    confidence: 0.3
+    lm: sports
+    hours: sports          # seed sports_hours: off in the 01:00-04:00 SQM window
+    burn_hours: sports
+    spd_mix: {MH: 0.6, LED4000: 0.4}
+    spd_mix_provenance: design_assumption (legacy metal halide still common on fields; no inventory)
+    u_mix: {MH: {3: 0.3, 4: 0.7}, LED4000: {1: 0.5, 3: 0.5}}
+    tariff: {generic: 1.0}
+    placement: {osm_sports: true}
+ordinance_seed: "LDC Ch. 50 (Sec. 50-460 shielding only, 50-132(d) agricultural exemption, no CCT or lumen cap); Chiefland Ord. 20-04 trespass 0.33 fc residential / 3.0 fc non-residential (6.5)"
+trend_seed: null   # no Levy-specific radiance trend in the corpus (Section 8 intro)
+# Approximate coordinates from 6.5 — must be verified (0B open items). RHO county placement per the 2026 abstract.
+sites:
+  - {id: CAV-BillyDodd, name: Chiefland Astronomy Village, lat: 29.40,  lon: -82.86,  seed_mag: 21.85, seed_range: [21.81, 21.99], seed_bortle: "2-3", role: Protected asset; Module B reference row, reference: true}
+  - {id: RHO-Dome1,     name: Rosemary Hill Observatory,   lat: 29.40,  lon: -82.59,  seed_mag: 21.45, seed_range: [21.25, 21.69], seed_bortle: "4",   role: UF asset; Module B reference row, reference: true}
+  - {id: CHF-Center,    name: Chiefland city center,       lat: 29.475, lon: -82.860, seed_mag: 19.8,  seed_bortle: "5", role: Light dome source}
+  - {id: BRN-Bronson,   name: Bronson,                     lat: 29.448, lon: -82.642, seed_mag: 20.3,  seed_bortle: "5", role: SQM station}
+  - {id: US19-South,    name: US 19 corridor south of Chiefland, lat: 29.43, lon: -82.87, seed_mag: 21.2, seed_bortle: "4", role: Corridor pilot}
+sources:
+  osm: "Overpass bbox query over the Module A grid (highway=street_lamp, utility=street_lighting)"

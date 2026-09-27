@@ -1,0 +1,76 @@
+# County data package manifest — Gilchrist (12041). Data only, never code (PRD 0B).
+# Neighbor county: no fixture inventory exists in the research corpus or in any public layer found on 2026-09-26
+# (no county/city streetlight service on ArcGIS Online; FDOT's public lighting layer covers District 5 codes 75/92 only).
+# Public streetlight counts use per-housing-unit rates derived from the Alachua and Levy seed inventories
+# (pipeline/build.py derive_public_rates; values recorded in engine.json), split urban/rural by Census 2020 block groups.
+fips: "12041"
+name: Gilchrist
+package_version: 2.0.0-derived
+stocks:
+  - id: municipal
+    group: Municipal
+    owners: {"incorporated places (owner not in corpus)": derived}
+    n: derived_public      # rate x housing units inside incorporated places
+    public: true
+    confidence: 0.2
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: design_assumption (Levy corpus mix [ECON-RETRO] reused)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    tariff_provenance: design_assumption (utility tariffs for this county are not in the corpus)
+    placement: {roads_in_places: all}
+  - id: utility
+    group: Utility
+    owners: {"utilities and FDOT outside places (split not in corpus)": derived}
+    n: derived_public      # rate x housing units outside incorporated places
+    public: true
+    confidence: 0.2
+    lm: public
+    spd_mix: {HPS: 0.65, LED4000: 0.35}
+    spd_mix_provenance: design_assumption (Levy corpus mix [ECON-RETRO] reused)
+    u_mix: {HPS: {3: 1.0}, LED4000: {0: 1.0}}
+    tariff: {generic: 1.0}
+    tariff_provenance: design_assumption (utility tariffs for this county are not in the corpus)
+    placement: {roads_outside_places: all}
+  - id: private_residential
+    group: Private
+    owners: {private: census}
+    n: census_housing
+    public: false
+    confidence: 0.3
+    lm: residential
+    spd_mix: {LED3000: 0.45, LED4000: 0.45, HPS: 0.10}
+    spd_mix_provenance: design_assumption (same as Alachua/Levy private stock)
+    u_mix: {LED3000: {0: 0.2, 3: 0.5, 4: 0.3}, LED4000: {0: 0.2, 3: 0.5, 4: 0.3}, HPS: {3: 0.6, 4: 0.4}}
+    tariff: {}
+    placement: {housing: all}
+  - id: private_commercial
+    group: Private
+    owners: {private: census}
+    n: commercial_flux
+    public: false
+    confidence: 0.3
+    lm: commercial
+    spd_mix: {LED4000: 0.50, MH: 0.30, HPS: 0.20}
+    spd_mix_provenance: design_assumption (same as Alachua/Levy commercial stock)
+    u_mix: {LED4000: {0: 0.5, 3: 0.2, 4: 0.3}, MH: {0: 0.3, 4: 0.7}, HPS: {0: 0.3, 3: 0.4, 4: 0.3}}
+    tariff: {}
+    placement: {housing: towns}   # housing units in incorporated places or urban block groups
+  - id: sports
+    group: Sports
+    owners: {"schools, parks, clubs (OSM venues)": osm}
+    n: osm_sports          # venues x fixtures per venue type x lit probability (seed/engine_defaults.yaml)
+    public: true           # mostly school boards and parks; costs counted as public
+    confidence: 0.3
+    lm: sports
+    hours: sports          # seed sports_hours: off in the 01:00-04:00 SQM window
+    burn_hours: sports
+    spd_mix: {MH: 0.6, LED4000: 0.4}
+    spd_mix_provenance: design_assumption (legacy metal halide still common on fields; no inventory)
+    u_mix: {MH: {3: 0.3, 4: 0.7}, LED4000: {1: 0.5, 3: 0.5}}
+    tariff: {generic: 1.0}
+    placement: {osm_sports: true}
+ordinance_seed: null
+trend_seed: null
+sites: []

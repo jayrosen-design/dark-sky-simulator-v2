@@ -1,0 +1,213 @@
+# Lighting-solution catalog for the Build tab. Generic fixture TYPES that meet DarkSky Approved criteria (fully
+# shielded or visor-controlled, <= 3000K), not specific products: DarkSky's searchable list
+# (https://darksky.org/what-we-do/darksky-approved/darksky-approved-luminaires-program/luminaires/) publishes no
+# prices, and product photos are manufacturers' copyright, so each card links to the official search instead.
+#
+# slot: which existing fixture stock a card replaces (street = public streetlights; commercial, residential and
+#       sports = the private and sports stocks). One card per slot is equipped at a time.
+# unit_cost: installed USD per fixture. provenance: corpus (PRD 6.4), web_survey (retail price seen 2026-09-26, plus
+#       the corpus truck-roll install allowance), derived, or design_assumption. Estimates, not quotes.
+version: 2.0.0
+darksky_search_url: "https://darksky.org/what-we-do/darksky-approved/darksky-approved-luminaires-program/luminaires/"
+install_allowance: {value: 200, provenance: corpus, ref: "PRD 6.4 truck roll $200 (range $150-250)"}
+categories:
+  street:      {label: "Street lights", icon: cobra}
+  decorative:  {label: "Decorative & pedestrian", icon: posttop}
+  commercial:  {label: "Commercial & parking", icon: shoebox}
+  residential: {label: "Residential", icon: porch}
+  sports:      {label: "Sports & stadium", icon: sports}
+  wildlife:    {label: "Wildlife-friendly", icon: amber}
+fixtures:
+  - id: roadway_led_3000
+    name: "Cobra-head LED, full cutoff, 3000K"
+    category: street
+    slot: street
+    archetype: cobra
+    darksky_category: Commercial
+    spd: LED3000
+    u: 0
+    lumens: 8300
+    watts: 75
+    unit_cost: {value: 600, low: 400, high: 800, provenance: corpus, ref: "PRD 6.4 utility LED/PCA U0 retrofit, per fixture [ECON-RETRO]"}
+  - id: roadway_led_2700
+    name: "Cobra-head LED, full cutoff, 2700K"
+    category: street
+    slot: street
+    archetype: cobra
+    darksky_category: Commercial
+    spd: LED2700
+    u: 0
+    lumens: 8000
+    watts: 80
+    unit_cost: {value: 600, low: 400, high: 800, provenance: corpus, ref: "PRD 6.4 utility LED/PCA U0 retrofit [ECON-RETRO]"}
+  - id: roadway_adaptive_3000
+    name: "Cobra-head LED 3000K + smart dimming node"
+    category: street
+    slot: street
+    archetype: cobra
+    darksky_category: Commercial
+    spd: LED3000
+    u: 0
+    lumens: 8300
+    watts: 75
+    dimming: {start: "00:00", end: "05:00", dim_level_pct: 50}
+    unit_cost: {value: 802, low: 602, high: 1002, provenance: corpus, ref: "PRD 6.4 retrofit $600 + smart node $202 [ECON-SMART]"}
+    note: "Dims 00:00-05:00 to 50% (or the step-2 curfew, if set)."
+  - id: roadway_pca_amber
+    name: "Roadway phosphor-converted amber (FDOT APL), U0"
+    category: wildlife
+    slot: street
+    archetype: cobra
+    darksky_category: Wildlife Tuned
+    spd: PCA590
+    u: 0
+    lumens: 7000
+    watts: 58
+    unit_cost: {value: 600, low: 400, high: 800, provenance: corpus, ref: "PRD 6.4 LED/PCA U0 retrofit; FDOT APL 715-005 products [FDOT-APL]"}
+  - id: roadway_nba
+    name: "Narrow-band amber roadway light"
+    category: wildlife
+    slot: street
+    archetype: cobra
+    darksky_category: Wildlife Tuned
+    spd: NBA
+    u: 0
+    lumens: 5000
+    watts: 83
+    unit_cost: {value: 600, low: 400, high: 800, provenance: design_assumption, ref: "priced like the PRD 6.4 retrofit; NBA efficacy 60 lm/W (PRD 6.1)"}
+  - id: posttop_kit_3000
+    name: "Shielded post-top retrofit kit, 3000K"
+    category: decorative
+    slot: street
+    archetype: posttop
+    darksky_category: Pedestrian Comfort
+    spd: LED3000
+    u: 0
+    lumens: 4000
+    watts: 40
+    unit_cost: {value: 675, low: 500, high: 850, provenance: corpus, ref: "PRD 6.4 decorative post-top kit (GRU L51) [GNV-ASSESS]"}
+  - id: decorative_2700
+    name: "New full-cutoff decorative luminaire, 2700K"
+    category: decorative
+    slot: street
+    archetype: decorative
+    darksky_category: Pedestrian Comfort
+    spd: LED2700
+    u: 0
+    lumens: 4000
+    watts: 40
+    unit_cost: {value: 1275, low: 1000, high: 1550, provenance: corpus, ref: "PRD 6.4 new decorative luminaire [GNV-ASSESS]"}
+  - id: area_shoebox_3000
+    name: "Area / shoebox light, full cutoff, 3000K"
+    category: commercial
+    slot: commercial
+    archetype: shoebox
+    darksky_category: Commercial
+    spd: LED3000
+    u: 0
+    lumens: 20000
+    watts: 120
+    unit_cost: {value: 385, low: 335, high: 850, provenance: web_survey, ref: "100-150 W 3000K shoebox $184.74 (ledlightingsupply.com, 2026-09-26) + $200 install; high end allows premium DarkSky Approved models"}
+  - id: wallpack_fc_3000
+    name: "Full-cutoff wall pack, 3000K"
+    category: commercial
+    slot: commercial
+    archetype: wallpack
+    darksky_category: Commercial
+    spd: LED3000
+    u: 0
+    lumens: 6000
+    watts: 50
+    unit_cost: {value: 355, low: 340, high: 430, provenance: web_survey, ref: "RAB SLIM 40-60 W full cutoff $140-166, Satco $157 (ledlightexpert.com, 2026-09-26) + $200 install"}
+  - id: canopy_flat_3000
+    name: "Flat-lens canopy light, 3000K (gas stations)"
+    category: commercial
+    slot: commercial
+    archetype: canopy
+    darksky_category: Commercial
+    spd: LED3000
+    u: 0
+    lumens: 13000
+    watts: 100
+    unit_cost: {value: 525, low: 400, high: 650, provenance: design_assumption, ref: "no listed retail price found; $200-450 fixture assumed + $200 install"}
+  - id: flood_visor_3000
+    name: "Flood light with full visor, aimed down, 3000K"
+    category: commercial
+    slot: commercial
+    archetype: flood
+    darksky_category: Commercial
+    spd: LED3000
+    u: 1
+    lumens: 7800
+    watts: 60
+    unit_cost: {value: 375, low: 300, high: 450, provenance: design_assumption, ref: "40-60 W selectable flood (Super Bright LEDs) price not listed; $100-250 fixture assumed + visor + $200 install"}
+  - id: porch_fc_2700
+    name: "Fully shielded porch / wall light, 2700K"
+    category: residential
+    slot: residential
+    archetype: porch
+    darksky_category: Residential
+    spd: LED2700
+    u: 0
+    lumens: 800
+    watts: 9
+    unit_cost: {value: 162, low: 107, high: 217, provenance: derived, ref: "fixture $40-150 (design_assumption; DarkSky-tagged retail listings) + $200 install shared by ~3 fixtures per home (PRD 6.5)"}
+  - id: porch_amber_2200
+    name: "Fully shielded amber porch light, 2200K"
+    category: wildlife
+    slot: residential
+    archetype: porch
+    darksky_category: Wildlife Tuned
+    spd: PCA590
+    u: 0
+    lumens: 600
+    watts: 8
+    unit_cost: {value: 177, low: 127, high: 227, provenance: derived, ref: "fixture $60-160 (design_assumption) + $200 install shared by ~3 fixtures per home"}
+  - id: motion_security_2700
+    name: "Shielded motion-sensor security light, 2700K"
+    category: residential
+    slot: residential
+    archetype: flood
+    darksky_category: Residential
+    spd: LED2700
+    u: 1
+    lumens: 1500
+    watts: 15
+    motion_only: true
+    unit_cost: {value: 127, low: 97, high: 167, provenance: derived, ref: "fixture $30-100 (design_assumption) + $200 install shared by ~3 fixtures per home"}
+    note: "Motion-only: modeled at the seed motion-only equivalent (30% output all night)."
+  - id: sports_led_visor_3000
+    name: "LED sports floodlight with glare visor, 3000K"
+    category: sports
+    slot: sports
+    archetype: sports
+    darksky_category: Commercial
+    spd: LED3000
+    u: 1
+    lumens: 157500
+    watts: 1050
+    unit_cost: {value: 8250, low: 4000, high: 12500, provenance: derived, ref: "football-field LED retrofit $80k-250k (Logos Lighting cost guide) / 20 fixtures per field"}
+  - id: sports_led_curfew_3000
+    name: "LED sports floodlight 3000K + 22:00 auto-off"
+    category: sports
+    slot: sports
+    archetype: sports
+    darksky_category: Commercial
+    spd: LED3000
+    u: 1
+    lumens: 157500
+    watts: 1050
+    hours: "18:00-22:00"
+    unit_cost: {value: 8250, low: 4000, high: 12500, provenance: derived, ref: "as above; control cost not separately estimated"}
+    note: "Lights end at 22:00 instead of 22:30."
+  - id: highmast_note
+    name: "Stadium-scale high-mast LED, 3000K with shields"
+    category: sports
+    slot: sports
+    archetype: highmast
+    darksky_category: Commercial
+    spd: LED3000
+    u: 1
+    lumens: 157500
+    watts: 1050
+    unit_cost: {value: 9000, low: 5000, high: 14000, provenance: design_assumption, ref: "600 W high-mast fixtures from $500-850 retail (web survey 2026-09-26) plus mast work; priced above field retrofits"}

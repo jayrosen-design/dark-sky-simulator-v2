@@ -1,0 +1,41 @@
+# Module B default weights and normalization anchors — PRD/TRD Section 6.6 (and 3 Module B table).
+version: 2.0.0
+weights:
+  sky:       {value: 0.30, label: "Current sky brightness"}
+  sprawl:    {value: 0.25, label: "10-year development trajectory"}
+  clarity:   {value: 0.15, label: "Atmospheric clarity"}
+  urban:     {value: 0.10, label: "Distance from urban cores"}
+  land:      {value: 0.10, label: "Land availability and protection"}
+  elevation: {value: 0.05, label: "Elevation and horizon"}
+  access:    {value: 0.05, label: "Proximity to paved road"}
+  # Not a PRD 6.6 criterion: weight 0 keeps the Research optical defaults unchanged; raise it to let cost steer the ranking.
+  land_cost: {value: 0.00, label: "Land acquisition cost"}
+anchors:
+  sky_mag:            {worst: 20.5, best: 22.0, form: linear, provenance: "6.6"}
+  sprawl_growth_pct:  {best: 0, worst: 50, form: inverse_linear, provenance: "6.6 (capped at +50%)"}
+  urban_distance_km:  {midpoint: 30, scale: 8, form: logistic, provenance: "6.6"}
+  photometric_nights: {worst: 0.40, best: 0.75, form: linear, provenance: "6.6"}
+  photometric_nights_seed: {inland: 0.55, coastal: 0.50, provenance: "6.6 Florida seed climatology"}
+  horizon_deg:        {best: 0, worst: 10, form: inverse_linear, provenance: "6.6"}
+  # 6.6 lists "access 0 -> 3 km inverse"; Section 3 says "within 3 km of both scores 1".
+  # v2.0 follows Section 3 (score 1 within 3 km) and declines linearly to 0 at 15 km. See docs/adr/0004.
+  access_km:          {full: 3, zero: 15, form: plateau_linear, provenance: "3 Module B; decline distance is design"}
+  land_classes:       {public_conservation: 1.0, agricultural: 0.6, residential_pud: 0.1, provenance: "6.6"}
+  # Land acquisition cost score: public land scores 1 (transfer/lease, no market purchase); private land is scored on the
+  # nearby market price, log-linear from best to worst $/acre (design anchors).
+  land_cost_usd_acre: {best: 2000, worst: 40000, form: log_inverse, provenance: "design"}
+urban_core_min_population: {value: 10000, provenance: "3 Module B (IDA UNSP threshold)"}
+site_min_cells: {value: 4, provenance: "3 Module B B-01 (>= 4 contiguous cells)"}
+top_sites: {value: 20, provenance: "3 Module B B-01"}
+# Only the default profile has PRD-specified weights; "Teaching/outreach" and "Radio-quiet" are v3.0 (workshop with UF Astronomy).
+profiles:
+  research_optical: {sky: 0.30, sprawl: 0.25, clarity: 0.15, urban: 0.10, land: 0.10, elevation: 0.05, access: 0.05}
+# Land and facility pricing (Module B scorecards). Source: Florida DOR 2025 cadastral roll (parcels >= 5 acres).
+land_pricing:
+  target_site_acres: {value: 80, options: [20, 40, 80, 160, 320], provenance: "PRD 1.1 (Rosemary Hill Observatory occupies 80 acres)"}
+  qualified_sale_code: {value: "01", provenance: "FL DOR sale qualification code 01 (arm's-length); Levy 2021+ vacant sales at code 01 cluster at 1.01-1.41x just value, other codes scatter (checked 2026-09-26)"}
+  sale_years: {value: [2021, 2025], provenance: design}
+  comps_k: {value: 15, provenance: design}
+  comps_radius_km: {value: 25, provenance: design}
+  comps_min: {value: 5, provenance: design}
+  largest_parcel_min_acres: {value: 20, provenance: design}

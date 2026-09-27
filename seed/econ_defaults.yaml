@@ -1,0 +1,25 @@
+# core.econ_defaults — PRD/TRD Section 6.4.
+version: 2.0.0
+params:
+  capex_retrofit_u0:        {value: 600, min: 400, max: 800, unit: USD/fixture, provenance: corpus, ref: "6.4 (Levy CBA) [ECON-RETRO]"}
+  capex_posttop_kit:        {value: 675, min: 500, max: 850, unit: USD/fixture, provenance: corpus, ref: "6.4 (GNV)"}
+  capex_new_decorative:     {value: 1275, min: 1000, max: 1550, unit: USD/fixture, provenance: corpus, ref: "6.4 (GNV)"}
+  capex_smart_node:         {value: 202, unit: USD/node, provenance: corpus, ref: "6.4 [ECON-SMART]"}
+  capex_commercial_dimmer:  {value: 135, unit: USD, provenance: corpus, ref: "6.4 (AC)"}
+  capex_curfew_timer:       {value: 225, unit: USD, provenance: corpus, ref: "6.4 (AC)"}
+  node_replacement_reserve: {value: 15, unit: USD/node/yr, provenance: corpus, ref: "6.4 (ECON)"}
+  cms_saas_default:         {value: 14, unit: USD/node/yr, provenance: corpus, ref: "6.4 (ECON); RF mesh 3, cellular 60"}
+  energy_saved_hps_to_led_kwh: {value: 450, unit: kWh/fixture/yr, provenance: corpus, ref: "6.4 (Levy)"}
+  dimming_saving_fraction_ref: {value: 0.217, provenance: corpus, ref: "6.4 50% dim for 5 h of 11.5 h"}
+  avoided_maintenance:      {value: 60, min: 60, max: 75, unit: USD/fixture/yr, provenance: corpus, ref: "6.4 (Levy, GNV)"}
+  truck_roll:               {value: 200, unit: USD, provenance: corpus, ref: "6.4"}
+  discount_rate:            {value: 0.04, provenance: design, ref: "6.4"}
+  espc_term_years:          {value: 15, provenance: corpus, ref: "6.4"}
+  co2_grid_factor_kg_kwh:   {value: 0.39, provenance: approximate, ref: "6.4 placeholder, not in corpus; CO2 panel hidden until eGRID value loaded", display_blocked: true}
+tariffs:
+  # A-06: every money output carries the tariff and rate date used.
+  GRU:     {type: energy, usd_per_kwh: 0.09,    dimming_savings: true,  rate_date: "assumption (no tariff sheet loaded)", provenance: corpus, ref: "6.4 GRU commercial ~$0.09/kWh assumption"}
+  Duke:    {type: energy, usd_per_kwh: 0.07541, dimming_savings: true,  rate_date: "LS-1 variable, per [ECON-DIM]", provenance: corpus, ref: "6.4 [ECON-DIM]"}
+  Clay:    {type: deemed, usd_per_fixture_month_small: 7.10, usd_per_fixture_month_large: 10.35, dimming_savings: false, rate_date: "Schedule L, per [ECON-DIM]", provenance: corpus, ref: "6.4; deemed-kWh fixtures return $0 dimming savings (flagged)"}
+  CFEC:    {type: deemed_daily, usd_per_day_tiers: [0.343, 0.554, 0.781], dimming_savings: false, rate_date: "outdoor lighting daily rate, per [ECON-DIM]", provenance: corpus, ref: "6.4"}
+  generic: {type: energy, usd_per_kwh: 0.10,    dimming_savings: true,  rate_date: "generic fallback", provenance: corpus, ref: "6.4 generic $0.10/kWh"}
