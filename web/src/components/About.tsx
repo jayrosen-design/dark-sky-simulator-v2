@@ -54,7 +54,8 @@ export default function About({ onClose }: { onClose: () => void }) {
               locally fit VIIRS LED correction, and ILLUMINA Tier 2 runs. See the PRD/TRD Sections 5–8.</p>
           </section>
           <p className="text-xs text-star-500">Data package {e.version}, built {e.built}. Basemap © OpenMapTiles © OpenStreetMap contributors (OpenFreeMap). Census TIGER/Line, FNAI Florida Conservation Lands, USGS 3DEP.
-            v1: doi.org/10.5281/zenodo.17252185 · Jay Rosen, University of Florida.</p>
+            v1: doi.org/10.5281/zenodo.17252185 · Jay Rosen, University of Florida.
+            Also on this mapping platform: <a className="text-glow-400 underline" href="wildsight/">WildSight Planner</a> (roadside wildlife-detection planning).</p>
         </div>
       </div>
     </div>

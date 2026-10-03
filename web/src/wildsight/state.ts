@@ -1,8 +1,8 @@
-// Traffic Insights state: data package, deployment parameters and the derived deployment.
+// WildSight planner state: data package (/wildsight/data), deployment parameters and the derived deployment.
 import { create } from "zustand";
 import type { FeatureCollection } from "geojson";
-import { fetchJson } from "../data/load";
-import { candidates, coverageCurve, defaultParams, deploy, parseRoads, selectSegments, type DeployParams, type Deployment, type Segment, type WsMeta } from "../engine/wildsight";
+import { fetchJson } from "../shared/data";
+import { candidates, coverageCurve, defaultParams, deploy, parseRoads, selectSegments, type DeployParams, type Deployment, type Segment, type WsMeta } from "./engine";
 
 export interface CrashPoint { lon: number; lat: number; year: number; group: number; on: boolean }
 export interface TrafficLayers { risk: boolean; crashes: boolean; hotspots: boolean; units: boolean }
@@ -37,8 +37,8 @@ export const useTraffic = create<TrafficState>((set, get) => ({
     set({ loading: true });
     try {
       const [meta, roads, crashes, hotspots] = await Promise.all([
-        fetchJson<WsMeta>("wildsight.json"), fetchJson<{ cols: string[]; rows: unknown[][] }>("wildsight_roads.json"),
-        fetchJson<{ cols: string[]; rows: number[][] }>("wildsight_crashes.json"), fetchJson<FeatureCollection>("wildsight_hotspots.geojson"),
+        fetchJson<WsMeta>("meta.json"), fetchJson<{ cols: string[]; rows: unknown[][] }>("roads.json"),
+        fetchJson<{ cols: string[]; rows: number[][] }>("crashes.json"), fetchJson<FeatureCollection>("hotspots.geojson"),
       ]);
       const segs = parseRoads(roads, Object.keys(meta.counties), meta.classes);
       const p = defaultParams(meta);

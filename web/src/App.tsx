@@ -8,19 +8,17 @@ import SitesPanel from "./components/SitesPanel";
 import EconomicsPanel from "./components/EconomicsPanel";
 import BriefPanel from "./components/BriefPanel";
 import About from "./components/About";
-import ErrorBoundary from "./components/ErrorBoundary";
+import ErrorBoundary from "./shared/ErrorBoundary";
 import CostHud from "./components/CostHud";
 
 const MapView = lazy(() => import("./components/MapView"));
 const ObservatoryPanel = lazy(() => import("./components/ObservatoryPanel"));
 const BuildTray = lazy(() => import("./components/BuildTray"));
 const StargazePanel = lazy(() => import("./components/StargazePanel"));
-const TrafficPanel = lazy(() => import("./components/TrafficPanel"));
 
 const TABS: { value: Tab; label: string }[] = [
   { value: "scenario", label: "Scenario" }, { value: "sites", label: "Sites" }, { value: "economics", label: "Costs" },
   { value: "observatory", label: "Observatory" }, { value: "stargaze", label: "Stargaze" }, { value: "brief", label: "Brief" },
-  { value: "traffic", label: "Traffic Insights" },
 ];
 
 export default function App() {
@@ -31,7 +29,7 @@ export default function App() {
   const setTab = useStore((s) => s.setTab);
   const buildOpen = useStore((s) => s.buildOpen);
   const setBuildOpen = useStore((s) => s.setBuildOpen);
-  const planner = tab !== "observatory" && tab !== "stargaze" && tab !== "traffic"; // lighting-scenario tabs (budget + build mode)
+  const planner = tab !== "observatory" && tab !== "stargaze"; // lighting-scenario tabs (budget + build mode)
 
   useEffect(() => {
     (async () => {
@@ -84,7 +82,6 @@ export default function App() {
                 {tab === "observatory" && <Suspense fallback={null}><ObservatoryPanel /></Suspense>}
                 {tab === "stargaze" && <Suspense fallback={null}><StargazePanel /></Suspense>}
                 {tab === "brief" && <BriefPanel />}
-                {tab === "traffic" && <Suspense fallback={null}><TrafficPanel /></Suspense>}
               </ErrorBoundary>
             </div>
           </aside>

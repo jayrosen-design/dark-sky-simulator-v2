@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { World } from "../components/CorridorSim";
+import { World } from "../CorridorSim";
 
 const run = (wildsight: boolean, mesh = true, mph = 55, seconds = 1200) => {
   const w = new World(wildsight, mesh, mph * 0.44704, 5, 40, 20260927);

@@ -38,7 +38,6 @@ def load_seed():
         "overlay": _yaml(SEED / "overlay_rules.yaml"),
         "presets": _yaml(SEED / "presets.yaml"),
         "catalog": _yaml(SEED / "fixture_catalog.yaml"),
-        "wildsight": _yaml(SEED / "wildsight.yaml"),
     }
 
 

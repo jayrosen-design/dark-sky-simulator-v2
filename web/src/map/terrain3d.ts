@@ -4,17 +4,13 @@
 import type { FeatureCollection, Point, Polygon } from "geojson";
 import type { GeoJSONSource, Map as MlMap } from "maplibre-gl";
 import { emptyFC } from "./lights3d";
-
-export const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
+import { metersToPx } from "../shared/map/maplibre";
 
 const DEM = {
   type: "raster-dem" as const, tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
   encoding: "terrarium" as const, tileSize: 256, maxzoom: 15,
   attribution: "Terrain: <a href=\"https://registry.opendata.aws/terrain-tiles/\">AWS Terrain Tiles</a> (USGS 3DEP et al.)",
 };
-const LAT_COS = Math.cos((29.5 * Math.PI) / 180);
-/** Circle radius in pixels for a radius in meters at any zoom (MapLibre 512-px tiles). */
-const metersToPx = (prop: string) => ["interpolate", ["exponential", 2], ["zoom"], 0, ["/", ["get", prop], 78271.517 * LAT_COS], 24, ["/", ["*", ["get", prop], 2 ** 24], 78271.517 * LAT_COS]];
 
 export const LAYERS_3D = ["hillshade-3d", "buildings-3d", "lamp-pools", "lamp-poles"] as const;
 

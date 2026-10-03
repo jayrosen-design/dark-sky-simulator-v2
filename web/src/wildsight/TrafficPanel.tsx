@@ -2,9 +2,9 @@
 // gateways that takes, and what it costs to scale across the eight counties.
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useTraffic } from "../state/traffic";
-import { deploy, KM_PER_MI, selectSegments, stopping, type DeployParams, type SeedValue } from "../engine/wildsight";
-import { Card, fmtInt, fmtUsd, Seg, Slider } from "./ui";
+import { useTraffic } from "./state";
+import { deploy, KM_PER_MI, selectSegments, stopping, type DeployParams, type SeedValue } from "./engine";
+import { Card, fmtInt, fmtUsd, Seg, Slider } from "../shared/ui";
 
 const CorridorSim = lazy(() => import("./CorridorSim"));
 const CLASS_LABEL: Record<string, string> = { motorway: "Interstate", trunk: "US / state highway", primary: "Primary highway", secondary: "Secondary road", tertiary: "Collector road", unclassified: "Rural road" };

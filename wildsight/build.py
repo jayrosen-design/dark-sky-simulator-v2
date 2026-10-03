@@ -1,4 +1,4 @@
-"""Traffic Insights (WildSight): animal-vehicle crash risk on the road network of the eight model counties.
+"""WildSight planner: animal-vehicle crash risk on the road network of the eight model counties.
 
 Road segments (~1 km, OSM) get traffic (FDOT AADT where counted), speed, lanes, habitat (conservation lands within
 300 m, housing density) and the reported animal crashes within 100 m (2014-2024). A negative-binomial safety
@@ -6,7 +6,10 @@ performance function (Highway Safety Manual style) predicts crashes from those c
 estimate blends it with each segment's own record. Back-test: fit on 2014-2019, rank segments, count how many of the
 2020-2024 crashes fall on the top-ranked miles.
 
-    python -m pipeline.wildsight
+    python -m wildsight.build
+
+Shared with the Dark Sky Simulator: the region manifest (counties/region), the raw-data cache and the census,
+conservation-land and HTTP connectors in ingest/. Everything WildSight-specific lives in wildsight/.
 """
 from __future__ import annotations
 
@@ -24,11 +27,15 @@ from shapely.prepared import prep
 from shapely.ops import substring, transform
 from shapely.strtree import STRtree
 
-from ingest import census, landscape, traffic
-from pipeline.config import load_region, load_seed
+import yaml
+
+from ingest import census, landscape
+from pipeline.config import load_region
+from wildsight import ingest as traffic
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "web" / "public" / "data"
+OUT = ROOT / "web" / "public" / "wildsight" / "data"
+SEED = Path(__file__).resolve().parent / "seed.yaml"
 CLASSES = ["motorway", "trunk", "primary", "secondary", "tertiary", "unclassified"]
 GROUPS = ["Deer", "Bear", "Other wildlife", "Dogs and cats", "Livestock", "Other / multiple"]
 LAT0 = 29.6
@@ -103,7 +110,7 @@ def captured(score, length, test, share):
 
 
 def build():
-    seed = load_seed()["wildsight"]
+    seed = yaml.safe_load(SEED.read_text(encoding="utf-8"))
     M = {k: v["value"] for k, v in seed["model"].items()}
     region = load_region()
     g = region["grids"]["module_a"]
@@ -232,16 +239,19 @@ def build():
                      round(s["habitat"], 2), s["cons"], s["hot"], int(yall[k]), G[k].tolist(), round(float(ebr[k]), 4),
                      fidx[s["county"]], coords])
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "wildsight_roads.json").write_text(json.dumps({
+    (OUT / "roads.json").write_text(json.dumps({
         "cols": ["cls", "name", "km", "mph", "lanes", "aadt", "aadt_fdot", "habitat", "conservation", "hotspot", "crashes", "groups", "eb_per_year", "county", "coords"],
         "rows": rows}, separators=(",", ":")), encoding="utf-8")
-    (OUT / "wildsight_crashes.json").write_text(json.dumps({"cols": ["lon", "lat", "year", "group", "on_network"], "rows": points}, separators=(",", ":")), encoding="utf-8")
+    (OUT / "crashes.json").write_text(json.dumps({"cols": ["lon", "lat", "year", "group", "on_network"], "rows": points}, separators=(",", ":")), encoding="utf-8")
     def light(geom):  # 30 m simplification, 4-decimal coordinates
         m = mapping(transform(lambda x, y, z=None: (np.round(np.asarray(x) / KX, 4), np.round(np.asarray(y) / KY, 4)), geom.simplify(30)))
         return json.loads(json.dumps(m))
     hot_fc = {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"tier": f["properties"]["Gi_Bin"], "level": f["properties"]["Confidence_Level"],
               "name": f["properties"]["NAME"], "wvc": f["properties"]["WVC_Total"]}, "geometry": light(hgeom[i])} for i, f in enumerate(hot)]}
-    (OUT / "wildsight_hotspots.geojson").write_text(json.dumps(hot_fc, separators=(",", ":")), encoding="utf-8")
+    (OUT / "hotspots.geojson").write_text(json.dumps(hot_fc, separators=(",", ":")), encoding="utf-8")
+    cty_fc = {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"fips": f, "name": county_names[f]},
+              "geometry": light(poly)} for f, poly in cpoly]}
+    (OUT / "counties.geojson").write_text(json.dumps(cty_fc, separators=(",", ":")), encoding="utf-8")
     by_class = {c: round(float(L[[s["cls"] == c for s in segs]].sum()), 1) for c in CLASSES}
     meta = {
         "built": "2026-09-27", "classes": CLASSES, "groups": GROUPS, "years": [years[0], years[-1]],
@@ -255,8 +265,8 @@ def build():
         "backtest": {"train": [t0, t1], "test": [v0, v1], "share_of_test_crashes_on_top_miles": backtest},
         "seed": seed,
     }
-    (OUT / "wildsight.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
-    for f in ("wildsight_roads.json", "wildsight_crashes.json", "wildsight_hotspots.geojson", "wildsight.json"):
+    (OUT / "meta.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
+    for f in ("roads.json", "crashes.json", "hotspots.geojson", "counties.geojson", "meta.json"):
         print(f, f"{(OUT / f).stat().st_size / 1e6:.2f} MB")
     return meta
 

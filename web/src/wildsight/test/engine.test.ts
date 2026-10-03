@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { corridors, coverageCurve, coverageShare, deploy, gatewayPoints, selectSegments, stopping, unitPoints, unitsFor, type DeployParams, type Segment } from "../engine/wildsight";
+import { corridors, coverageCurve, coverageShare, deploy, gatewayPoints, selectSegments, stopping, unitPoints, unitsFor, type DeployParams, type Segment } from "../engine";
 
 const seg = (id: number, x0: number, eb: number, extra: Partial<Segment> = {}): Segment => ({
   id, cls: 3, name: `Road ${id}`, km: 1, mph: 55, lanes: 2, aadt: 5000, aadtFdot: true, habitat: 0.5, conservation: false, hotspot: 0,

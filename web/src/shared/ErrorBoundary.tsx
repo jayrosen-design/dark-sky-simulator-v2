@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from "react";
-import { isChunkLoadError, reloadForNewBuild } from "../staleBuild";
+import { isChunkLoadError, reloadForNewBuild } from "./staleBuild";
 
 /** Keeps one broken panel from blanking the whole app; shows the error instead. */
 export default class ErrorBoundary extends Component<{ children: ReactNode; label: string }, { error: Error | null }> {

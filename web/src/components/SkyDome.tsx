@@ -4,19 +4,16 @@
 // are placed for the chosen date and time at the site; twilight and moonlight add to the modeled sky.
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import * as maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import { BASEMAP_STYLE, maplibregl } from "../shared/map/maplibre";
 import type { FeatureCollection } from "geojson";
 import { useData, useModel } from "../state/model";
 import { fetchJson } from "../data/load";
 import { domesFor, glowCurve, glowModel, glowUniforms, luminanceAt, LUM_LEGEND, magOf, mcdOf, SKYGLOW_GLSL, type GlowModel } from "../engine/skyglow";
-import { add3DLayers, BASEMAP_STYLE, set3D, setLamps } from "../map/terrain3d";
+import { add3DLayers, set3D, setLamps } from "../map/terrain3d";
 import { basemapRoads, buildLamps, lampLayers, slotLooks } from "../map/lights3d";
 import { formatSky, nelmFromSqm } from "../engine/bortle";
 import { BRIGHT_STARS, dirFromAltAz, eqUnit, equatorialToScene, GALACTIC_POLE, SITE_TZ, skyNow, skyState, utcToZoned, zonedToUtc, type SkyState } from "../engine/sky";
 
-maplibregl.setWorkerUrl(workerUrl);
 const R_STARS = 45;
 const EYE_HEIGHTS = [{ m: 2, label: "Standing (2 m)" }, { m: 30, label: "Rooftop (30 m)" }, { m: 150, label: "Drone (150 m)" }, { m: 600, label: "Aircraft (600 m)" }];
 let lightData: Promise<[FeatureCollection, FeatureCollection]> | null = null;

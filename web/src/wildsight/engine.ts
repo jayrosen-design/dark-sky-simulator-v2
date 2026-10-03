@@ -1,5 +1,5 @@
 // Traffic Insights: WildSight deployment sizing, costs and benefits on the modeled road network. Pure functions.
-// Segment risk is the pipeline's Empirical Bayes estimate of reported animal crashes per year (pipeline/wildsight.py).
+// Segment risk is the pipeline's Empirical Bayes estimate of reported animal crashes per year (wildsight/build.py).
 
 export interface SeedValue<T = number> { value: T; low?: number; high?: number; options?: number[]; provenance: string }
 export interface WsMeta {

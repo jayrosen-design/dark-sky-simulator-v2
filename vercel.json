@@ -3,5 +3,6 @@
   "framework": null,
   "installCommand": "cd web && npm ci",
   "buildCommand": "cd web && npm run build",
-  "outputDirectory": "web/dist"
+  "outputDirectory": "web/dist",
+  "redirects": [{ "source": "/wildsight", "destination": "/wildsight/", "permanent": true }]
 }

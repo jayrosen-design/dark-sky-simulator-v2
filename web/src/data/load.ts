@@ -1,13 +1,9 @@
 // Loads the precomputed data package (web/public/data) and decodes the binary layers.
 import type { EngineData, Lin16Meta, Log16Meta } from "../engine/types";
 
-const BASE = `${import.meta.env.BASE_URL}data/`;
+import { DATA_BASE as BASE, fetchJson } from "../shared/data";
 
-export async function fetchJson<T>(name: string): Promise<T> {
-  const r = await fetch(BASE + name);
-  if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
-  return r.json() as Promise<T>;
-}
+export { fetchJson };
 
 /** Undo pipeline/encode.py packing: gunzip when the gzip magic is present, then cumulative-sum each row (mod 65536). */
 export async function unpackU16(bytes: ArrayBuffer, nx: number, delta: boolean): Promise<Uint16Array> {

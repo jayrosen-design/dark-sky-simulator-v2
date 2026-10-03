@@ -1,6 +1,6 @@
-# ADR 0010: Traffic Insights (WildSight roadside AI wildlife detection)
+# WildSight ADR 0001: Roadside wildlife-detection planner
 
-Status: accepted (v2.0) · 2026-09-27
+Status: accepted · 2026-09-27 (first built as a Dark Sky Simulator tab; moved to its own app 2026-10-03)
 
 ## Context
 WildSight (github.com/jayrosen-design/wildsight, UF Engineering Innovation Team 7) is a solar roadside unit that
@@ -10,7 +10,11 @@ roadside-safety simulations on this map range and estimates how many units and n
 and what it costs.
 
 ## Decision
-- **Data (pipeline/wildsight.py, ingest/traffic.py):**
+- **Separation (2026-10-03):** a separate app at `/wildsight/` with its own code (`web/src/wildsight`), pipeline
+  (`wildsight/`), config and data package (`web/public/wildsight/data`). It shares the mapping core and UI
+  (`web/src/shared`), the region manifest and the ingest plumbing with the Dark Sky Simulator; neither app imports
+  the other.
+- **Data (wildsight/build.py, wildsight/ingest.py):**
   - Roads: OpenStreetMap motorway to unclassified in the eight model counties, split into ~1 km segments
     (15,747 segments, 8,555 km) with class, name/ref, maxspeed and lanes (class defaults where untagged).
   - Traffic: FDOT 2025 AADT sections within 40 m (73% of segment-km); class defaults elsewhere.
@@ -21,7 +25,7 @@ and what it costs.
   its square (risk peaks near 6,700 vehicles/day), habitat, speed and two-lane; Empirical Bayes blend with each
   segment's record (HSM). Back-test: fit on 2014-2019, rank, score on 2020-2024: the riskiest 10% of miles carry
   28% of test crashes (random 10%, model alone 21%, observed record alone 28%); top 20%: 47% vs 44% for the record.
-- **Deployment sizing (web/src/engine/wildsight.ts):** riskiest-miles, UF-hotspot or all-candidate strategies,
+- **Deployment sizing (web/src/wildsight/engine.ts):** riskiest-miles, UF-hotspot or all-candidate strategies,
   two-lane filter (FHWA: 89% of large-animal collisions), counties. Units = ceil(length / spacing) x sides, default
   40 m (two 17 m PIR zones) on both shoulders; gateways by greedy radio cover (every segment wholly within the LoRa
   range, default 3 km, of a gateway).

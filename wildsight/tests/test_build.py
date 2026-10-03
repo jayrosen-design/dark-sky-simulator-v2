@@ -1,4 +1,4 @@
-"""Traffic Insights (WildSight) crash model and data package."""
+"""WildSight planner: crash model and data package."""
 import json
 import math
 from pathlib import Path
@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from pipeline.wildsight import captured, eb, fit_nb, group_of, nb_nll, parse_lanes, parse_speed
+from wildsight.build import captured, eb, fit_nb, group_of, nb_nll, parse_lanes, parse_speed
 
-DATA = Path(__file__).resolve().parents[1] / "web" / "public" / "data"
+DATA = Path(__file__).resolve().parents[2] / "web" / "public" / "wildsight" / "data"
 
 
 def test_negative_binomial_fit_recovers_known_coefficients():
@@ -55,12 +55,12 @@ def test_species_groups_and_tag_parsing():
     assert parse_lanes("2;4") == 2 and parse_lanes("") is None
 
 
-META = json.loads((DATA / "wildsight.json").read_text()) if (DATA / "wildsight.json").exists() else None
+META = json.loads((DATA / "meta.json").read_text()) if (DATA / "meta.json").exists() else None
 
 
-@pytest.mark.skipif(META is None, reason="run python -m pipeline.wildsight first")
+@pytest.mark.skipif(META is None, reason="run python -m wildsight.build first")
 def test_package_is_consistent_and_the_ranking_beats_chance():
-    roads = json.loads((DATA / "wildsight_roads.json").read_text())
+    roads = json.loads((DATA / "roads.json").read_text())
     cols = roads["cols"]
     rows = roads["rows"]
     km = sum(r[cols.index("km")] for r in rows)

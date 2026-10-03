@@ -1,9 +1,9 @@
-"""Traffic Insights (WildSight) connectors: tagged road network, FDOT traffic volumes, animal-vehicle crash
-records and hotspots. All public, no keys."""
+"""WildSight planner connectors: tagged road network, FDOT traffic volumes, animal-vehicle crash records and
+hotspots. All public, no keys. HTTP, ArcGIS paging and the raw-data cache are the shared backend in ingest/."""
 from __future__ import annotations
 
-from .common import arcgis_query, bbox_tag, cached_json, http
-from .inventory import OVERPASS
+from ingest.common import arcgis_query, bbox_tag, cached_json, http
+from ingest.inventory import OVERPASS
 
 # Roads where roadside wildlife warning units could go. Residential streets and links are left out.
 WVC_ROAD_CLASSES = "motorway|trunk|primary|secondary|tertiary|unclassified"
