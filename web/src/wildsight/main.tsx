@@ -1,5 +1,6 @@
-// WildSight Planner entry (/wildsight/). A separate app from the Dark Sky Simulator that shares its mapping core,
-// UI primitives and data loader (src/shared) and its offline backend plumbing (ingest/, counties/region).
+// WildSight Planner entry (/wildsight/planner.html, embedded in the /wildsight/ homepage). A separate app from the
+// Dark Sky Simulator that shares its mapping core, UI primitives and data loader (src/shared) and its offline backend
+// plumbing (ingest/, counties/region).
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";

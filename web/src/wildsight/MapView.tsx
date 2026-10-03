@@ -25,10 +25,12 @@ export default function MapView() {
 
   useEffect(() => {
     setReady(false); // a remount or hot reload builds a new map: the data effects must run again once it loads
+    // Embedded in the WildSight homepage (an iframe): the wheel scrolls the page, Ctrl + wheel / pinch zooms, as on its 3D scenes.
+    const embedded = window.self !== window.top;
     const map = new maplibregl.Map({ container: ref.current!, style: BASEMAP_STYLE, bounds: BOUNDS, fitBoundsOptions: { padding: 10 },
-      attributionControl: { compact: true }, maxPitch: 60 });
+      attributionControl: { compact: true }, maxPitch: 60, cooperativeGestures: embedded });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
-    const offNav = enableTrackpadNav(map, 60);
+    const offNav = embedded ? () => {} : enableTrackpadNav(map, 60);
     map.on("load", async () => {
       const firstSymbol = map.getStyle().layers.find((l: { type: string }) => l.type === "symbol")?.id;
       const add = (id: string) => map.addSource(id, { type: "geojson", data: EMPTY() });

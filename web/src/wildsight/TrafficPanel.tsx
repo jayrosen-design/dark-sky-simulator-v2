@@ -60,7 +60,7 @@ function Loaded() {
 
   return (
     <div className="space-y-3">
-      <Card title="Traffic Insights · WildSight" right={<a className="text-[11px] text-glow-400 hover:underline" href="https://github.com/jayrosen-design/wildsight" target="_blank" rel="noreferrer">WildSight ↗</a>}>
+      <Card title="Traffic Insights · WildSight" right={<a className="text-[11px] text-glow-400 hover:underline" href="./" target="_top">WildSight ↗</a>}>
         <p className="text-xs text-star-300">
           Where roadside AI wildlife-detection units would prevent the most animal-vehicle crashes in the eight counties, how many units and
           LoRa gateways that takes, and what it costs to scale. <b className="text-star-100">{fmtInt(m.crashes.eight_counties)}</b> reported animal crashes

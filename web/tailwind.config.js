@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: { relative: true, files: ["./index.html", "./wildsight/index.html", "./src/**/*.{ts,tsx}"] },
+  content: { relative: true, files: ["./index.html", "./wildsight/planner.html", "./src/**/*.{ts,tsx}"] },
   theme: {
     extend: {
       colors: {

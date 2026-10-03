@@ -5,7 +5,9 @@ Innovation Team 7) would prevent the most animal-vehicle crashes in the eight-co
 how many units and LoRa gateways that takes, and what scaling the service costs. A separate app from the Dark Sky
 Simulator that runs on the same mapping and backend platform.
 
-Live: `/wildsight/` on the same deployment (e.g. https://dark-sky-simulator-v2.vercel.app/wildsight/).
+Live: `/wildsight/` on the same deployment (e.g. https://dark-sky-simulator-v2.vercel.app/wildsight/) is the WildSight
+homepage, the 3D animated pitch and simulation site, with the planner embedded right below its hero simulation. The
+planner on its own: `/wildsight/planner.html`. Its WildSight links lead to the homepage.
 
 ## What it does
 - Roads colored by expected animal-crash risk: a negative-binomial crash model (traffic, speed, habitat, two-lane)
@@ -26,7 +28,9 @@ wildsight/                     this folder: offline pipeline, config, tests, doc
   seed.yaml                    device, network, cost and benefit assumptions with sources
   tests/test_build.py          model and data-package tests
   docs/adr/                    design records
-web/wildsight/index.html       app page (served at /wildsight/)
+web/wildsight/index.html       homepage (/wildsight/): the WildSight repo's index.html plus a Planner section
+web/wildsight/planner.html     planner page (/wildsight/planner.html; embedded in the homepage, where the map's
+                               wheel scrolls the page and Ctrl + wheel / pinch zooms)
 web/src/wildsight/             app code: App, MapView, TrafficPanel, CorridorSim, engine, state, tests
 web/public/wildsight/data/     data package: roads.json, crashes.json, hotspots.geojson, counties.geojson, meta.json
 ```
@@ -42,7 +46,7 @@ web/ (Vite, Tailwind, Vitest), vercel.json                one build and one depl
 ```
 Nothing in the Dark Sky Simulator imports WildSight code, and WildSight imports only `shared/` and the backend
 plumbing above. To split it into its own repository later, copy the WildSight paths plus `web/src/shared` and
-`ingest/` and point a new Vite config at `web/wildsight/index.html`.
+`ingest/` and point a new Vite config at `web/wildsight/index.html` and `web/wildsight/planner.html`.
 
 ## Commands
 ```
