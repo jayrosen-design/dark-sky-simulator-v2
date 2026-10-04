@@ -1,4 +1,4 @@
-// Shared UI primitives for the Dark Sky Simulator and the WildSight planner (same night theme).
+// Shared UI primitives for the apps (Dark Sky Simulator, WildSight planner, Public Art Policy Simulator; same night theme).
 import type { ReactNode } from "react";
 
 export function Card({ title, children, right, id, highlight }: { title?: ReactNode; children: ReactNode; right?: ReactNode; id?: string; highlight?: boolean }) {

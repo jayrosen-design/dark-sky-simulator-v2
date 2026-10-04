@@ -6,7 +6,7 @@ data API (ACS) now requires a key, so ACS B25024 structure-type splits are not u
 """
 from __future__ import annotations
 
-from .common import arcgis_query, cached_json
+from .common import arcgis_query, bbox_tag, cached_json
 
 TIGER = "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb"
 C2020 = f"{TIGER}/tigerWMS_Census2020/MapServer"
@@ -23,6 +23,22 @@ def block_groups(bbox, refresh=False):
                  "urban": p.get("UR") == "U"} for p in (f["properties"] for f in fc["features"])]
         return {"vintage": "2020 decennial (TIGERweb HU100/POP100)", "rows": rows}
     return cached_json("census_block_groups.json", fetch, refresh)
+
+
+def block_group_polygons(bbox, refresh=False):
+    """2020 block-group polygons (generalized to ~20 m) with GEOID, population and housing units."""
+    return cached_json(f"census_bg_polygons_{bbox_tag(bbox)}.json", lambda: arcgis_query(
+        f"{C2020}/8", bbox=bbox, out_fields="GEOID,POP100,HU100", max_offset=0.0002), refresh)
+
+
+def blocks(bbox, refresh=False):
+    """2020 census-block internal points with population and housing units (for walk-access coverage)."""
+    def fetch():
+        fc = arcgis_query(f"{C2020}/10", bbox=bbox, geometry=False, out_fields="GEOID,INTPTLAT,INTPTLON,POP100,HU100")
+        return {"vintage": "2020 decennial (TIGERweb POP100/HU100)", "rows": [
+            [round(float(p["INTPTLON"]), 5), round(float(p["INTPTLAT"]), 5), int(p["POP100"] or 0), int(p["HU100"] or 0), p["GEOID"]]
+            for p in (f["properties"] for f in fc["features"])]}
+    return cached_json(f"census_blocks_{bbox_tag(bbox)}.json", fetch, refresh)
 
 
 def places(bbox, refresh=False):

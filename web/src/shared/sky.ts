@@ -1,6 +1,6 @@
-// Low-precision astronomy for the all-sky view: sidereal time, Sun and Moon positions (Astronomical Almanac
-// low-precision formulae, ~0.01° Sun, ~0.3° Moon), Moon phase, twilight and moonlight sky brightness, and
-// time-zone conversion for the site's local clock. Pure functions; no DOM or three.js.
+// Low-precision astronomy shared by the apps (Dark Sky all-sky view, sun lighting in 3D): sidereal time, Sun and
+// Moon positions (Astronomical Almanac low-precision formulae, ~0.01° Sun, ~0.3° Moon), Moon phase, twilight and
+// moonlight sky brightness, and time-zone conversion for the site's local clock. Pure functions; no DOM or three.js.
 
 const RAD = Math.PI / 180;
 const sin = (d: number) => Math.sin(d * RAD);

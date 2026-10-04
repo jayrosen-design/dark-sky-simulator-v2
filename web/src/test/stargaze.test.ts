@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cloudAt, darknessFactor, dewRisk, goScore, gridPoints, parseGrid, parsePoint, seeingProxy, simCloud, simGrid, transparencyProxy, WX_BBOX } from "../engine/weather";
 import { factorsAt, kmBetween, topSpots, waterViewLayer } from "../engine/spots";
-import { nightSummary, skyState } from "../engine/sky";
+import { nightSummary, skyState } from "../shared/sky";
 import type { McdaData } from "../engine/mcda";
 
 const RHO = { lat: 29.4, lon: -82.59 };

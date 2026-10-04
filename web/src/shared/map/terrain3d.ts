@@ -1,10 +1,10 @@
-// 3D terrain, extruded buildings and light-source layers, shared by the planner map and the Sites ground view.
+// 3D terrain, extruded buildings and light-source layers, shared by the apps' 3D maps and the Sites ground view.
 // Terrain: AWS Terrain Tiles (Terrarium encoding; USGS 3DEP and other public DEMs), no key. Buildings: the
 // OpenFreeMap/OpenMapTiles building layer (render_height).
 import type { FeatureCollection, Point, Polygon } from "geojson";
 import type { GeoJSONSource, Map as MlMap } from "maplibre-gl";
-import { emptyFC } from "./lights3d";
-import { metersToPx } from "../shared/map/maplibre";
+import { emptyFC } from "./geo";
+import { metersToPx } from "./maplibre";
 
 const DEM = {
   type: "raster-dem" as const, tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
@@ -34,10 +34,10 @@ export function add3DLayers(map: MlMap, beforeId?: string) {
     paint: { "fill-extrusion-color": ["get", "color"], "fill-extrusion-height": ["get", "top"], "fill-extrusion-base": ["get", "base"], "fill-extrusion-opacity": 1 } });
 }
 
-/** Turn terrain + 3D layers on or off. */
-export function set3D(map: MlMap, on: boolean, exaggeration = 1) {
+/** Turn terrain + 3D layers on or off (withTerrain = false keeps the ground flat). */
+export function set3D(map: MlMap, on: boolean, exaggeration = 1, withTerrain = true) {
   if (!map.getSource("dem")) return;
-  map.setTerrain(on ? { source: "dem", exaggeration } : null);
+  map.setTerrain(on && withTerrain ? { source: "dem", exaggeration } : null);
   for (const id of LAYERS_3D) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
 }
 

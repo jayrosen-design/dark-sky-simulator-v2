@@ -1,7 +1,7 @@
 // Stargaze mode state: use case, selected spot, forecast hour, weather source, and saved spots.
 import { create } from "zustand";
 import { gridUrl, parseGrid, parsePoint, pointUrls, simGrid, simPoint, type WxGrid, type WxPoint, type WxSource } from "../engine/weather";
-import { skyState } from "../engine/sky";
+import { skyState } from "../shared/sky";
 import type { Spot, UseCase } from "../engine/spots";
 
 export type WxOverlay = "clouds" | "score" | "none";

@@ -1,4 +1,4 @@
-// Shapes of web/public/data/engine.json (written by pipeline/build.py). Field names follow PRD 4.3.
+// Shapes of web/public/dark-sky/data/engine.json (written by pipeline/build.py). Field names follow PRD 4.3.
 
 export type Group = "GRU" | "Municipal" | "Utility" | "FDOT" | "Private" | "Sports" | "External";
 export type SpdCode = "HPS" | "MH" | "LED4000" | "LED3000" | "LED2700" | "PCA590" | "NBA";

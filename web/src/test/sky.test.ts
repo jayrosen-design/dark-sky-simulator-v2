@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { altAz, dirFromAltAz, eqUnit, equatorialToScene, lstDeg, moonlightMag, moonPosition, skyNow, skyState, sunPosition, twilightMag, utcToZoned, zonedToUtc } from "../engine/sky";
+import { altAz, dirFromAltAz, eqUnit, equatorialToScene, lstDeg, moonlightMag, moonPosition, skyNow, skyState, sunPosition, twilightMag, utcToZoned, zonedToUtc } from "../shared/sky";
 
 const RHO = { lat: 29.4, lon: -82.59 };
 const sep = (ra1: number, d1: number, ra2: number, d2: number) => {

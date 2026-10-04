@@ -7,7 +7,7 @@ import pytest
 from pipeline.build import on_fraction
 from pipeline.config import load_seed
 
-DATA = Path(__file__).resolve().parents[1] / "web" / "public" / "data"
+DATA = Path(__file__).resolve().parents[1] / "web" / "public" / "dark-sky" / "data"
 
 
 def test_on_fraction_windows():

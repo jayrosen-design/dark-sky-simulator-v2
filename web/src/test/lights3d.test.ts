@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildLamps, lampLayers, metersBetween, placeAlong, square, type LightInputs, type SlotLook } from "../map/lights3d";
+import { buildLamps, lampLayers, type LightInputs, type SlotLook } from "../map/lights3d";
+import { metersBetween, placeAlong, square } from "../shared/map/geo";
 import type { EngineData, GridMeta } from "../engine/types";
 
 const grid: GridMeta = { west: -82.4, south: 29.6, east: -82.39, north: 29.61, res_deg: 0.005, nx: 2, ny: 2, dx_km: 0.48, dy_km: 0.56 };

@@ -1,4 +1,4 @@
-// Shared mapping core for the Dark Sky Simulator and the WildSight planner: one MapLibre setup (worker, CSS),
+// Shared mapping core for the apps (Dark Sky, WildSight, Public Art): one MapLibre setup (worker, CSS),
 // the dark OpenFreeMap basemap, and helpers for meter-sized map symbols.
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";

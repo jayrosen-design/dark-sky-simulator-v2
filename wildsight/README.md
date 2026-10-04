@@ -42,7 +42,7 @@ web/src/shared/data.ts         data loader (each app reads data/ next to its own
 web/src/shared/ErrorBoundary.tsx, staleBuild.ts   error panels and reload-after-redeploy
 ingest/common.py, census.py, landscape.py, inventory.py   HTTP, ArcGIS paging, raw-data cache, census and FNAI connectors
 counties/region/manifest.yaml  the region: model counties and grids
-web/ (Vite, Tailwind, Vitest), vercel.json                one build and one deployment for both apps
+web/ (Vite, Tailwind, Vitest), vercel.json                one build and one deployment for all the apps
 ```
 Nothing in the Dark Sky Simulator imports WildSight code, and WildSight imports only `shared/` and the backend
 plumbing above. To split it into its own repository later, copy the WildSight paths plus `web/src/shared` and

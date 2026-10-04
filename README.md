@@ -17,13 +17,13 @@ so on every screen.
 python -m uv venv --python 3.12 .venv
 python -m uv pip install --python .venv -e ".[dev,ml,viirs]"
 .venv/Scripts/python -m pipeline.ingest_all      # pull public sources into data_raw/ (cached)
-.venv/Scripts/python -m pipeline.build           # precompute web/public/data/ and docs/sanity_check.md
-.venv/Scripts/python -m pytest                   # 54 tests (49 Dark Sky + 5 in wildsight/tests)
+.venv/Scripts/python -m pipeline.build           # precompute web/public/dark-sky/data/ and docs/sanity_check.md
+.venv/Scripts/python -m pytest                   # 61 tests (49 Dark Sky, 5 WildSight, 7 Public Art)
 
 # Web client
 cd web
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173 (homepage); Dark Sky at /dark-sky/, /wildsight/, /public-art/
 npm test           # Vitest: requirement-ID acceptance tests
 npm run build      # static site in web/dist (relative paths; host under any sub-path)
 ```
@@ -116,7 +116,7 @@ fixture, and Clay/CFEC deemed tariffs earn nothing from dimming.
 
 ```
 data_raw/ (cached public pulls) ─┐
-seed/  (PRD 6 constants)        ─┼─> pipeline/build.py ──> web/public/data/ ──> web/ (static React + MapLibre)
+seed/  (PRD 6 constants)        ─┼─> pipeline/build.py ──> web/public/dark-sky/data/ ──> web/ (static React + MapLibre)
 counties/ (data packages)       ─┘        │
 engine/ (pure physics) ◄──────────────────┘
 ```
@@ -180,6 +180,8 @@ See [docs/adr/](docs/adr/). In short:
 8. Stargaze mode with live Open-Meteo weather (not a PRD requirement; added on request). ([ADR 0008](docs/adr/0008-stargaze-mode.md))
 9. 3D terrain, light-source structures, Sites ground view and sky-glow indicators (added on request). ([ADR 0009](docs/adr/0009-3d-terrain-lights-skyglow.md))
 10. WildSight Planner, a separate app on the same platform (added on request): see [wildsight/README.md](wildsight/README.md).
+11. Public Art Policy Simulator, a third app on the same platform (added on request): see [publicart/README.md](publicart/README.md).
+12. A homepage at the site root for the three apps; the Dark Sky Simulator moved to `/dark-sky/`, and old `/#s=…` links are forwarded. ([ADR 0010](docs/adr/0010-homepage-and-dark-sky-path.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
@@ -194,20 +196,22 @@ Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for
 
 ## Layout
 
-Two apps share this repository, build and deployment: the Dark Sky Simulator (`/`) and the
-[WildSight Planner](wildsight/README.md) (`/wildsight/`, roadside wildlife-detection planning). They share the
-mapping core and UI (`web/src/shared`) and the backend plumbing (`ingest/`, `counties/region`); neither imports the
-other's code.
+A homepage (`/`, `web/index.html`) and three apps share this repository, build and deployment: the Dark Sky
+Simulator (`/dark-sky/`), [WildSight](wildsight/README.md) (`/wildsight/`, roadside wildlife-detection planning) and
+the [Public Art Policy Simulator](publicart/README.md) (`/public-art/`, Chapter 5.5 Art in Public Places planning).
+They share the mapping core, astronomy and UI (`web/src/shared`) and the backend plumbing (`ingest/`,
+`counties/region`); no app imports another's code.
 
 ```
 engine/    pure physics (Garstang kernel, spectral, Bortle, MCDA, flux)
-ingest/    public-data connectors, shared by both apps (cache to data_raw/, git-ignored)
+ingest/    public-data connectors, shared by the apps (cache to data_raw/, git-ignored)
 pipeline/  ingest_all, build, VIIRS mode, sanity check, encoders
 ml/        VIIRS trend + step-change detector, LightGBM growth model
 seed/      PRD Section 6 constants with provenance
 counties/  12001 and 12075 data packages, region + grids
-web/       React clients; web/public/data is the Dark Sky package, web/src/shared the shared platform
+web/       homepage and React clients; web/public/<app>/data are the data packages, web/src/shared the shared platform
 wildsight/ WildSight Planner pipeline, config, tests and docs (its web app is web/src/wildsight)
+publicart/ Public Art Policy Simulator pipeline, registry, capital program, assumptions, tests and docs (web/src/publicart)
 tests/     pytest (engine, contracts, ML, VIIRS-mode build)
 docs/      ADRs, sanity check, demo script, v3.0 funding one-pager
 ```

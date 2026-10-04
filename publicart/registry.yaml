@@ -1,0 +1,1103 @@
+# Public art registry: Gainesville and Alachua County, Florida
+#
+# HAND-COMPILED from public web sources on 2026-10-03.
+# This is NOT the City of Gainesville's or Alachua County's official inventory;
+# neither publishes a machine-readable one. Each entry cites the page that
+# supports it (source_url). Unknown values are null. Uncertainty is in `notes`.
+#
+# Sources used: gainesvillefl.gov, alachuacounty.us, ufl.edu pages, Alachua
+# Chronicle, WCJB, WUFT, Mainstreet Daily News, Gainesville Sun (via syndicated
+# copies), Visit Gainesville, guidetogreatergainesville.com, Monochronicle
+# (the Alachua County Arts Council's call-for-artists platform), and the
+# OpenStreetMap Overpass API (tourism=artwork in bbox 29.58,-82.47,29.76,-82.20).
+# Works listed in the Public Art Archive are in registry_paa.yaml (facts only);
+# three that were already here cite their archive record in extra_sources.
+# Entries here have no `setting` field and are treated as outdoor works.
+#
+# Conventions:
+# - lon/lat are given ONLY where an OSM node/way supplies them (5 decimals);
+#   every other entry is address/location_note only.
+# - status "existing" for older murals means "last reported in place in the
+#   cited source"; murals were not re-checked in person. See notes.
+# - provenance follows the categories in the request; null = none of the
+#   categories fits or it could not be determined (explained in notes).
+# - material null = not stated in any source used.
+
+artworks:
+
+  # ---------------------------------------------------------------------------
+  # Alachua County (Art in Public Places / Arts Council)
+  # ---------------------------------------------------------------------------
+
+  - id: sankofa-hilliard-nunn
+    title: "Sankofa"
+    artist: "George Gadson"
+    year: 2023
+    status: existing
+    type: figure
+    material: null
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "12 SE 1st St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "West Lawn of the Alachua County Administration Building (corner of University Ave and Main St), on the site left empty when a Confederate statue was removed in 2017"
+    facade_bearing: null
+    budget_usd: 75000
+    budget_note: "County call-to-artists budget $75,000 (2022). WCJB (May 2022) reported a $50,000 project cost within a $75,000 estimated total; WUFT (Dec 2021) reported the budget raised from $38,000 to $100,000 with an anonymous donor match. Final contract amount not found."
+    artist_local: false
+    source_url: "https://alachuacounty.us/news/Article/pages/Sankofa-Statue-Honoring-Dr-Nunn-Unveiled.aspx"
+    extra_sources:
+      - "https://www.wcjb.com/2023/06/19/statue-unveiling-honors-late-uf-professor/"
+      - "https://www.wcjb.com/2022/05/24/alachua-county-commissioners-pick-artist-west-lawn-sankofa-stature/"
+      - "https://alachuacounty.us/news/Article/Pages/Call-to-Artists-for-Sankofa-Statue.aspx"
+      - "https://www.wuft.org/entertainment/2021-12-15/alachua-county-commissioners-picked-a-new-statue-to-stand-on-the-of-university-avenue-and-main-street"
+      - "https://www.mainstreetdailynews.com/news/sankofa-statue-unveiled-to-honor-local-historian"
+    notes: "Unveiled Juneteenth, June 19, 2023; honors Dr. Patricia Hilliard-Nunn. Depicts the Sankofa bird. Artist is from Broward County (George Gadson Studios, Hollywood FL). Material and height not stated in sources (the call required durable, vandal-resistant materials on an existing 12x12 ft concrete slab). Type 'figure' because it is a statue of an animal (the Sankofa bird)."
+
+  - id: bounce-sports-events-center
+    title: "Bounce"
+    artist: "Jenn Garrett"
+    year: 2023
+    status: existing
+    type: sculpture
+    material: steel
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "4870 Celebration Pointe Ave, Gainesville, FL 32608"
+    lon: null
+    lat: null
+    location_note: "On Celebration Pointe Ave at the Alachua County Sports & Events Center"
+    geocode_query: "Alachua County Sports and Events Center"   # OpenStreetMap place search; approximate
+    facade_bearing: null
+    budget_usd: 55000
+    budget_note: "Call-to-artists budget ($55,000) as listed on the County Arts Council's Monochronicle page; final contract amount not found."
+    artist_local: true
+    source_url: "https://alachuacounty.us/news/Article/Pages/Bounce-Sculpture-Installation-Coming-Thursday-.aspx"
+    extra_sources:
+      - "https://monochronicle.com/property/sports-event-center-exterior-sculpture/"
+      - "https://www.mainstreetdailynews.com/news/celebration-pointe-bounce-sculpture-alachua-county"
+    notes: "Installed Thursday, Sept 28, 2023; commissioned June 2022 through the County's Art in Public Places program. About one ton; arcing forms topped with stainless-steel basketballs, volleyballs, cheer pompoms and pickleballs at roughly three times actual size (one basketball is 36 in). Stainless steel with colorful finishes. Fabricated with Boone Welding, JWM Engineering and Viking Construction. Height not published. ZIP 32608 is from the OSM address of the Sports & Events Center (Monochronicle lists 'Celebration Pointe Drive, 32607')."
+
+  - id: acfr-station-80-firefighter
+    title: "Statue Honoring Alachua County Firefighters"
+    artist: "Steven Whyte"
+    year: 2024
+    status: existing
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "10180 SW 24th Ave, Gainesville, FL"
+    lon: null
+    lat: null
+    location_note: "Grounds of Alachua County Fire Rescue Station 80"
+    facade_bearing: null
+    budget_usd: 65000
+    budget_note: "Call-to-artists budget of $65,000 per sculpture (two bronze sculptures, Stations 21 and 80); final contract amount not found."
+    artist_local: false
+    source_url: "https://alachuacounty.us/news/article/pages/Public-Works-Installs-New-Statue-Honoring-Alachua-County-Firefighters.aspx"
+    extra_sources:
+      - "https://alachuachronicle.com/alachua-county-public-works-installs-new-statue-honoring-alachua-county-firefighters/"
+      - "https://monochronicle.com/property/fire-rescue-themed-sculpture/"
+    notes: "The County's release (week of July 19, 2024) gives NO formal title; the title here is taken from the release headline. It describes 'a young female firefighter ready for duty' honoring County firefighters and the County's commitment to diversity. 'Lady Firefighter' is an informal name; the County does not use it in its release, and no approved source used it. Artist is from Carmel, California. Installed by Public Works Road & Bridge Division. The 2023 call listed Station #80 at 12825 NW US Hwy 441, Alachua and Station #21 at 10404 SW 24th Ave; the 2024 release puts Station 80 at 10180 SW 24th Ave, which is used here (no ZIP given in the source). A reader comment on Alachua Chronicle says a male counterpart was planned for Station 21; not verified. Height not published."
+
+  - id: lady-justice-public-defender
+    title: "Lady Justice"
+    artist: "James Gabbert"
+    year: 2019
+    status: existing
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "151 SW 2nd Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Outside the Public Defender's Office"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.visitgainesville.com/blog/lady-justice-public-art-in-gainesville-and-alachua-county/"
+    notes: "Selected 2018, unveiled June 19, 2019. Lost-wax cast bronze of a seated, cross-legged figure holding scales as dishes in each hand, no blindfold, sheathed sword inscribed 'For the Defense'; pedestal carries an MLK quote. Source is Visit Gainesville (the county tourism agency); owner recorded as Alachua County Commission / Public Defender's Office."
+
+  - id: justice-for-all-court-complex
+    title: "Justice for All"
+    artist: "David Allan Clark"
+    year: null
+    status: planned
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "220 S Main St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Outdoor plaza of the new Alachua County court complex, a civil courthouse addition on the south side of the criminal courthouse on S Main St (address is the criminal courthouse site)"
+    facade_bearing: null
+    budget_usd: 100000
+    budget_note: "WCJB: $100,000 covering design, materials and installation."
+    artist_local: null
+    source_url: "https://www.wcjb.com/2025/05/13/new-sculpture-symbolizing-justice-grace-downtown-gainesvilles-future-court-complex/"
+    extra_sources:
+      - "https://alachuachronicle.com/alachua-county-commission-awards-14-million-for-broadband-selects-sculpture-for-court-complex-revises-direction-on-new-maps-for-county-commission-districts/"
+      - "https://www.wcjb.com/2024/11/14/new-alachua-county-courthouse-complex-get-100k-statue/"
+    notes: "Selected unanimously by the County Commission on May 13, 2025. A take on Lady Justice with scales. Expected to be installed when the court complex opens in 2026; installation was NOT confirmed by any source found, so status is planned. Artist described as 'nationally recognized'; hometown not stated."
+
+  - id: sports-events-center-silhouettes
+    title: "Sports-themed silhouettes (Sports & Events Center east wall)"
+    artist: "Gus and Lina Fine Art"
+    year: 2023
+    status: existing
+    type: wall
+    material: null
+    height_m: 4.27
+    width_m: null
+    lit: null
+    provenance: county
+    owner: "Alachua County"
+    address: "4870 Celebration Pointe Ave, Gainesville, FL 32608"
+    lon: null
+    lat: null
+    location_note: "Exterior east wall of the Alachua County Sports & Events Center"
+    geocode_query: "Alachua County Sports and Events Center"   # OpenStreetMap place search; approximate
+    facade_bearing: 90
+    budget_usd: 20000
+    budget_note: "Call-to-artists budget for the 'High Sports Themed Silhouettes Installation' ($20,000); final amount not found."
+    artist_local: null
+    source_url: "https://www.wuft.org/2023-06-12/alachua-county-sports-events-center-hosts-grand-opening-and-open-house"
+    extra_sources:
+      - "https://monochronicle.com/property/high-sports-themed-silhouettes-installation/"
+    notes: "WUFT (June 2023 grand opening): '14-foot sports-themed decals by Gus and Lina Fine Art' showing pickleball, basketball, cheer, track and field, baseball and volleyball. Described as decals, so material is not one of the coded types (left null). Title is descriptive, not official. Height 14 ft from the source; total length not published. Lighting not stated."
+
+  # ---------------------------------------------------------------------------
+  # Partner projects (nonprofit / arts-in-health)
+  # ---------------------------------------------------------------------------
+
+  - id: heart-wall-depot-park
+    title: "HeART Wall"
+    artist: "Sarah Hinds"
+    year: 2024
+    status: existing
+    type: wall
+    material: mosaic
+    height_m: null
+    width_m: 63.4
+    lit: null
+    provenance: partner
+    owner: null
+    address: "874 SE 4th St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Across the street from Depot Park, downtown Gainesville (WCJB); UF Health Arts in Medicine gives 874 SE 4th St, which is Depot Park's own address. The specific wall and its owner are not named in any source found."
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: true
+    source_url: "https://artsinmedicine.ufhealth.org/programs/community-programs-2/visual-art/heartwall/"
+    extra_sources:
+      - "https://www.wcjb.com/2024/07/22/artist-residents-create-heart-wall-across-depot-park/"
+      - "https://artsinmedicine.ufhealth.org/2024/07/03/heart-wall-ribbon-cutting-ceremony/"
+      - "https://www.wuft.org/podcast/tell-me-about-it/2024-07-22/heart-wall-a-love-letter-to-gainesville-from-gainesville"
+    notes: "Community-engaged mosaic mural of 2,500+ glass-tile mosaic hearts made Nov 2023 to May 2024 (WCJB says 3,000+); ribbon cutting July 27, 2024. Funded by One Nation One Project via UF Health Shands Arts in Medicine; AIM also lists the City of Gainesville, Florida Division of Arts and Culture, Alachua County School Board, GRU, Children's Miracle Network, Arts for Everybody, CROM and UF Health Facilities as partners. Collaborators Jennifer Kuhns and Cherie Bosela. Length 208 ft per AIM and WUFT (WCJB says about 250 ft); height not published. Facing direction unknown because the wall is not identified."
+
+  # ---------------------------------------------------------------------------
+  # City of Gainesville (Art in Public Places Trust / Cultural Affairs)
+  # ---------------------------------------------------------------------------
+
+  - id: common-light-gpd-fence
+    title: "Common Light"
+    artist: "Sarah Hinds"
+    year: null
+    status: planned
+    type: fence
+    material: null
+    height_m: 1.52
+    width_m: 3.05
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: "721 NW 6th St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Fence section between the new GPD Property & Evidence Building (SW corner of NW 6th St and NW 8th Ave, next to the GPD administration building) and the adjacent 6th Street Rails-to-Trails multi-use path; separates a GPD parking area from the trail"
+    facade_bearing: null
+    budget_usd: 100000
+    budget_note: "WCJB: $100,000 total, with $80,000 to the selected artist and $20,000 kept in the Art in Public Places Trust Fund for maintenance. The City's call (Feb 2026) gave an $80,000 all-inclusive artist budget."
+    artist_local: true
+    source_url: "https://www.gainesvillefl.gov/News-articles/GPD-Public-Art-Fencing-Project-selection"
+    extra_sources:
+      - "https://www.wcjb.com/2026/07/17/gainesville-residents-invited-weigh-new-public-art-fence-design-outside-police-facility/"
+      - "https://www.gainesvillefl.gov/News-articles/City-of-Gainesville-seeks-artists-for-GPD-fencing-project"
+      - "https://alachuachronicle.com/community-feedback-sought-for-gpd-public-art-project/"
+      - "https://www.mainstreetdailynews.com/local-living/gainesville-sarah-hinds-gpd-public-art-fencing-project"
+    notes: "Selection announced Aug 7, 2026, after Art in Public Places Trust review with GPD and design-team input; 1,162 community members took part in the exhibition and survey. Circular forms evoking citrus slices, bicycle wheels, train wheels and sunlight. Size 5 ft by 10 ft; height 5 ft and width 10 ft is an assumption (the source does not say which is which). Unveiling expected mid-2027 after the building is completed. Address 721 NW 6th St is from the City's call to artists. Funded under the 1989 ordinance (1% of construction, capped at $100,000). Materials not specified."
+
+  - id: al-black-highwaymen-mural
+    title: "Florida Highwaymen landscape mural"
+    artist: "Al Black"
+    year: 2022
+    status: removed
+    type: mural
+    material: acrylic_mural
+    height_m: 2.44
+    width_m: 9.75
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: "602 N Main St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Corner of N Main St and NE 6th Ave (former location)"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.gainesvillefl.gov/News-articles/Highwaymen-mural-restoration"
+    extra_sources:
+      - "https://alachuachronicle.com/city-of-gainesville-to-restore-public-mural-by-florida-highwaymen-artist-al-black/"
+      - "https://currently.att.yahoo.com/att/al-black-florida-highwaymen-fame-090058663.html"
+    notes: "Commissioned by the City in 2022 through 352walls; painted Aug 23-25, 2022 with regional muralist Fabian Sanchez. Painted on panels, 8 ft by 32 ft (Gainesville Sun, Aug 19, 2022, via Yahoo syndication), so it can be moved. REMOVED from this site in July 2026 (last public viewing July 12, 2026) for professional restoration after about four years outdoors; the City plans to reinstall it at a new, more sheltered permanent location that has not been named. No formal title found. Paint type not stated."
+
+  - id: tonic-of-wildness-northside-park
+    title: "The Tonic of Wildness"
+    artist: "Ernesto Maranje"
+    year: 2021
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: "5701 NW 34th Blvd, Gainesville, FL 32653"
+    lon: null
+    lat: null
+    location_note: "Northside Park, on the racquetball court wall (the artist worked the wall's windows into the design)"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.mainstreetdailynews.com/local-living/world-famous-artist-completes-mural-at-gainesville-park_id_10659c58-67d2-11eb-a4bb-ff3f64b88fe7"
+    extra_sources:
+      - "https://www.gainesvillefl.gov/Parks/Northside-Park"
+      - "https://www.publicartarchive.org/art/The-Tonic-of-Wildness/d6ceae78"   # Public Art Archive (Creative West) record
+    notes: "Completed Jan 30, 2021 after five days of painting. A wild horse running through foliage, inspired by Paynes Prairie. Funded jointly by the City's Wild Spaces & Public Places program and the Art in Public Places Trust, created through the 352walls project. Artist is a Miami native. Details are from the Mainstreet article as indexed by search (the page refuses automated fetches). Park address from search results for the City park page. Wall size and orientation not published; status not re-checked since 2021."
+
+  - id: edward-the-eagle-reserve-park
+    title: "Edward the Eagle"
+    artist: "John Andrews"
+    year: 2019
+    status: existing
+    type: figure
+    material: null
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: null
+    lon: null
+    lat: null
+    location_note: "Reserve Park, NE 8th Ave"
+    geocode_query: "Reserve Park, Gainesville, Florida"   # OpenStreetMap place search; approximate
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: true
+    source_url: "https://www.wcjb.com/content/news/Local-artist-creates-sculpture-on-display-at-soon-to-be-Reserve-Park-565458852.html"
+    notes: "WCJB, Nov 25, 2019: the City partnered with local welder-sculptor John Andrews; about 400 lb, made entirely of recycled metals, roughly five months' work. Reserve Park was then under construction (opening expected early 2020). Material is recycled scrap metal, not a single coded type (left null). Height not published; status not re-checked."
+
+  - id: social-justice-murals-oakview-park
+    title: "Gainesville Social Justice Mural Project panels (Oakview Park)"
+    artist: "Thomas Berdugo; Jenna Horner"
+    year: 2020
+    status: removed
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: "810 NW 8th Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Oakview Park; murals painted on plywood panels fixed to wooden posts"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: "Underwritten by the fund marking the City's 150th anniversary of incorporation; amount not published."
+    artist_local: null
+    source_url: "https://www.yahoo.com/news/vandals-spray-paint-over-national-210610163.html"
+    extra_sources:
+      - "https://www.wcjb.com/2020/12/17/social-justice-mural-project-to-bring-color-and-change-to-gainesville/"
+      - "https://www.wuft.org/news/2020/12/10/social-justice-mural-painting-begins-in-gainesville/"
+    notes: "Part of the City's 352walls Community Artist Program (12 artist teams, painting began Dec 5, 2020), which helped earn second place in the National League of Cities Cultural Diversity Award. Intended as temporary. Vandalized in April 2022; the Gainesville Sun (Apr 11, 2022, via Yahoo syndication) reported that the painted-over panels 'have since been taken down', hence status removed. Panels at the MLK Multipurpose Center, Porters Community Center and Possum Creek Skate Park are not listed because their current status could not be confirmed."
+
+  - id: social-justice-murals-cofrin-park
+    title: "Gainesville Social Justice Mural Project panels (Cofrin Nature Park)"
+    artist: "Robert Ponzio; Mimi Stocker; Lauren Donnellan"
+    year: 2020
+    status: removed
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: municipal
+    owner: "City of Gainesville"
+    address: "4810 NW 8th Ave, Gainesville, FL 32605"
+    lon: null
+    lat: null
+    location_note: "Cofrin Nature Park; plywood panels on wooden posts"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: "Underwritten by the City's 150th-anniversary fund; amount not published."
+    artist_local: null
+    source_url: "https://www.yahoo.com/news/vandals-spray-paint-over-national-210610163.html"
+    extra_sources:
+      - "https://www.wcjb.com/2020/12/17/social-justice-mural-project-to-bring-color-and-change-to-gainesville/"
+    notes: "WCJB lists Robert Ponzio and Mimi Stocker at Cofrin. The Gainesville Sun lists a Patricia Hilliard-Nunn panel by Mimi Stocker and Lauren Donnellan and a Rosa Parks / Constitution panel by Robert Ponzio with Oak Hall students; both were vandalized in Nov 2021. Status 'removed' is an INFERENCE from the Sun's statement that the painted-over panels were taken down; not separately confirmed for Cofrin. OSM has an unnamed tourism=artwork 'installation' node in Cofrin Nature Park (node 9429812809) whose identity is unknown."
+
+  - id: bik-ismo-chrome-gator-the-bull
+    title: "Chrome Gator (352walls mural by Bik Ismo)"
+    artist: "Bik Ismo (Joshua Santos Rivera)"
+    year: 2018
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: municipal
+    owner: null
+    address: "18 SW 1st Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "West wall of The Bull, downtown"
+    facade_bearing: 270
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.wcjb.com/content/news/New-mural-being-created-in-Downtown-Gainesville-501098501.html"
+    notes: "WCJB (Nov 22, 2018): a photorealistic chrome alligator by a Puerto Rican artist, sponsored by the City of Gainesville in the 4th year of 352walls, which the City described as 'a changing gallery' where murals are periodically replaced. Coded municipal because it was City-sponsored. Title is descriptive. Status not re-checked since 2018. The 2015 352walls mural by Axel Void was also reported at The Bull, but only by a source not used here, so it is not listed."
+
+  # ---------------------------------------------------------------------------
+  # Gainesville Community Redevelopment/Reinvestment Area (CRA/GCRA)
+  # ---------------------------------------------------------------------------
+
+  - id: rejoined-university-heights
+    title: "Rejoined"
+    artist: "Brad Smith"
+    year: 2009
+    status: existing
+    type: sculpture
+    material: null
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: cra
+    owner: null
+    address: null
+    lon: null
+    lat: null
+    location_note: "Between SW 13th Street and Norman Hall, at the UF campus edge, as a gateway between UF and the University Heights neighborhood"
+    geocode_query: "Norman Hall, Gainesville, Florida"   # OpenStreetMap place search; approximate
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: true
+    source_url: "https://archive.news.ufl.edu/articles/2009/03/artwork-connects-campus-and-gainesville.html"
+    notes: "UF News, March 4, 2009: funded by the (then) Gainesville Community Redevelopment Agency and coordinated by the City's Art in Public Places Trust. A split column joined by three stainless-steel bars, partly built from material salvaged from the old downtown Federal Building (so material is mixed stainless steel and salvaged stone/masonry, left null). Artist was a UF School of Art and Art History sculpture lab specialist. Exact install date and current status not verified since 2009; it is not mapped in OSM."
+
+  # ---------------------------------------------------------------------------
+  # 352walls / Gainesville Urban Art Initiative (2015-2016 festival edition)
+  # Coordinated by City of Gainesville PRCA with Visit Gainesville; sponsors
+  # included the Gainesville CRA and Nautilus Realty. Coded partner per request.
+  # ---------------------------------------------------------------------------
+
+  - id: 352walls-2501-university-ave
+    title: "352walls mural by 2501"
+    artist: "2501 (Jacopo Ceccarelli)"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "201 W University Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Building at the SW corner of W University Ave and SW 2nd St (home of the :08 Seconds bar, managed by Nautilus Realty); the mural wraps the corner"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: "Artist honorarium $2,000 (Business Report of North Central Florida); total project value not published."
+    artist_local: false
+    source_url: "https://brncf.com/352walls-painting-the-town-with-murals/"
+    notes: "Preview mural for 352walls, painted June 2015 by an Italian muralist. It wraps the building corner facing the intersection, which by the building's position at the SW corner means the north (University Ave) and east (SW 2nd St) faces; inferred, not stated, so facade_bearing is null. Status not re-checked; 352walls murals were described as temporary."
+
+  - id: 352walls-pastel-the-top
+    title: "352walls mural by Pastel"
+    artist: "Pastel"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "30 N Main St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "The Top restaurant, downtown; two-part mural"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.wuft.org/news/2015/12/16/352walls-project-adds-culture-and-inspiration-to-city/"
+    notes: "Argentine artist, Nov 2015 international phase of 352walls. The address is The Top's address from OpenStreetMap, not from the source. A title ('Main Pollution') appears only in a source not used here. Which wall is not stated; status not re-checked."
+
+  - id: 352walls-franco-fasoli-shadow-health
+    title: "352walls mural by Franco Fasoli (JAZ)"
+    artist: "Franco Fasoli (JAZ)"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "15 SW 1st Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Shadow Health building, SW 1st Ave"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    extra_sources:
+      - "https://www.wuft.org/news/2015/12/16/352walls-project-adds-culture-and-inspiration-to-city/"
+    notes: "Buenos Aires artist; a 'three-step deconstruction' mural (Arrested Motion recap). Wall side not stated; status not re-checked."
+
+  - id: 352walls-leo-looseys
+    title: "352walls mural by L.E.O."
+    artist: "L.E.O."
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "120 SW 1st Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Loosey's bar, SW 1st Ave"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    notes: "Miami-based artist, 352walls 2015. Wall side not stated; status not re-checked."
+
+  - id: 352walls-evoca1-garage-south
+    title: "352walls mural by Evoca1"
+    artist: "Evoca1"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: "City of Gainesville"
+    address: "105 SW 3rd St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "South wall of the downtown parking garage"
+    facade_bearing: 180
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    extra_sources:
+      - "https://www.wuft.org/news/2015/12/16/352walls-project-adds-culture-and-inspiration-to-city/"
+    notes: "Dominican-born, Miami-based artist; WUFT places the work in his 'Through The Perils Of Our Youth' series (about childhood and letting go). Garage ownership by the City is an assumption (it is described only as the 'Downtown Parking Garage'). Status not re-checked."
+
+  - id: 352walls-gaia-garage-north
+    title: "What Are the Aesthetics of Reinvestment"
+    artist: "Gaia"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: "City of Gainesville"
+    address: "105 SW 3rd St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "North wall of the downtown parking garage"
+    facade_bearing: 0
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    extra_sources:
+      - "https://arrestedmotion.com/2016/04/streets-352walls-gainesville/"
+    notes: "Baltimore-based artist, 352walls 2015; a portrait-based mural. Title from the Arrested Motion recap. Garage ownership by the City is an assumption (see the Evoca1 entry). Status not re-checked."
+
+  - id: 352walls-interesni-kazki-market-street-pub
+    title: "352walls mural by Interesni Kazki"
+    artist: "Interesni Kazki (AEC & Waone)"
+    year: 2016
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "112 SW 1st Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Market Street Pub, SW 1st Ave"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    extra_sources:
+      - "https://www.wuft.org/news/2015/12/16/352walls-project-adds-culture-and-inspiration-to-city/"
+      - "https://arrestedmotion.com/2016/04/streets-352walls-gainesville/"
+    notes: "Ukrainian duo; phase two of 352walls, scheduled to begin Jan 11 (2016) per WUFT. Arrested Motion describes a two-piece mural. Year 2016 is inferred from that schedule. Status not re-checked."
+
+  - id: 352walls-add-fuel-main-university
+    title: "352walls work by Add Fuel"
+    artist: "Add Fuel (Diogo Machado)"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: null
+    lon: -82.32483   # Main St & W University Ave intersection, approximate
+    lat: 29.65194
+    location_note: "Corner of Main St and W University Ave"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://guidetogreatergainesville.com/gainesville-352walls/"
+    extra_sources:
+      - "https://arrestedmotion.com/2016/04/streets-352walls-gainesville/"
+    notes: "Portuguese artist; work inspired by Portuguese tile patterns (Arrested Motion). A secondary blog describes the Add Fuel piece as painted on a GRU utility box; if so the type would be 'functional'. Not confirmed, so coded as mural. Status not re-checked."
+
+  - id: 352walls-2alas-hector-gallery
+    title: "352walls mural by 2Alas"
+    artist: "2Alas (Andrew Antonaccio and Filio Galvez)"
+    year: 2015
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: null
+    lon: null
+    lat: null
+    location_note: "Hector Gallery wall, downtown Gainesville"
+    geocode_query: "Hector Gallery, Gainesville, Florida"   # OpenStreetMap place search; approximate
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.wuft.org/news/2015/12/16/352walls-project-adds-culture-and-inspiration-to-city/"
+    notes: "Miami-based duo known for geometric work. Hector Gallery's street address was not found in an approved source. Status not re-checked."
+
+  # ---------------------------------------------------------------------------
+  # Other partner / nonprofit-curated murals
+  # ---------------------------------------------------------------------------
+
+  - id: gaia-poetics-grove-street
+    title: "Poetics"
+    artist: "Gaia"
+    year: 2017
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: null
+    address: "231 NW 10th Ave, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Grove Street neighborhood"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: "Monochronicle lists the project 'from $15,000'; not confirmed as the actual cost."
+    artist_local: false
+    source_url: "https://monochronicle.com/property/vr-mural-painting/"
+    extra_sources:
+      - "https://www.brooklynstreetart.com/2017/03/20/gaia-paints-in-virtual-reality-for-new-mural-in-gainesville-fl/"
+    notes: "Painted Feb/March 2017 for Changeville (Gainesville's social change festival), curated by Iryna Kanishcheva (Monochronicle). Portraits of educator and civil rights leader Wilhelmina Johnson and poet Jack Kerouac in a magnolia/azalea frame, painted alongside a parallel VR (Tilt Brush) work. Monochronicle labels it a 'temporary installation'. No news-outlet source found. Status not re-checked."
+
+  - id: bo-diddley-mural-jeks
+    title: "Bo Diddley mural"
+    artist: "JEKS"
+    year: 2022
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: partner
+    owner: "Bosshardt Realty"
+    address: "16 S Main St, Gainesville, FL 32601"
+    lon: null
+    lat: null
+    location_note: "Corrugated-metal section of the second-floor facade of Bosshardt Realty's downtown office"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://alachuachronicle.com/bo-diddley-mural-comes-to-downtown-gainesville-curator-iryna-kanishcheva-of-monochronicle-teams-up-with-mural-artist-jeks/"
+    notes: "Painted Nov 3-10, 2022, unveiled Nov 9, 2022. Two profiles and two portraits of Bo Diddley with his rectangular guitar. Artist from Greensboro, NC. Funded with support from the State of Florida Division of Arts and Culture and the Florida Council on Arts and Culture; curated by Monochronicle. Bosshardt Realty is described as supporting the work as building owner. Painted on corrugated metal (paint type not stated). Facade direction not stated."
+
+  # ---------------------------------------------------------------------------
+  # Private
+  # ---------------------------------------------------------------------------
+
+  - id: leon-keer-anamorphic-gator-butler-plaza
+    title: "Anamorphic gator toy mural"
+    artist: "Leon Keer"
+    year: 2020
+    status: existing
+    type: mural
+    material: acrylic_mural
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: private
+    owner: null
+    address: null
+    lon: null
+    lat: null
+    location_note: "North wall of the Jo-Ann Fabric store, Butler Plaza"
+    geocode_query: "Butler Plaza, Gainesville, Florida"   # OpenStreetMap place search; approximate
+    facade_bearing: 0
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.wcjb.com/content/news/Dutch-artist-finishes-anamorphic-mural-in-Gainesville-568043251.html"
+    extra_sources:
+      - "https://www.wuft.org/entertainment/2020-02-20/new-gator-mural-graces-wall-at-butler-plaza"
+    notes: "Completed by Feb 20, 2020; a 3D (anamorphic) gator toy by a Dutch artist. Sponsor not stated, so coded private (it is on a private shopping-center wall). Jo-Ann Fabric closed its stores nationally in 2025 (general knowledge, not from the source); the mural's current status was not checked."
+
+  - id: ghf-america-250-eagle
+    title: "America 250 eagle sculpture"
+    artist: "Glen Purdy"
+    year: 2026
+    status: existing
+    type: figure
+    material: null
+    height_m: null
+    width_m: 7.32
+    lit: true
+    provenance: private
+    owner: "Gainesville Health & Fitness"
+    address: null
+    lon: null
+    lat: null
+    location_note: "In front of the main Gainesville Health & Fitness gym on W Newberry Rd"
+    geocode_query: "Gainesville Health & Fitness, West Newberry Road, Gainesville"   # OpenStreetMap place search; approximate
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: true
+    source_url: "https://www.wcjb.com/2026/07/01/eagle-sculpture-unveiled-gainesville-health-fitness-celebrate-america-250/"
+    notes: "Unveiled July 1, 2026; TEMPORARY, on display through the end of 2026. Built of 1-inch PVC pipe with LED lighting (lit: true); about 1,200 lb with a 24-ft wingspan (width_m is the wingspan). Holds nine dog tags honoring Alachua County soldiers killed in Iraq and Afghanistan. The artist is a longtime GHF employee. Street number not verified."
+
+  # ---------------------------------------------------------------------------
+  # OpenStreetMap tourism=artwork features (Overpass query run 2026-10-03)
+  # Title/artist/material/height/lit come from OSM tags; lon/lat from OSM.
+  # ---------------------------------------------------------------------------
+
+  - id: osm-alachua-french-fries
+    title: "Alachua"
+    artist: "John Henry"
+    year: 1987
+    status: existing
+    type: sculpture
+    material: painted_steel
+    height_m: 9.75
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: "University of Florida"
+    address: null
+    lon: -82.34432
+    lat: 29.64796
+    location_note: "UF main campus near Marston Science Library and the Reitz Union North Lawn"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/1637323042"
+    extra_sources:
+      - "http://www.johnhenrysculpture.com/project/alachua/"
+      - "https://www.publicartarchive.org/art/Alachua/04dd551b"   # Public Art Archive (Creative West) record
+    notes: "Known informally as 'The French Fries' (OSM name; official_name 'Alachua'). OSM material=aluminium, colour=yellow; coded painted_steel as the nearest type (painted metal). Height 9.75 m and lit=yes from OSM tags. Also listed in UF's Art in State Buildings collection on the Public Art Archive (1988; merged with that record, see extra_sources)."
+
+  - id: osm-moses-physics
+    title: "Moses"
+    artist: "John T. Young"
+    year: 1998
+    status: existing
+    type: sculpture
+    material: steel
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: "University of Florida"
+    address: null
+    lon: -82.34946
+    lat: 29.64470
+    location_note: "UF campus near Phelps Lab and Reitz Ravine Woods (physics area)"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/4249725551"
+    extra_sources:
+      - "http://www.phys.ufl.edu/news/display/2018/"
+      - "https://www.publicartarchive.org/art/Moses/cdcf7797"   # Public Art Archive (Creative West) record
+    notes: "OSM artwork_type=installation, material=steel, start_date 1998. The Public Art Archive lists it at the Physics Building in UF's Art in State Buildings collection, made mainly of granite with steel (merged with that record, see extra_sources)."
+
+  - id: osm-turlington-rock
+    title: "Turlington Rock"
+    artist: "Dr. James Eades"
+    year: 1984
+    status: existing
+    type: sculpture
+    material: stone
+    height_m: 3
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: "University of Florida"
+    address: null
+    lon: -82.34377
+    lat: 29.64906
+    location_note: "Near Turlington Hall, Rolfs Hall and Century Tower"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/4741925737"
+    notes: "Known informally as 'The Potato' (OSM name; official_name 'Turlington Rock'). A roughly 10-ton stone on a pedestal, operated by the UF Department of Geological Sciences (OSM). OSM credits 'Dr. James Eades' in artist_name; he is better read as the person who placed it than as a sculptor (inference). Height 3 m from OSM."
+
+  - id: osm-albert-and-alberta
+    title: "Albert & Alberta"
+    artist: null
+    year: null
+    status: existing
+    type: figure
+    material: bronze
+    height_m: 2
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.34936
+    lat: 29.65229
+    location_note: "Near Emerson Alumni Hall and the stadium lawn"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/4742232841"
+    notes: "Bronze alligator mascot statues on a pedestal; OSM height 2 m, lit=yes, facing direction 180. Artist and year not tagged."
+
+  - id: osm-albert-murphree-statue
+    title: "Albert A. Murphree"
+    artist: "Paul Manship"
+    year: 1946
+    status: existing
+    type: figure
+    material: null
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: "University of Florida"
+    address: null
+    lon: -82.34206
+    lat: 29.65041
+    location_note: "Near Plaza of the Americas, by Smathers Library, Peabody Hall and Criser Hall"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.openstreetmap.org/node/5145535993"
+    notes: "Memorial statue of UF's 2nd president (1909-1927). OSM has no material tag (probably bronze, but unverified). Paul Manship was not a Gainesville artist."
+
+  - id: osm-heisman-tebow
+    title: "Tim Tebow (2007)"
+    artist: "W. Stanley \"Sandy\" Proctor"
+    year: 2011
+    status: existing
+    type: figure
+    material: bronze
+    height_m: 2.5
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.35001
+    lat: 29.65012
+    location_note: "Heisman Trophy statues on the west side of Ben Hill Griffin Stadium"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.openstreetmap.org/node/7984819935"
+    extra_sources:
+      - "http://www.proctorbronzes.com/gallery-commissions-heisman-project.php"
+    notes: "One of three Heisman winner statues dedicated April 9, 2011 (OSM start_date). OSM: bronze, 2.5 m, lit=yes, faces 270. Probably owned by the University Athletic Association, which operates the stadium (not tagged)."
+
+  - id: osm-heisman-spurrier
+    title: "Steve Spurrier (1966)"
+    artist: "W. Stanley \"Sandy\" Proctor"
+    year: 2011
+    status: existing
+    type: figure
+    material: bronze
+    height_m: 2.5
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.35002
+    lat: 29.65008
+    location_note: "Heisman Trophy statues on the west side of Ben Hill Griffin Stadium"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.openstreetmap.org/node/7984819936"
+    extra_sources:
+      - "http://www.proctorbronzes.com/gallery-commissions-heisman-project.php"
+    notes: "Heisman statue series, dedicated April 9, 2011 (OSM). Bronze, 2.5 m, lit=yes, faces 270."
+
+  - id: osm-heisman-wuerffel
+    title: "Danny Wuerffel (1996)"
+    artist: "W. Stanley \"Sandy\" Proctor"
+    year: 2011
+    status: existing
+    type: figure
+    material: bronze
+    height_m: 2.5
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.35002
+    lat: 29.65004
+    location_note: "Heisman Trophy statues on the west side of Ben Hill Griffin Stadium"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: false
+    source_url: "https://www.openstreetmap.org/node/7984819937"
+    extra_sources:
+      - "http://www.proctorbronzes.com/gallery-commissions-heisman-project.php"
+    notes: "Heisman statue series, dedicated April 9, 2011 (OSM). Bronze, 2.5 m, lit=yes, faces 270."
+
+  - id: osm-bull-gator
+    title: "Bull Gator"
+    artist: null
+    year: 2008
+    status: existing
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.34960
+    lat: 29.64880
+    location_note: "Southwest of Ben Hill Griffin Stadium, near Weil Hall and the Engineering Clock Tower"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/7984819939"
+    notes: "Bronze alligator on a pedestal; OSM start_date 2008, lit=yes, faces 230. Artist not tagged. A second, unnamed bronze alligator near the Courtyard of Champions (OSM node 7984819938) is not listed separately."
+
+  - id: osm-gator-ubiquity
+    title: "Gator Ubiquity"
+    artist: "Chris Williams"
+    year: 2015
+    status: existing
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: "University of Florida"
+    address: null
+    lon: -82.34049
+    lat: 29.65154
+    location_note: "Warrington College of Business, by Heavener, Bryan and Matherly halls; on a pedestal on a brick surface"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/8015328511"
+    extra_sources:
+      - "https://www.chriswilliamssculpture.com/gator-ubiquity"
+    notes: "Bronze alligator (OSM sculpture=animal, start_date 2015)."
+
+  - id: osm-alpha-gator-statue
+    title: "Alpha Gator Statue"
+    artist: "Jeff \"Gator\" Wilson"
+    year: null
+    status: existing
+    type: figure
+    material: bronze
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.35616
+    lat: 29.64556
+    location_note: "Fraternity Row (UF-operated area per OSM), near Museum Road"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/13689440538"
+    notes: "Coded uf because it stands in the UF-operated Fraternity Row area; it may belong to a fraternity chapter rather than the University (not verified)."
+
+  - id: osm-lion-statue-fraternity-row
+    title: "Lion Statue"
+    artist: null
+    year: null
+    status: existing
+    type: figure
+    material: stone
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: uf
+    owner: null
+    address: null
+    lon: -82.35507
+    lat: 29.64504
+    location_note: "Fraternity Row near Museum Road and Woodlawn Drive, by the Lake Alice Conservation Area"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/4270695539"
+    notes: "Stone lion on a pedestal, facing 180 (OSM). Coded uf by location; likely associated with a fraternity house (not verified)."
+
+  - id: osm-34th-street-wall
+    title: "34th Street Wall"
+    artist: null
+    year: 1979
+    status: existing
+    type: wall
+    material: concrete
+    height_m: null
+    width_m: 341.4
+    lit: null
+    provenance: null
+    owner: "State of Florida (FDOT)"
+    address: null
+    lon: -82.37226
+    lat: 29.64591
+    location_note: "Retaining wall along SW 34th St (SR 121) beside the UF golf course"
+    facade_bearing: 270
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/way/387038734"
+    extra_sources:
+      - "https://en.wikipedia.org/wiki/34th_Street_Wall"
+      - "https://www.wuft.org/art-and-culture/2026-03-05/photo-gallery-tom-petty-34th-street-wall-mural"
+    notes: "OSM tags it as artwork_type=street_art. A 1,120-ft poured-concrete retaining wall built by FDOT in 1979 (Wikipedia) that serves as a community graffiti board; repainted constantly. No provenance category fits (state-owned, not commissioned), so provenance is null. It carries the Tom Petty memorial mural first painted in Oct 2017 by Steve Blake Harrison; it was accidentally painted over in Feb 2026 and repainted. facade_bearing 270 (west) is an INFERENCE from the golf course lying east of SW 34th St. Lon/lat are the OSM way's center."
+
+  - id: osm-mlk-memorial-garden
+    title: "Dr. Martin Luther King Jr."
+    artist: null
+    year: null
+    status: existing
+    type: sculpture
+    material: null
+    height_m: null
+    width_m: null
+    lit: null
+    provenance: null
+    owner: null
+    address: null
+    lon: -82.32292
+    lat: 29.65225
+    location_note: "Dr. Martin Luther King Jr. Memorial Garden, E University Ave near NE 1st Ave, downtown"
+    facade_bearing: null
+    budget_usd: null
+    budget_note: null
+    artist_local: null
+    source_url: "https://www.openstreetmap.org/node/10186157872"
+    notes: "Known from OSM tags only (artwork_type=sculpture). Secondary web listings (not cited) describe a 1988 memorial garden next to the City Hall annex with a monument and a bronze relief portrait of Dr. King. Artist, material, owner and provenance could not be confirmed from an approved source, so provenance is null."

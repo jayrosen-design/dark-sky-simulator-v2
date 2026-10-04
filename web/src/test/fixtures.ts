@@ -1,4 +1,4 @@
-// Loads the real data package from web/public/data for tests (no network, no DOM).
+// Loads the real data package from web/public/dark-sky/data for tests (no network, no DOM).
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,7 @@ import type { EngineData, Lin16Meta, Log16Meta } from "../engine/types";
 import type { DataPackage } from "../state/model";
 import type { LandParcel, McdaData } from "../engine/mcda";
 
-const DIR = fileURLToPath(new URL("../../public/data/", import.meta.url));
+const DIR = fileURLToPath(new URL("../../public/dark-sky/data/", import.meta.url));
 // Same unpacking as data/load.ts unpackU16 (gunzip + per-row cumulative sum), done synchronously for tests.
 const u16 = (f: string, nx: number) => {
   const b = gunzipSync(readFileSync(DIR + f));

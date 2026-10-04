@@ -7,7 +7,7 @@ import { useStargaze, type Place } from "../state/stargaze";
 import { bortleClass, bortleLabel, nelmFromSqm } from "../engine/bortle";
 import { meanCloudLayer, placeFacts, topSpots, USE_CASES, waterViewLayer, type PlaceFacts, type UseCase } from "../engine/spots";
 import { darknessFactor, dewRisk, goScore, seeingProxy, transparencyProxy, WX_ATTRIBUTION, type WxPoint } from "../engine/weather";
-import { nightDateOf, nightSummary, siteTimeLabel, skyState } from "../engine/sky";
+import { nightDateOf, nightSummary, siteTimeLabel, skyState } from "../shared/sky";
 import type { EngineData } from "../engine/types";
 import { Card, fmtInt, fmtUsd, Seg } from "./ui";
 

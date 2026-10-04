@@ -1,0 +1,2734 @@
+# Public art registry, part 2: works listed in the Public Art Archive for Alachua County, Florida
+#
+# Source: Public Art Archive, a publication of Creative West (https://publicartarchive.org). Imported on 2026-10-04
+# from the archive's public search (all records within 60 miles of Gainesville, kept if inside Alachua County):
+# 133 records, 129 entries here, 3 merged into registry.yaml (their entries now cite the
+# archive record), 1 skipped (c3e89f69: umbrella record for Light Abacus 1, 2 and 3; parts 2 and 3 have their own records).
+#
+# FACTS ONLY, each linked to its archive record (source_url): title, artist, year, building, address, the archive's
+# coordinates, and collection/owner. The archive's descriptions and images are not copied; see each record for them
+# and for credits. The archive's terms allow non-commercial research use with citation; this simulator relies on that
+# and on fair use for facts. The archive does not warrant its records' accuracy, and neither does this file.
+#
+# Coded by hand from each record (the archive has no such fields):
+# - setting: outdoor | indoor | unverified. Outdoor or indoor only when the record states or clearly implies it (or
+#   OpenStreetMap maps the work outdoors); `notes` says which. "unverified" works are treated as indoor: they count
+#   for the collection and walking access but get no street impressions and no 3D model. Change a work to outdoor
+#   once someone has checked it on site.
+# - type and material: the nearest of the simulator's classes (aluminum counts as steel; ceramic tile as mosaic).
+#   Flat ground-level works (pavement or pool mosaics) are coded as a 'wall' 5-10 cm high.
+# - status: off_view where the archive marks a work off view; removed where the record says it is gone.
+# - provenance: uf for UF and UF Health collections (mostly Florida's Art in State Buildings program at UF),
+#   municipal for the City and GRU, county for Alachua County, private for the Marilyn A. Wall Foundation.
+# Settings in this import: 18 outdoor, 76 indoor, 35 unverified.
+
+artworks:
+
+  - id: paa-28c663f4
+    title: "Urban Metal Organic"
+    artist: "James Millikan Lasley"
+    year: 2012
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "private"
+    owner: "Marilyn A. Wall Foundation"
+    collection: "Marilyn A. Wall Foundation"
+    address: "516 NE 8th Avenue, Gainesville, FL 32601"
+    lon: -82.319527
+    lat: 29.659225
+    location_note: "516 NE 8th Avenue"
+    source_url: "https://www.publicartarchive.org/art/Urban-Metal-Organic/28c663f4"
+    notes: "Setting: the record places it on a sidewalk."
+
+  - id: paa-83fb349c
+    title: "Scales of Hammurabi"
+    artist: "Jack Archibald"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: 3.96
+    width_m: 12.19
+    lit: false
+    provenance: "county"
+    owner: "Alachua County"
+    collection: "Alachua County"
+    address: "220 South Main Street, Gainesville, FL 32601"
+    lon: -82.324993
+    lat: 29.64959
+    location_note: "Alachua County Criminal Justice Center"
+    source_url: "https://www.publicartarchive.org/art/Scales-of-Hammurabi/83fb349c"
+    notes: "Setting: in the main lobby (per the record). Dimensions as stated in the record."
+
+  - id: paa-8383f9f0
+    title: "Flash Point"
+    artist: "Steven Oakley"
+    year: 1988
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351831
+    lat: 29.631345
+    location_note: "Animal Sciences Building"
+    source_url: "https://www.publicartarchive.org/art/Flash-Point/8383f9f0"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-93a2b61b
+    title: "Some Were Quite Blind"
+    artist: "Carol K. Brown"
+    year: 1987
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351527
+    lat: 29.63162
+    location_note: "Animal Sciences Building"
+    source_url: "https://www.publicartarchive.org/art/Some-Were-Quite-Blind/93a2b61b"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-34e5d77e
+    title: "Wind Totem"
+    artist: "Steven Oakley"
+    year: 1988
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351403
+    lat: 29.630931
+    location_note: "Animal Sciences Building"
+    source_url: "https://www.publicartarchive.org/art/Wind-Totem/34e5d77e"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-08f1c4cf
+    title: "Schooling Fish"
+    artist: "Gar Waterman"
+    year: 2000
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "586 Newell Dr, Gainesville, FL 32603"
+    lon: -82.344022
+    lat: 29.64677
+    location_note: "Aquatic Products Lab"
+    source_url: "https://www.publicartarchive.org/art/Schooling-Fish/08f1c4cf"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-7128b0ad
+    title: "Door Pulls"
+    artist: "Tony Shipp"
+    year: 2000
+    status: existing
+    setting: unverified
+    type: functional
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "982 Museum Rd, Gainesville, FL 32603"
+    lon: -82.363679
+    lat: 29.642198
+    location_note: "Baughman Meditation Center"
+    source_url: "https://www.publicartarchive.org/art/Door-Pulls/7128b0ad"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-5566719c
+    title: "Collocation 13 (NATURE)"
+    artist: "Mickey Smith"
+    year: 2009
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1275 Center Dr, Gainesville, FL 32611"
+    lon: -82.345919
+    lat: 29.640708
+    location_note: "Biomedical Sciences"
+    source_url: "https://www.publicartarchive.org/art/Collocation-13-NATURE-/5566719c"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-8992207e
+    title: "Biplane"
+    artist: "Tim Prentice"
+    year: 2003
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1900 Museum Rd, Gainesville, FL 32603"
+    lon: -82.347981
+    lat: 29.645057
+    location_note: "Bookstore Welcome Center and Garage XII"
+    source_url: "https://www.publicartarchive.org/art/Biplane/8992207e"
+    notes: "Setting: suspended inside the building (per the record)."
+
+  - id: paa-7c8d14e1
+    title: "Cause and Effect"
+    artist: "Steven Oakley"
+    year: 1987
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "351 Village Dr, Gainesville, FL 32603"
+    lon: -82.358389
+    lat: 29.650149
+    location_note: "Bruton-Geer Hall"
+    source_url: "https://www.publicartarchive.org/art/Cause-and-Effect/7c8d14e1"
+    notes: "Setting: the record calls it an outdoor sculpture."
+
+  - id: paa-1e55ff4f
+    title: "Pattern System Marking"
+    artist: "Stuart Keeler"
+    year: 2010
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2089 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.350466
+    lat: 29.634035
+    location_note: "CERC"
+    source_url: "https://www.publicartarchive.org/art/Pattern-System-Marking/1e55ff4f"
+    notes: "Setting: suspended from a ceiling (per the record)."
+
+  - id: paa-0ab15467
+    title: "DNA"
+    artist: "Tom Otterness"
+    year: 2007
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2033 Mowry Rd, Gainesville, FL 32610"
+    lon: -82.35211
+    lat: 29.638183
+    location_note: "Cancer/Genetics Research"
+    source_url: "https://www.publicartarchive.org/art/DNA/0ab15467"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-99bcbe07
+    title: "Squares & Square"
+    artist: "Charles Fager"
+    year: 1989
+    status: existing
+    setting: unverified
+    type: mural
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "125 Buckman Dr, Gainesville, FL 32611"
+    lon: -82.343763
+    lat: 29.650714
+    location_note: "Chemistry Laboratory"
+    source_url: "https://www.publicartarchive.org/art/Squares-Square/99bcbe07"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-d4b474dd
+    title: "Harp of Color"
+    artist: "Shan Shan Sheng"
+    year: 2003
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1800 McCarty Dr, Gainesville, FL 32603"
+    lon: -82.346893
+    lat: 29.646155
+    location_note: "Constans Theatre"
+    source_url: "https://www.publicartarchive.org/art/Harp-of-Color/d4b474dd"
+    notes: "Setting: suspended from the theatre ceiling (per the record)."
+
+  - id: paa-b0e82fcc
+    title: "Florida Planet Series: Site Horizon"
+    artist: "Georgina Holt"
+    year: 1992
+    status: existing
+    setting: unverified
+    type: mural
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3190 Radio Rd, Gainesville, FL 32611"
+    lon: -82.369431
+    lat: 29.642527
+    location_note: "Counseling And Wellness"
+    source_url: "https://www.publicartarchive.org/art/Florida-Planet-Series-Site-Horizon/b0e82fcc"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-fc29bc16
+    title: "Multiverses"
+    artist: "Carol J. Prusa"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3190 Radio Rd, Gainesville, FL 32611"
+    lon: -82.369431
+    lat: 29.642527
+    location_note: "Counseling And Wellness"
+    source_url: "https://www.publicartarchive.org/art/Multiverses/fc29bc16"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-8b063785
+    title: "One Continent-One Humanity"
+    artist: "Salma Arastu"
+    year: 2009
+    status: existing
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3190 Radio Rd, Gainesville, FL 32611"
+    lon: -82.369431
+    lat: 29.642527
+    location_note: "Counseling And Wellness"
+    source_url: "https://www.publicartarchive.org/art/One-Continent-One-Humanity/8b063785"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-14e430f9
+    title: "Spillway"
+    artist: "Lyda Toy"
+    year: null
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3190 Radio Rd, Gainesville, FL 32611"
+    lon: -82.369431
+    lat: 29.642527
+    location_note: "Counseling And Wellness"
+    source_url: "https://www.publicartarchive.org/art/Spillway/14e430f9"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-1e33be38
+    title: "Underwater"
+    artist: "Susanne Clawson"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3190 Radio Rd, Gainesville, FL 32611"
+    lon: -82.369431
+    lat: 29.642527
+    location_note: "Counseling And Wellness"
+    source_url: "https://www.publicartarchive.org/art/Underwater/1e33be38"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-2df68229
+    title: "Light Abacus 3"
+    artist: "Dale Eldred"
+    year: 1990
+    status: off_view
+    setting: unverified
+    type: sculpture
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1478 Union Rd, Gainesville, FL 32611"
+    lon: -82.344085
+    lat: 29.649995
+    location_note: "Criser Hall"
+    source_url: "https://www.publicartarchive.org/art/Light-Abacus-3/2df68229"
+    notes: "The archive marks it off view (not on public display). Setting: not stated in the record (unverified)."
+
+  - id: paa-99c2e041
+    title: "Touch the Sky"
+    artist: "Robert J. Sindorf"
+    year: 1998
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "stone"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1064 Center Dr, Gainesville, FL 32611"
+    lon: -82.347742
+    lat: 29.642275
+    location_note: "Engineering Building"
+    source_url: "https://www.publicartarchive.org/art/Touch-the-Sky/99c2e041"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-d7347658
+    title: "Radiant Will O' the Wisp"
+    artist: "Barbara Neijina"
+    year: 1990
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1881 Natural Area Dr, Gainesville, FL 32611"
+    lon: -82.366488
+    lat: 29.634685
+    location_note: "Entomology-Nematology Building"
+    source_url: "https://www.publicartarchive.org/art/Radiant-Will-O-the-Wisp/d7347658"
+    notes: "Setting: a sculptural pavilion with seating; outdoors inferred."
+
+  - id: paa-c96f934c
+    title: "By Reef and Trail"
+    artist: "Paul Fullerton"
+    year: 1987
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1389 Stadium Rd, Gainesville, FL 32611"
+    lon: -82.340832
+    lat: 29.648192
+    location_note: "Fine Arts A"
+    source_url: "https://www.publicartarchive.org/art/By-Reef-and-Trail/c96f934c"
+    notes: "Setting: mapped outdoors in OpenStreetMap (node 13684845071, 26 m away)."
+
+  - id: paa-7ed5ab4d
+    title: "A Parallel Place: Ode to Foucault"
+    artist: "Julia Morrisroe"
+    year: 2019
+    status: existing
+    setting: outdoor
+    type: wall
+    material: "acrylic_mural"
+    height_m: 0.1
+    width_m: null
+    lit: false
+    provenance: "municipal"
+    owner: "City of Gainesville"
+    collection: "City of Gainesville"
+    address: "200 E University Ave, Gainesville, FL , Gainesville, FL 32601"
+    lon: -82.323189
+    lat: 29.652639
+    location_note: "Gainesville City Hall"
+    source_url: "https://www.publicartarchive.org/art/A-Parallel-Place-Ode-to-Foucault/7ed5ab4d"
+    notes: "Setting: painted in two reflecting pools in front of City Hall (per the record); drawn as a low flat work."
+
+  - id: paa-038b6362
+    title: "Elemental Energy"
+    artist: "Michele R Gutlove - Design Studio G+H"
+    year: 2011
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "municipal"
+    owner: "Gainesville Regional Utilities"
+    collection: "Gainesville Regional Utilities"
+    address: "4747 North Main Street, Gainesville, FL 32609"
+    lon: -82.314205
+    lat: 29.696995
+    location_note: "Gainesville Regional Utilities"
+    source_url: "https://www.publicartarchive.org/art/Elemental-Energy/038b6362"
+    notes: "Setting: in the lobby of the fire training center (per the record)."
+
+  - id: paa-3f1f38ce
+    title: "The Giving Tree"
+    artist: "Leslie Tharp"
+    year: 2012
+    status: existing
+    setting: outdoor
+    type: functional
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "municipal"
+    owner: "City of Gainesville"
+    collection: "City of Gainesville"
+    address: "5701 N.W. 34th Street, Gainesville, FL 32653"
+    lon: -82.354593
+    lat: 29.708717
+    location_note: "Gainesville Senior Recreation Center"
+    source_url: "https://www.publicartarchive.org/art/The-Giving-Tree/3f1f38ce"
+    notes: "Setting: the record lists it as outdoor sculpture on a sidewalk."
+
+  - id: paa-99cdb47a
+    title: "Rotated Superimposition"
+    artist: "Kenneth F. von Roenn, Jr."
+    year: 1998
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2021 Stadium Rd, Gainesville, FL 32608"
+    lon: -82.349886
+    lat: 29.648002
+    location_note: "Gator Corner Dining Center"
+    source_url: "https://www.publicartarchive.org/art/Rotated-Superimposition/99cdb47a"
+    notes: "Setting: stained glass above interior windows."
+
+  - id: paa-25515efa
+    title: "Double Scroll"
+    artist: "Lynn Newcomb"
+    year: 2003
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1368 Union Rd, Gainesville, FL 32611"
+    lon: -82.340174
+    lat: 29.650709
+    location_note: "Gerson Hall"
+    source_url: "https://www.publicartarchive.org/art/Double-Scroll/25515efa"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-5785cad7
+    title: "Wonders of the Hive"
+    artist: "Michelle K. Rogers"
+    year: 2019
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1881 Natural Area Dr, Gainesville, FL 32611"
+    lon: -82.365753
+    lat: 29.634657
+    location_note: "HBREL"
+    source_url: "https://www.publicartarchive.org/art/Wonders-of-the-Hive/5785cad7"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-4ba21265
+    title: "Floater #5"
+    artist: "Robert Mueller"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.369824
+    lat: 29.636717
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Floater-5/4ba21265"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-bc6561af
+    title: "Fragmented Reflections"
+    artist: "James Piercey"
+    year: 1991
+    status: existing
+    setting: outdoor
+    type: wall
+    material: "stone"
+    height_m: 0.1
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.369824
+    lat: 29.636717
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Fragmented-Reflections/bc6561af"
+    notes: "Setting: in the shallow pools at the museum entrance (per the record); drawn as a low flat work."
+
+  - id: paa-31d0f39d
+    title: "Meditation"
+    artist: "Robert Mueller"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.369824
+    lat: 29.636717
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Meditation/31d0f39d"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-9b54ca84
+    title: "Shade # 7"
+    artist: "Robert Mueller"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.369824
+    lat: 29.636717
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Shade-7/9b54ca84"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-7923f76b
+    title: "Shades #4"
+    artist: "Robert Mueller"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.369824
+    lat: 29.636717
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Shades-4/7923f76b"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-79aa7eae
+    title: "Tile and Sphere Installation"
+    artist: "Masamichi Yoshikawa"
+    year: 2012
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3259 Hull Rd, Gainesville, FL 32608"
+    lon: -82.370774
+    lat: 29.636863
+    location_note: "Harn Museum Of Art"
+    source_url: "https://www.publicartarchive.org/art/Tile-and-Sphere-Installation/79aa7eae"
+    notes: "Setting: on a knoll behind the museum (per the record)."
+
+  - id: paa-34537922
+    title: "Balance"
+    artist: "Kathleen Meehan, Howard Meehan"
+    year: 2003
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: 5.49
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1225 Center Dr, Gainesville, FL 32603"
+    lon: -82.345148
+    lat: 29.641521
+    location_note: "Health Professions, Nursing, and Pharmacy"
+    source_url: "https://www.publicartarchive.org/art/Balance/34537922"
+    notes: "Setting: not stated in the record (unverified). Dimensions as stated in the record."
+
+  - id: paa-bae7bbda
+    title: "Separation of Powers: The Jurist"
+    artist: "Jim Cole"
+    year: 2005
+    status: existing
+    setting: unverified
+    type: functional
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "309 Village Dr, Gainesville, FL 32603"
+    lon: -82.358406
+    lat: 29.6499
+    location_note: "Holland Law Center"
+    source_url: "https://www.publicartarchive.org/art/Separation-of-Powers-The-Jurist/bae7bbda"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-7b7e2bc1
+    title: "Separation of Powers: The Legislature"
+    artist: "Jim Cole"
+    year: 2005
+    status: existing
+    setting: unverified
+    type: functional
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "309 Village Dr, Gainesville, FL 32603"
+    lon: -82.35932
+    lat: 29.649518
+    location_note: "Holland Law Center"
+    source_url: "https://www.publicartarchive.org/art/Separation-of-Powers-The-Legislature/7b7e2bc1"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-d330bb4e
+    title: "Separation of Powers: The Lobbyist"
+    artist: "Jim Cole"
+    year: 2005
+    status: existing
+    setting: unverified
+    type: functional
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "309 Village Dr, Gainesville, FL 32603"
+    lon: -82.358848
+    lat: 29.649655
+    location_note: "Holland Law Center"
+    source_url: "https://www.publicartarchive.org/art/Separation-of-Powers-The-Lobbyist/d330bb4e"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-6c0773b5
+    title: "Separation of Powers: The President"
+    artist: "Jim Cole"
+    year: 2005
+    status: existing
+    setting: unverified
+    type: functional
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "309 Village Dr, Gainesville, FL 32603"
+    lon: -82.359248
+    lat: 29.649439
+    location_note: "Holland Law Center"
+    source_url: "https://www.publicartarchive.org/art/Separation-of-Powers-The-President/6c0773b5"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-34f7920b
+    title: "Flotilla"
+    artist: "Nobuho Nagasawa"
+    year: 2010
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "digital"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1404 Union Rd, Gainesville, FL 32603"
+    lon: -82.340707
+    lat: 29.650467
+    location_note: "Hough Hall"
+    source_url: "https://www.publicartarchive.org/art/Flotilla/34f7920b"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-5465f5b4
+    title: "Dedication"
+    artist: "Moses X Ball"
+    year: 2023
+    status: existing
+    setting: unverified
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1510 W University Ave, Gainesville, FL 32603"
+    lon: -82.342171
+    lat: 29.652324
+    location_note: "Institute of Black Culture"
+    source_url: "https://www.publicartarchive.org/art/Dedication/5465f5b4"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-82f27806
+    title: "Abuelita"
+    artist: "Ernesto Maranje"
+    year: 2021
+    status: existing
+    setting: outdoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1504 W University Ave, Gainesville, FL 32603"
+    lon: -82.341915
+    lat: 29.652483
+    location_note: "La Casita"
+    source_url: "https://www.publicartarchive.org/art/Abuelita/82f27806"
+    notes: "Setting: a multistory mural on La Casita; exterior wall inferred."
+
+  - id: paa-3d5d63b8
+    title: "Barcas"
+    artist: "Connie Lloveras"
+    year: 2007
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "411 Village Dr, Gainesville, FL 32611"
+    lon: -82.359266
+    lat: 29.648892
+    location_note: "Levin Advocacy Ctr"
+    source_url: "https://www.publicartarchive.org/art/Barcas/3d5d63b8"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-6a22e78c
+    title: "Boat and Two Structural Forms"
+    artist: "Connie Lloveras"
+    year: 2005
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "411 Village Dr, Gainesville, FL 32611"
+    lon: -82.359267
+    lat: 29.648923
+    location_note: "Levin Advocacy Ctr"
+    source_url: "https://www.publicartarchive.org/art/Boat-and-Two-Structural-Forms/6a22e78c"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-cd1e9dbd
+    title: "Circuits, Signs and Place"
+    artist: "Richard Heipp"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1545 W University Ave, Gainesville, FL 32611"
+    lon: -82.34304
+    lat: 29.651157
+    location_note: "Library West"
+    source_url: "https://www.publicartarchive.org/art/Circuits-Signs-and-Place/cd1e9dbd"
+    notes: "Setting: part of a 'curiosity cabinet' series with paintings; indoors inferred."
+
+  - id: paa-ef41101b
+    title: "Circuits, Signs and Place"
+    artist: "Richard Heipp"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1545 W University Ave, Gainesville, FL 32611"
+    lon: -82.343007
+    lat: 29.651157
+    location_note: "Library West"
+    source_url: "https://www.publicartarchive.org/art/Circuits-Signs-and-Place/ef41101b"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-c510ba82
+    title: "Circuits, Signs and Place"
+    artist: "Richard Heipp"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1545 W University Ave, Gainesville, FL 32611"
+    lon: -82.343007
+    lat: 29.651157
+    location_note: "Library West"
+    source_url: "https://www.publicartarchive.org/art/Circuits-Signs-and-Place/c510ba82"
+    notes: "Setting: part of a 'curiosity cabinet' series with paintings; indoors inferred."
+
+  - id: paa-0800029f
+    title: "Circuits, Signs and Place"
+    artist: "Richard Heipp"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1545 W University Ave, Gainesville, FL 32611"
+    lon: -82.342964
+    lat: 29.651157
+    location_note: "Library West"
+    source_url: "https://www.publicartarchive.org/art/Circuits-Signs-and-Place/0800029f"
+    notes: "Setting: part of a 'curiosity cabinet' series with paintings; indoors inferred."
+
+  - id: paa-c5b9c56b
+    title: "Circuits, Signs and Place"
+    artist: "Richard Heipp"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1545 W University Ave, Gainesville, FL 32611"
+    lon: -82.342909
+    lat: 29.651191
+    location_note: "Library West"
+    source_url: "https://www.publicartarchive.org/art/Circuits-Signs-and-Place/c5b9c56b"
+    notes: "Setting: part of a 'curiosity cabinet' series with paintings; indoors inferred."
+
+  - id: paa-29abc23e
+    title: "Circuit Board"
+    artist: "Windy Chien"
+    year: 2023
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1889 Museum Rd, Gainesville, FL 32606"
+    lon: -82.347844
+    lat: 29.644134
+    location_note: "Malachowsky Hall for Data Science & Information Technology"
+    source_url: "https://www.publicartarchive.org/art/Circuit-Board/29abc23e"
+    notes: "Setting: knotted cord."
+
+  - id: paa-ba10df65
+    title: "Synapse"
+    artist: "Ray King"
+    year: 2000
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1149 Newell Dr, Gainesville, FL 32610"
+    lon: -82.343479
+    lat: 29.641835
+    location_note: "McKnight Brain Institute"
+    source_url: "https://www.publicartarchive.org/art/Synapse/ba10df65"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-ffec4f55
+    title: "Wings, Petals, and Leaves"
+    artist: "Robert Stout, Stephanie Jurs, Twin Dolphin Mosaics"
+    year: 2004
+    status: existing
+    setting: outdoor
+    type: wall
+    material: "mosaic"
+    height_m: 0.05
+    width_m: 3.05
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3215 Hull Rd, Gainesville, FL 32608"
+    lon: -82.370608
+    lat: 29.636446
+    location_note: "Mcguire Ctr For Lepidoptera Res"
+    source_url: "https://www.publicartarchive.org/art/Wings-Petals-and-Leaves/ffec4f55"
+    notes: "Setting: four pavement mosaics set in the walkways (per the record); drawn as a low flat work."
+
+  - id: paa-116d0101
+    title: "Untitled"
+    artist: "Kenneth F. von Roenn, Jr."
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1355 Museum Dr, Gainesville, FL 32603"
+    lon: -82.363768
+    lat: 29.639965
+    location_note: "Microbiology/Cell Science"
+    source_url: "https://www.publicartarchive.org/art/Untitled/116d0101"
+    notes: "Setting: stained glass."
+
+  - id: paa-7668763c
+    title: "Incubator"
+    artist: "Carol J. Prusa"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1041 Center Dr, Gainesville, FL 32611"
+    lon: -82.346289
+    lat: 29.642587
+    location_note: "Nanoscale Research"
+    source_url: "https://www.publicartarchive.org/art/Incubator/7668763c"
+    notes: "Setting: silverpoint and graphite on acrylic domes."
+
+  - id: paa-2b90bd7a
+    title: "Nanotube Fullerenes"
+    artist: "Robert Stout, Stephanie Jurs"
+    year: 2008
+    status: existing
+    setting: unverified
+    type: wall
+    material: "mosaic"
+    height_m: 0.05
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1041 Center Dr, Gainesville, FL 32611"
+    lon: -82.346335
+    lat: 29.642584
+    location_note: "Nanoscale Research"
+    source_url: "https://www.publicartarchive.org/art/Nanotube-Fullerenes/2b90bd7a"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-0dc4db54
+    title: "Connections"
+    artist: "Carol May, Tim Watkins"
+    year: 2017
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1700 Stadium Rd, Gainesville, FL 32603"
+    lon: -82.345156
+    lat: 29.648816
+    location_note: "Newell Hall"
+    source_url: "https://www.publicartarchive.org/art/Connections/0dc4db54"
+    notes: "Setting: mapped outdoors in OpenStreetMap (node 9273544758)."
+
+  - id: paa-42361775
+    title: "CURIOSIDAD"
+    artist: "Don Rimx"
+    year: 2020
+    status: existing
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1221 SW 5th Ave, Gainesville, FL 32601"
+    lon: -82.338258
+    lat: 29.646579
+    location_note: "Norman Hall"
+    source_url: "https://www.publicartarchive.org/art/CURIOSIDAD/42361775"
+    notes: "Setting: the record calls it an interior mural."
+
+  - id: paa-0dd450a6
+    title: "Garden of Knowledge"
+    artist: "Béatrice Coron"
+    year: 2020
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1080 SW 11th St, Gainesville, FL 32601"
+    lon: -82.334163
+    lat: 29.6399
+    location_note: "PK Yonge Middle and High School Expansion"
+    source_url: "https://www.publicartarchive.org/art/Garden-of-Knowledge/0dd450a6"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-bb1e8a4c
+    title: "What Do We Know? How Do We Know?"
+    artist: "John Catteral"
+    year: 1998
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1180 Center Dr, Gainesville, FL 32603"
+    lon: -82.347672
+    lat: 29.64155
+    location_note: "Particle Science & Technology"
+    source_url: "https://www.publicartarchive.org/art/What-Do-We-Know-How-Do-We-Know-/bb1e8a4c"
+    notes: "Setting: a mixed-media construction with inkjet prints."
+
+  - id: paa-1de3371f
+    title: "Flux"
+    artist: "Kenneth F. von Roenn, Jr."
+    year: 2010
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2055 Mowry Rd, Gainesville, FL 32610"
+    lon: -82.352112
+    lat: 29.637501
+    location_note: "Pathogens"
+    source_url: "https://www.publicartarchive.org/art/Flux/1de3371f"
+    notes: "Setting: suspended from a ceiling (per the record)."
+
+  - id: paa-8b93b783
+    title: "Light Abacus 2"
+    artist: "Dale Eldred"
+    year: 1990
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1500 Union Rd, Gainesville, FL 32611"
+    lon: -82.344241
+    lat: 29.650126
+    location_note: "Peabody Hall"
+    source_url: "https://www.publicartarchive.org/art/Light-Abacus-2/8b93b783"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-ec10c84d
+    title: "2 & 3 Part Inventions"
+    artist: "Charles Partin"
+    year: 2003
+    status: existing
+    setting: outdoor
+    type: mural
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1080 SW 11th St, Gainesville, FL 32601"
+    lon: -82.335426
+    lat: 29.640567
+    location_note: "Pk Performing Arts Center"
+    source_url: "https://www.publicartarchive.org/art/2-3-Part-Inventions/ec10c84d"
+    notes: "Setting: brickwork above a building entrance (per the record)."
+
+  - id: paa-14132082
+    title: "Moondance"
+    artist: "Charles Strain"
+    year: 2003
+    status: existing
+    setting: unverified
+    type: figure
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1080 SW 11th St, Gainesville, FL 32601"
+    lon: -82.335426
+    lat: 29.640567
+    location_note: "Pk Performing Arts Center"
+    source_url: "https://www.publicartarchive.org/art/Moondance/14132082"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-87269435
+    title: "Rana Wall: A Celebration of Frogs"
+    artist: "Gar Waterman"
+    year: 1996
+    status: existing
+    setting: unverified
+    type: wall
+    material: "bronze"
+    height_m: 3.05
+    width_m: 9.14
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3215 Hull Rd, Gainesville, FL 32611"
+    lon: -82.369853
+    lat: 29.635809
+    location_note: "Powell Hall (FLMNH)"
+    source_url: "https://www.publicartarchive.org/art/Rana-Wall-A-Celebration-of-Frogs/87269435"
+    notes: "Setting: not stated in the record (unverified). Dimensions as stated in the record."
+
+  - id: paa-e503bd4a
+    title: "A Sacred Land"
+    artist: "Molly Mabe"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "296 Buckman Dr, Gainesville, FL 32611"
+    lon: -82.34524
+    lat: 29.649462
+    location_note: "Pugh Hall"
+    source_url: "https://www.publicartarchive.org/art/A-Sacred-Land/e503bd4a"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-d4fdc633
+    title: "Ancient River, Cypress Marsh"
+    artist: "Molly Mabe"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "296 Buckman Dr, Gainesville, FL 32611"
+    lon: -82.345264
+    lat: 29.649452
+    location_note: "Pugh Hall"
+    source_url: "https://www.publicartarchive.org/art/Ancient-River-Cypress-Marsh/d4fdc633"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-20e913ba
+    title: "River to Sea"
+    artist: "Molly Mabe"
+    year: 2008
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "296 Buckman Dr, Gainesville, FL 32611"
+    lon: -82.345264
+    lat: 29.64948
+    location_note: "Pugh Hall"
+    source_url: "https://www.publicartarchive.org/art/River-to-Sea/20e913ba"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-e4269821
+    title: "Islamorada Weekend"
+    artist: "John Wilton"
+    year: 1991
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "222 Fletcher Dr, Gainesville, FL 32611"
+    lon: -82.348775
+    lat: 29.650128
+    location_note: "Racquet Club Dining Center"
+    source_url: "https://www.publicartarchive.org/art/Islamorada-Weekend/e4269821"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-aa7f8dba
+    title: "No Coat and Tie Required"
+    artist: "John Wilton"
+    year: 1991
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "222 Fletcher Dr, Gainesville, FL 32611"
+    lon: -82.348775
+    lat: 29.650128
+    location_note: "Racquet Club Dining Center"
+    source_url: "https://www.publicartarchive.org/art/No-Coat-and-Tie-Required/aa7f8dba"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-84df1c49
+    title: "Okeechobee Sunset"
+    artist: "John Wilton"
+    year: 1991
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "222 Fletcher Dr, Gainesville, FL 32611"
+    lon: -82.348775
+    lat: 29.650128
+    location_note: "Racquet Club Dining Center"
+    source_url: "https://www.publicartarchive.org/art/Okeechobee-Sunset/84df1c49"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-ff324836
+    title: "Waiting For You in Florida"
+    artist: "John Wilton"
+    year: 1991
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "222 Fletcher Dr, Gainesville, FL 32611"
+    lon: -82.348775
+    lat: 29.650128
+    location_note: "Racquet Club Dining Center"
+    source_url: "https://www.publicartarchive.org/art/Waiting-For-You-in-Florida/ff324836"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-89f82dc4
+    title: "Bone Series: Biophilia Connections"
+    artist: "Jenni Ward"
+    year: 2019
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348081
+    lat: 29.646437
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Bone-Series-Biophilia-Connections/89f82dc4"
+    notes: "Setting: hung through the building's walls and stairwell (per the record)."
+
+  - id: paa-d73017ac
+    title: "Light Falls"
+    artist: "Ivan Toth Depeña"
+    year: 2015
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "digital"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.347169
+    lat: 29.646448
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Light-Falls/d73017ac"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-385313a2
+    title: "Little Nemo Springs"
+    artist: "Margaret Ross Tolbert"
+    year: 1991
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.347991
+    lat: 29.646537
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Little-Nemo-Springs/385313a2"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-f4ccc5f7
+    title: "Riding Seaward"
+    artist: "Heidi S. Edwards"
+    year: 1994
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.347828
+    lat: 29.646579
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Riding-Seaward/f4ccc5f7"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-5543e117
+    title: "Series: The Sylvan Suite"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348356
+    lat: 29.646628
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Series-The-Sylvan-Suite/5543e117"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-e8efbef9
+    title: "The Sylvan Suite: Bald Cypress"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348308
+    lat: 29.646627
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Bald-Cypress/e8efbef9"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-4a9fb675
+    title: "The Sylvan Suite: Cabbage Palm"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348146
+    lat: 29.646627
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Cabbage-Palm/4a9fb675"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-041bb3c0
+    title: "The Sylvan Suite: Dogwood"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348491
+    lat: 29.646633
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Dogwood/041bb3c0"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-a9f67498
+    title: "The Sylvan Suite: Live Oak"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348356
+    lat: 29.646628
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Live-Oak/a9f67498"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-aa8fe753
+    title: "The Sylvan Suite: Long Leaf Pine"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348399
+    lat: 29.646629
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Long-Leaf-Pine/aa8fe753"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-942040b4
+    title: "The Sylvan Suite: Magnolia"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348443
+    lat: 29.646629
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Magnolia/942040b4"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-ed6f719d
+    title: "The Sylvan Suite: Pecan"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348257
+    lat: 29.646627
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Pecan/ed6f719d"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-07eb0eac
+    title: "The Sylvan Suite: Sweet Gum"
+    artist: "Jerry Cutler"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348356
+    lat: 29.646628
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/The-Sylvan-Suite-Sweet-Gum/07eb0eac"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-38a1e5a7
+    title: "Union Arch"
+    artist: "Carl Reed"
+    year: 1998
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "stone"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "655 Reitz Union Dr, Gainesville, FL 32611"
+    lon: -82.348494
+    lat: 29.646117
+    location_note: "Reitz Student Union"
+    source_url: "https://www.publicartarchive.org/art/Union-Arch/38a1e5a7"
+    notes: "Setting: a granite gate, monolith and stone seating blocks (per the record); outdoors inferred."
+
+  - id: paa-9e627ced
+    title: "Forging Away"
+    artist: "Gary Prazen"
+    year: 2001
+    status: existing
+    setting: unverified
+    type: figure
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "549 Gale Lemerand Dr, Gainesville, FL 32611"
+    lon: -82.349221
+    lat: 29.647848
+    location_note: "Rhines Hall"
+    source_url: "https://www.publicartarchive.org/art/Forging-Away/9e627ced"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-82a72007
+    title: "The Glass Blower"
+    artist: "Gary Prazen"
+    year: 2001
+    status: existing
+    setting: unverified
+    type: figure
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "549 Gale Lemerand Dr, Gainesville, FL 32611"
+    lon: -82.349244
+    lat: 29.647823
+    location_note: "Rhines Hall"
+    source_url: "https://www.publicartarchive.org/art/The-Glass-Blower/82a72007"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-c3591b20
+    title: "The Potter"
+    artist: "Gary Prazen"
+    year: 2001
+    status: existing
+    setting: unverified
+    type: figure
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "549 Gale Lemerand Dr, Gainesville, FL 32611"
+    lon: -82.349267
+    lat: 29.647851
+    location_note: "Rhines Hall"
+    source_url: "https://www.publicartarchive.org/art/The-Potter/c3591b20"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-08aeb52d
+    title: "Ball"
+    artist: "Steven Siegel"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "549 Gale Lemerand Dr, Gainesville, FL 32611"
+    lon: -82.343263
+    lat: 29.646973
+    location_note: "Rinker Hall"
+    source_url: "https://www.publicartarchive.org/art/Ball/08aeb52d"
+    notes: "Setting: paper sculpture."
+
+  - id: paa-46fc1e33
+    title: "Carbon#5"
+    artist: "Steven Siegel"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "573 Newell Dr, Gainesville, FL 32611"
+    lon: -82.343263
+    lat: 29.646973
+    location_note: "Rinker Hall"
+    source_url: "https://www.publicartarchive.org/art/Carbon-5/46fc1e33"
+    notes: "Setting: paper sculpture."
+
+  - id: paa-a4a8daa0
+    title: "Tabletop#4"
+    artist: "Steven Siegel"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "573 Newell Dr, Gainesville, FL 32611"
+    lon: -82.34315
+    lat: 29.647187
+    location_note: "Rinker Hall"
+    source_url: "https://www.publicartarchive.org/art/Tabletop-4/a4a8daa0"
+    notes: "Setting: paper sculpture."
+
+  - id: paa-cedbff87
+    title: "Tabletop#5"
+    artist: "Steven Siegel"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "573 Newell Dr, Gainesville, FL 32611"
+    lon: -82.34315
+    lat: 29.647213
+    location_note: "Rinker Hall"
+    source_url: "https://www.publicartarchive.org/art/Tabletop-5/cedbff87"
+    notes: "Setting: paper sculpture."
+
+  - id: paa-af2926e4
+    title: "Tabletop#8"
+    artist: "Steven Siegel"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "573 Newell Dr, Gainesville, FL 32611"
+    lon: -82.343311
+    lat: 29.646971
+    location_note: "Rinker Hall"
+    source_url: "https://www.publicartarchive.org/art/Tabletop-8/af2926e4"
+    notes: "Setting: paper sculpture."
+
+  - id: paa-da0626d3
+    title: "Field Day (I & II)"
+    artist: "Ellen Kochansky"
+    year: 1989
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1600 SW Archer Rd, Gainesville, FL 32608"
+    lon: -82.345506
+    lat: 29.64002
+    location_note: "Shands Teaching Hospital"
+    source_url: "https://www.publicartarchive.org/art/Field-Day-I-II-/da0626d3"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-04914cdf
+    title: "Gathering Places"
+    artist: "Robert Calvo"
+    year: 1989
+    status: off_view
+    setting: indoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1600 SW Archer Rd, Gainesville, FL 32608"
+    lon: -82.345506
+    lat: 29.64002
+    location_note: "Shands Teaching Hospital"
+    source_url: "https://www.publicartarchive.org/art/Gathering-Places/04914cdf"
+    notes: "The archive marks it off view (not on public display). Setting: painted wood pieces modelled on interior architectural details."
+
+  - id: paa-e47b55d6
+    title: "Landscape"
+    artist: "Elizabeth MacDonald"
+    year: 1989
+    status: off_view
+    setting: unverified
+    type: sculpture
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1600 SW Archer Rd, Gainesville, FL 32608"
+    lon: -82.345506
+    lat: 29.64002
+    location_note: "Shands Teaching Hospital"
+    source_url: "https://www.publicartarchive.org/art/Landscape/e47b55d6"
+    notes: "The archive marks it off view (not on public display). Setting: not stated in the record (unverified)."
+
+  - id: paa-37a6ef97
+    title: "Origami"
+    artist: "Lenn Neff"
+    year: 1988
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1600 SW Archer Rd, Gainesville, FL 32608"
+    lon: -82.345506
+    lat: 29.64002
+    location_note: "Shands Teaching Hospital"
+    source_url: "https://www.publicartarchive.org/art/Origami/37a6ef97"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-c0bdcf1b
+    title: "Slice of Life #s 1-6"
+    artist: "Carlos Alves"
+    year: 1995
+    status: existing
+    setting: indoor
+    type: wall
+    material: "mosaic"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "12085 Research Dr, Alachua, FL 32615"
+    lon: -82.474864
+    lat: 29.782818
+    location_note: "Sid Martin Biotechnology"
+    source_url: "https://www.publicartarchive.org/art/Slice-of-Life-s-1-6/c0bdcf1b"
+    notes: "Setting: set in the floors and on the walls of the facility (per the record)."
+
+  - id: paa-ddc4089f
+    title: "A Good Day at the Gym"
+    artist: "James Piercey"
+    year: 1993
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3150 Hull Rd, Gainesville, FL 32611"
+    lon: -82.368518
+    lat: 29.638149
+    location_note: "Southwest Recreational Center"
+    source_url: "https://www.publicartarchive.org/art/A-Good-Day-at-the-Gym/ddc4089f"
+    notes: "Setting: back-lit stained glass."
+
+  - id: paa-694000b0
+    title: "Thirst"
+    artist: "David Dahlquist"
+    year: 2010
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "stone"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3150 Hull Rd, Gainesville, FL 32611"
+    lon: -82.368385
+    lat: 29.637833
+    location_note: "Southwest Recreational Center"
+    source_url: "https://www.publicartarchive.org/art/Thirst/694000b0"
+    notes: "Setting: set along the site's bioswale (per the record)."
+
+  - id: paa-4cde2cf5
+    title: "Zigzag"
+    artist: "Carl Powell"
+    year: 2003
+    status: off_view
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "3150 Hull Rd, Gainesville, FL 32611"
+    lon: -82.368518
+    lat: 29.638149
+    location_note: "Southwest Recreational Center"
+    source_url: "https://www.publicartarchive.org/art/Zigzag/4cde2cf5"
+    notes: "The archive marks it off view (not on public display). Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-c1c1c0d1
+    title: "George's Locker"
+    artist: "R. F. Buckley"
+    year: 2010
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1556 Inner Rd, Gainesville, FL 32601"
+    lon: -82.342807
+    lat: 29.647559
+    location_note: "Steinbrenner"
+    source_url: "https://www.publicartarchive.org/art/George-s-Locker/c1c1c0d1"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-c7336967
+    title: "Evolving Forms #16"
+    artist: "Geoffrey Lardiere"
+    year: 1991
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "painted_steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "244 Fletcher Dr, Gainesville, FL 32611"
+    lon: -82.348948
+    lat: 29.650115
+    location_note: "Student Recreation and Fitness Center"
+    source_url: "https://www.publicartarchive.org/art/Evolving-Forms-16/c7336967"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-9d789a74
+    title: "Fullerene"
+    artist: "Tony Stallard"
+    year: 2016
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1645 W University Ave, Gainesville, FL 32601"
+    lon: -82.344559
+    lat: 29.651721
+    location_note: "The Chemistry/Chemical Biology Building"
+    source_url: "https://www.publicartarchive.org/art/Fullerene/9d789a74"
+    notes: "Setting: hangs from the University Avenue side of the building (per the record)."
+
+  - id: paa-ad7ab096
+    title: "Velocity"
+    artist: "Randy Olson"
+    year: 2006
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2070 NE Waldo Rd, Gainesville, FL 32609"
+    lon: -82.300917
+    lat: 29.671979
+    location_note: "The Powell Family Structures And Materials Lab"
+    source_url: "https://www.publicartarchive.org/art/Velocity/ad7ab096"
+    notes: "Setting: a kinetic sculpture driven by the wind (per the record)."
+
+  - id: paa-3a0c1544
+    title: "sTREEt Lamp"
+    artist: "Jay Rosen"
+    year: 2012
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "UF Innovate"
+    collection: "University of Florida College of the Arts"
+    address: "UF Innovate, Gainesville, FL 32601"
+    lon: -82.33267
+    lat: 29.650184
+    location_note: "UF Innovate"
+    source_url: "https://www.publicartarchive.org/art/sTREEt-Lamp/3a0c1544"
+    notes: "Setting: the record lists it as outdoor sculpture by a roadside (a parking lot)."
+
+  - id: paa-ee56e63d
+    title: "Lascaux Horses"
+    artist: "James Piercey"
+    year: 1993
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2221 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.350307
+    lat: 29.631799
+    location_note: "UF Large Animal Hospital"
+    source_url: "https://www.publicartarchive.org/art/Lascaux-Horses/ee56e63d"
+    notes: "Setting: stained-glass windows."
+
+  - id: paa-6bcf647b
+    title: "Shands Commission 10'x9'"
+    artist: "Alfred Phillips"
+    year: 2019
+    status: existing
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: 3.05
+    width_m: 2.74
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida"
+    collection: "University of Florida"
+    address: "6201 W Newberry Rd, Gainesville, FL 32605"
+    lon: -82.410014
+    lat: 29.656004
+    location_note: "University of Florida Eye Center"
+    source_url: "https://www.publicartarchive.org/art/Shands-Commission-10-x9-/6bcf647b"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass. Dimensions as stated in the record."
+
+  - id: paa-2bd9b788
+    title: "Cycle"
+    artist: "Leslie Tharp"
+    year: 2011
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "painted_steel"
+    height_m: 3.05
+    width_m: 2.13
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida"
+    collection: "University of Florida"
+    address: "2089 SW 16th Ave., Gainesville, FL 32618"
+    lon: -82.346145
+    lat: 29.634851
+    location_note: "University of Florida Small Animal Veterinary Hospital"
+    source_url: "https://www.publicartarchive.org/art/Cycle/2bd9b788"
+    notes: "Setting: not stated in the record (unverified). Dimensions as stated in the record."
+
+  - id: paa-7eb28714
+    title: "Alligator in Swamp"
+    artist: "Jeffrey H. Dean"
+    year: 1998
+    status: removed
+    setting: indoor
+    type: sculpture
+    material: "stone"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida, Gainesville"
+    collection: "University of Florida, Gainesville"
+    address: "Stadium Rd, Gainesville, FL 32611"
+    lon: -82.353262
+    lat: 29.647098
+    location_note: "University of Florida, Gainesville"
+    source_url: "https://www.publicartarchive.org/art/Alligator-in-Swamp/7eb28714"
+    notes: "The artist's statement on the record says it was stolen from its hall soon after delivery in 1998. Setting: the record says it stood in one of the halls."
+
+  - id: paa-bbbf1554
+    title: "Alberto at the Shelly Ranch"
+    artist: "Susan Kempton Floyd"
+    year: 2001
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351355
+    lat: 29.633125
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Alberto-at-the-Shelly-Ranch/bbbf1554"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-c94c1bac
+    title: "Backwoods River"
+    artist: "Brad Phares"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351355
+    lat: 29.633125
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Backwoods-River/c94c1bac"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-5f5cc6f2
+    title: "Bovine Boulevard"
+    artist: "Brad Phares"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351351
+    lat: 29.633109
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Bovine-Boulevard/5f5cc6f2"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-fc082010
+    title: "Gator"
+    artist: "Sean Sexton"
+    year: 2004
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.35135
+    lat: 29.633142
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Gator/fc082010"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-ee561c00
+    title: "Goats and Cows"
+    artist: "Sean Sexton"
+    year: 1980
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351364
+    lat: 29.633139
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Goats-and-Cows/ee561c00"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-62eca7a0
+    title: "Semen test"
+    artist: "Sean Sexton"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351378
+    lat: 29.633112
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/Semen-test/62eca7a0"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-cebcea54
+    title: "The Little Bull"
+    artist: "Sean Sexton"
+    year: 2006
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "2250 Shealy Dr, Gainesville, FL 32608"
+    lon: -82.351372
+    lat: 29.633095
+    location_note: "Vet Med Food Animal Clinic"
+    source_url: "https://www.publicartarchive.org/art/The-Little-Bull/cebcea54"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-7e7c9272
+    title: "Foal's Point of View"
+    artist: "H.A. Fadhli"
+    year: 1997
+    status: existing
+    setting: unverified
+    type: figure
+    material: "bronze"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.351202
+    lat: 29.633961
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Foal-s-Point-of-View/7e7c9272"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-2bf01401
+    title: "Hercules"
+    artist: "Wopo Holup"
+    year: 1997
+    status: existing
+    setting: unverified
+    type: mural
+    material: "concrete"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.348912
+    lat: 29.6339
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Hercules/2bf01401"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-934a6b7d
+    title: "Morelet's Crocodile"
+    artist: "James Balog"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.348984
+    lat: 29.634089
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Morelet-s-Crocodile/934a6b7d"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-02be4247
+    title: "Patience"
+    artist: "Frances Merritt Thompson"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.351202
+    lat: 29.633961
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Patience/02be4247"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-288ea3f8
+    title: "Split Image 2"
+    artist: "Frances Merritt Thompson"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.351202
+    lat: 29.633961
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Split-Image-2/288ea3f8"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-7f013830
+    title: "Still Life"
+    artist: "Frances Merritt Thompson"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: "mixed"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.351202
+    lat: 29.633961
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Still-Life/7f013830"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-a250e03d
+    title: "Untitled"
+    artist: "Joe Walters"
+    year: 1997
+    status: existing
+    setting: indoor
+    type: mural
+    material: null
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1945 SW 16th Ave, Gainesville, FL 32608"
+    lon: -82.351202
+    lat: 29.633961
+    location_note: "Veterinary Academic Bldg"
+    source_url: "https://www.publicartarchive.org/art/Untitled/a250e03d"
+    notes: "Setting: a painting, print, photograph, drawing, textile or stained glass."
+
+  - id: paa-aff09ed1
+    title: "Macromicrochip"
+    artist: "James Piercey"
+    year: 1990
+    status: existing
+    setting: indoor
+    type: mural
+    material: "glass"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1885 Stadium Rd, Gainesville, FL 32611"
+    lon: -82.347329
+    lat: 29.648212
+    location_note: "Weimer Hall"
+    source_url: "https://www.publicartarchive.org/art/Macromicrochip/aff09ed1"
+    notes: "Setting: stained glass."
+
+  - id: paa-16d58ae8
+    title: "Packet Switching"
+    artist: "Owen Mundy, Joelle Dietrich"
+    year: 2012
+    status: existing
+    setting: indoor
+    type: mural
+    material: "acrylic_mural"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1885 Stadium Rd, Gainesville, FL 32611"
+    lon: -82.34752
+    lat: 29.647912
+    location_note: "Weimer Hall"
+    source_url: "https://www.publicartarchive.org/art/Packet-Switching/16d58ae8"
+    notes: "Setting: the record calls it an interior mural."
+
+  - id: paa-d9727997
+    title: "Wavelengths"
+    artist: "Don Dickson"
+    year: 1999
+    status: existing
+    setting: unverified
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: false
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "1885 Stadium Rd, Gainesville, FL 32611"
+    lon: -82.347592
+    lat: 29.648252
+    location_note: "Weimer Hall"
+    source_url: "https://www.publicartarchive.org/art/Wavelengths/d9727997"
+    notes: "Setting: not stated in the record (unverified)."
+
+  - id: paa-2f3a6bf9
+    title: "ZnS"
+    artist: "Beth Nybeck"
+    year: 2020
+    status: existing
+    setting: outdoor
+    type: sculpture
+    material: "steel"
+    height_m: null
+    width_m: null
+    lit: true
+    provenance: "uf"
+    owner: "University of Florida's Art in State Buildings Program"
+    collection: "University of Florida's Art in State Buildings Program"
+    address: "527 Gale Lemerand Dr, Gainesville, FL 32611"
+    lon: -82.347533
+    lat: 29.647099
+    location_note: "Wertheim Lab for Eng. Excellence"
+    source_url: "https://www.publicartarchive.org/art/ZnS/2f3a6bf9"
+    notes: "Setting: the record calls it an outdoor sculpture."

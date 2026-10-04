@@ -4,5 +4,9 @@
   "installCommand": "cd web && npm ci",
   "buildCommand": "cd web && npm run build",
   "outputDirectory": "web/dist",
-  "redirects": [{ "source": "/wildsight", "destination": "/wildsight/", "permanent": true }]
+  "redirects": [
+    { "source": "/dark-sky", "destination": "/dark-sky/", "permanent": true },
+    { "source": "/wildsight", "destination": "/wildsight/", "permanent": true },
+    { "source": "/public-art", "destination": "/public-art/", "permanent": true }
+  ]
 }

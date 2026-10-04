@@ -1,13 +1,14 @@
 """WildSight planner connectors: tagged road network, FDOT traffic volumes, animal-vehicle crash records and
-hotspots. All public, no keys. HTTP, ArcGIS paging and the raw-data cache are the shared backend in ingest/."""
+hotspots. All public, no keys. HTTP, ArcGIS paging, the raw-data cache and the FDOT traffic connector are the
+shared backend in ingest/."""
 from __future__ import annotations
 
 from ingest.common import arcgis_query, bbox_tag, cached_json, http
 from ingest.inventory import OVERPASS
+from ingest.traffic import fdot_aadt  # noqa: F401  (shared connector; wildsight.build calls it as traffic.fdot_aadt)
 
 # Roads where roadside wildlife warning units could go. Residential streets and links are left out.
 WVC_ROAD_CLASSES = "motorway|trunk|primary|secondary|tertiary|unclassified"
-FDOT_AADT = "https://services1.arcgis.com/O1JpcwDW8sjYuddV/arcgis/rest/services/Annual_Average_Daily_Traffic_TDA/FeatureServer/0"
 # University of Florida Center for Landscape Conservation Planning, from Signal Four Analytics crash reports.
 UF_AVC = "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Animal_Related_Vehicle_Collisions_2014_2024/FeatureServer/0"
 UF_AVC_HOTSPOTS = "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/AnimalVehicleCollisionHotspots_2014To2024/FeatureServer/120"
@@ -47,13 +48,6 @@ def osm_roads_tagged(bbox, tile_deg: float = 0.5, refresh=False):
             y += tile_deg
         return {"bbox": list(bbox), "ways": ways}
     return cached_json(f"osm_roads_tagged_{bbox_tag(bbox)}.json", fetch, refresh)
-
-
-def fdot_aadt(county_names, refresh=False):
-    """FDOT annual average daily traffic on state-highway sections in the named counties (polylines)."""
-    where = "COUNTY IN (" + ",".join(f"'{c}'" for c in county_names) + ")"
-    return cached_json("fdot_aadt.json", lambda: arcgis_query(
-        FDOT_AADT, where=where, out_fields="YEAR_,ROADWAY,DESC_FRM,DESC_TO,AADT,TFCTR,COUNTY"), refresh)
 
 
 def avc_crashes(bbox, refresh=False):

@@ -3,7 +3,7 @@
 // the sky is illustrative: brightening toward the horizon, Gaussian light domes toward the regional towns, and
 // forward scattering around the Sun and Moon. Each component is normalized so the zenith equals the modeled value.
 // SKYGLOW_GLSL mirrors luminanceAt() for the shader; keep the two in step.
-import { NATURAL_MAG } from "./sky";
+import { NATURAL_MAG } from "../shared/sky";
 
 const RAD = Math.PI / 180;
 /** Light-dome brightness near the horizon relative to the zenith artificial glow. At Rosemary Hill (Gainesville ~30 km

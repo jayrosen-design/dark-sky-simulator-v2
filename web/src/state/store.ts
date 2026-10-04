@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { DEFAULT_PARAMS, type ScenarioParams } from "../engine/scenario";
 import type { Mode } from "../engine/types";
 import type { Weights } from "../engine/mcda";
+import { decodeState, encodeState, readHash, shareHref } from "../shared/share";
 
 export type Tab = "scenario" | "sites" | "economics" | "observatory" | "stargaze" | "brief";
 export type MapView = "scenario" | "delta" | "baseline" | "fixtures" | "viirs" | "trend";
@@ -31,22 +32,16 @@ interface State {
 
 // Scenario state lives in the URL hash so any view can be shared and a PDF figure can link back to the
 // exact field it came from (C-01).
-export function encodeParams(p: ScenarioParams) {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
+export const encodeParams = (p: ScenarioParams) => encodeState(p);
 
 export function decodeParams(s: string): ScenarioParams | null {
-  try {
-    const json = decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/"))));
-    return { ...DEFAULT_PARAMS, ...JSON.parse(json) };
-  } catch {
-    return null;
-  }
+  const v = decodeState<Partial<ScenarioParams>>(s);
+  return v ? { ...DEFAULT_PARAMS, ...v } : null;
 }
 
 function fromHash() {
-  const h = new URLSearchParams(location.hash.replace(/^#/, ""));
-  return { params: h.get("s") ? decodeParams(h.get("s")!) : null, field: h.get("f"), tab: h.get("t") as Tab | null };
+  const h = readHash();
+  return { params: h.s ? decodeParams(h.s) : null, field: h.field, tab: h.tab as Tab | null };
 }
 
 const initial = typeof location !== "undefined" ? fromHash() : { params: null, field: null, tab: null };
@@ -75,13 +70,7 @@ export const useStore = create<State>((set) => ({
   setWeights: (weights) => set({ weights }),
 }));
 
-export function shareUrl(p: ScenarioParams, field?: string, tab?: Tab) {
-  const base = location.href.split("#")[0];
-  const q = new URLSearchParams({ s: encodeParams(p) });
-  if (field) q.set("f", field);
-  if (tab) q.set("t", tab);
-  return `${base}#${q.toString()}`;
-}
+export const shareUrl = (p: ScenarioParams, field?: string, tab?: Tab) => shareHref(encodeParams(p), field, tab);
 
 if (typeof window !== "undefined") {
   useStore.subscribe((s, prev) => {

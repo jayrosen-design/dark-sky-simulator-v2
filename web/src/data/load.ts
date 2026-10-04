@@ -1,4 +1,4 @@
-// Loads the precomputed data package (web/public/data) and decodes the binary layers.
+// Loads the precomputed data package (web/public/dark-sky/data) and decodes the binary layers.
 import type { EngineData, Lin16Meta, Log16Meta } from "../engine/types";
 
 import { DATA_BASE as BASE, fetchJson } from "../shared/data";

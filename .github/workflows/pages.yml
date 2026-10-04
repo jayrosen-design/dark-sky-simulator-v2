@@ -1,4 +1,4 @@
-# Static deploy of web/dist to GitHub Pages (PRD 0A.3 hosting). The data package in web/public/data is committed
+# Static deploy of web/dist to GitHub Pages (PRD 0A.3 hosting). The data packages in web/public/*/data are committed
 # output of `python -m pipeline.build`; CI only tests and builds the client.
 name: pages
 on:

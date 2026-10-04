@@ -11,7 +11,7 @@ from pipeline.config import load_county, load_seed
 from pipeline.encode import decode_log16, read_codes, write_lin16, write_log16
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "web" / "public" / "data"
+DATA = ROOT / "web" / "public" / "dark-sky" / "data"
 
 
 def test_engine_imports_nothing_county_specific():

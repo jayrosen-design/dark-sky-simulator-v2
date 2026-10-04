@@ -1,4 +1,4 @@
-"""Step 2: precompute everything the static v2.0 site needs into web/public/data/.
+"""Step 2: precompute everything the static v2.0 site needs into web/public/dark-sky/data/.
 
     python -m pipeline.build
 
@@ -29,7 +29,7 @@ from . import land, sanity, viirs_mode
 from .config import ROOT, load_county, load_region, load_seed, p
 from .encode import write_lin16, write_log16
 
-OUT = ROOT / "web" / "public" / "data"
+OUT = ROOT / "web" / "public" / "dark-sky" / "data"
 COUNTY_FIPS = tuple(load_region()["model_counties"])
 MI_KM = 1.609344
 
@@ -472,7 +472,7 @@ def main():
     # ---- sanity check against public points (never fitted)
     gan = globe_at_night.observations(a15.bounds())
     gan_rows, gan_summary = sanity.globe_at_night(a15, L15, p(seed, "natural_zenith_mag"), gan["rows"])
-    if OUT == ROOT / "web" / "public" / "data":
+    if OUT == ROOT / "web" / "public" / "dark-sky" / "data":
         sanity.write_markdown(ROOT / "docs" / "sanity_check.md", site_rows, anchor, gan_rows, gan_summary, gan["files"])
 
     # ---- files: Module A
