@@ -18,11 +18,11 @@ def cache_path(name: str) -> Path:
     return RAW / name
 
 
-def http(method: str, url: str, *, params=None, data=None, timeout=120, retries=5, binary=False):
+def http(method: str, url: str, *, params=None, data=None, json_body=None, timeout=120, retries=5, binary=False):
     last = None
     for attempt in range(retries):
         try:
-            r = requests.request(method, url, params=params, data=data, timeout=timeout,
+            r = requests.request(method, url, params=params, data=data, json=json_body, timeout=timeout,
                                  headers={"User-Agent": USER_AGENT})
             r.raise_for_status()
             return r.content if binary else r.json()

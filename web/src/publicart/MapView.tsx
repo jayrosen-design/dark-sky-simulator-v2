@@ -13,6 +13,9 @@ import CameraPad from "../shared/map/CameraPad";
 import { skyState } from "../shared/sky";
 import { Crowd } from "./agents";
 import { ArtLayer, type PlacedArt } from "./map/ArtLayer";
+import { addGrantLayers, setGrantData, showGrantLayers } from "./map/grantLayers";
+import { allItems, CALL_COLOR, filterCalls, filterItems, SOURCE_COLOR } from "./engine/grants";
+import { todayIso, useFunding } from "./funding";
 import { ACCENT, GNV_BOUNDS, GNV_CENTER, PROVENANCE_COLOR } from "./constants";
 import { contextOf, type Model } from "./model";
 import type { Suggestion } from "./engine/equity";
@@ -126,6 +129,11 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
         "circle-stroke-color": ACCENT, "circle-stroke-width": 1.5 } });
       map.addLayer({ id: "sugs-label", type: "symbol", source: "sugs", layout: { visibility: "none", "text-field": ["get", "n"], "text-size": 11, "text-font": ["Noto Sans Regular"] },
         paint: { "text-color": "#ffffff" } });
+      addGrantLayers(map, (kind, id) => {
+        const f = useFunding.getState();
+        if (kind === "county") { const it = allItems(f.pkg!).find((x) => x.place === id); if (it) f.fly(it.lon, it.lat, 8); return; }
+        f.set({ sel: { kind, id } });
+      });
       add("art");
       map.addLayer({ id: "art-halo", type: "circle", source: "art",
         paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 6, 16, 14], "circle-color": ["get", "color"], "circle-opacity": 0.18, "circle-blur": 0.6 } });
@@ -249,6 +257,31 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
     map.easeTo({ center: [a.lon, a.lat], zoom: Math.max(map.getZoom(), show3D ? 18.8 : 15.5), duration: 800 });
   }, [ready, fly]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Funding tab: grants and calls on the map, the view the panel counts, and fly requests.
+  const funding = useFunding();
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const on = tab === "funding" && !!funding.pkg;
+    showGrantLayers(map, on);
+    if (!on) return;
+    const items = filterItems(allItems(funding.pkg!), { q: funding.q, sources: funding.sources, year: funding.year, bounds: null });
+    setGrantData(map, items, filterCalls(funding.pkg!.calls, funding.q, todayIso(), null), funding.sel?.id ?? null);
+  }, [ready, tab, funding.pkg, funding.q, funding.sources, funding.year, funding.sel]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || tab !== "funding") return;
+    const report = () => { const b = map.getBounds(); useFunding.getState().set({ view: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()] }); };
+    report();
+    map.on("moveend", report);
+    return () => { map.off("moveend", report); };
+  }, [ready, tab]);
+  useEffect(() => {
+    const map = mapRef.current, t = funding.flyTo;
+    if (!ready || !map || !t) return;
+    map.easeTo({ center: [t.lon, t.lat], zoom: t.zoom, pitch: 0, duration: 900 });
+  }, [ready, funding.flyTo?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Moving people and vehicles (Activity tab).
   useEffect(() => {
     const map = mapRef.current;
@@ -286,10 +319,10 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
         <button onClick={() => setShow3D(!show3D)} aria-pressed={show3D} title="3D buildings and artworks lit by the Sun"
           className={`rounded border px-2 py-1 text-xs font-semibold ${show3D ? "border-[#b79cff] bg-[#b79cff]/20 text-[#b79cff]" : "border-ink-600 bg-ink-950/85 text-star-300 hover:bg-ink-800"}`}>3D</button>
       </div>
-      {m && <div className="absolute right-12 top-2 w-[440px] max-w-[70%]"><KpiHud m={m} /></div>}
+      {m && tab !== "funding" && <div className="absolute right-12 top-2 w-[440px] max-w-[70%]"><KpiHud m={m} /></div>}
       {!m && <div className="absolute left-14 top-2 rounded bg-ink-900/90 px-2 py-1 text-[11px] text-star-300">Loading the art registry and city data…</div>}
       {ready && show3D && <CameraPad map={mapRef.current} maxPitch={75} resetPitch={62} />}
-      <div className="pointer-events-none absolute bottom-6 left-1/2 w-[min(560px,70%)] -translate-x-1/2"><TimeBar /></div>
+      {tab !== "funding" && <div className="pointer-events-none absolute bottom-6 left-1/2 w-[min(560px,70%)] -translate-x-1/2"><TimeBar /></div>}
       <Legend tab={tab} agents={agents} />
     </div>
   );
@@ -304,6 +337,9 @@ function Legend({ tab, agents }: { tab: string; agents: boolean }) {
       {tab === "place" && <div className="mt-1">Heatmap: daily impressions a medium sculpture would get (low → <span className="text-[#ffdc96]">high</span>)</div>}
       {tab === "equity" && <div className="mt-1">Shading: median household income (darker purple = lower); <span className="text-[#f08ab8]">pink edge</span> low-income; rings ½ mile;
         <span className="text-amber-400"> East Gainesville</span>; <span className="text-[#5fd6c4]">GCRA</span> dashed</div>}
+      {tab === "funding" && <div className="mt-1">Arts funding: <span style={{ color: SOURCE_COLOR.NEA }}>●</span> NEA <span style={{ color: SOURCE_COLOR.NEH }}>●</span> NEH{" "}
+        <span style={{ color: SOURCE_COLOR.IMLS }}>●</span> IMLS awards (circles: totals, click to expand) · <span style={{ color: SOURCE_COLOR.FL }}>◯</span> Florida awards by county
+        · <span style={{ color: CALL_COLOR }}>○</span> open calls (budget)</div>}
       {tab === "activity" && <div className="mt-1">{agents ? <><span className="text-amber-400">●</span> vehicles <span className="text-[#5fd6c4]">●</span> people (illustrative) · </> : null}○ City counters (people/day)</div>}
     </div>
   );

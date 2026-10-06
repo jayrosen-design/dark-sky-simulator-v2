@@ -1,0 +1,527 @@
+# Calls to artists for public art (Funding tab of the Public Art Policy Simulator)
+#
+# CURATED BY HAND, not pulled from a feed: there is no open national listing. CaFE (callforentry.org, Creative West)
+# forbids automated access in its terms and NYFA blocks automated requests, so neither is read; the Funding tab
+# links to them instead (linkouts below). Every call here was checked on source_url: the commissioning body, a public
+# agency or arts council, a university, or the nonprofit running the call. Values the source does not state are null;
+# inferred values (a deadline year, an end-of-month date) are flagged in notes.
+#
+# Compiled 2026-10-05: 31 calls open on or after that date (8 in Florida, 23 elsewhere). No commission was open in
+# Gainesville or Alachua County; the County's rolling art-loan program is listed as `other`.
+# budget_usd is the published figure; where it is per artist, per unit or per future project, budget_note says so.
+# The app hides calls once their deadline passes. Add new calls in the same format and rebuild:
+#   python -m publicart.grants
+#
+# kind: commission | rfq | rfp | mural | temporary | residency | other
+
+linkouts:
+  - label: "CaFÉ call listings (Creative West)"
+    url: "https://opportunities.wearecreativewest.org/"
+    note: "The largest US listing of public art calls; linked, not read (its terms forbid automated access)"
+  - label: "CODAworx RFPs"
+    url: "https://www.codaworx.com/rfps/"
+  - label: "NYFA classifieds"
+    url: "https://www.nyfa.org/"
+  - label: "Florida Art in State Buildings calls"
+    url: "https://dos.fl.gov/cultural/programs/art-in-state-buildings/calls-to-artists/"
+  - label: "Florida arts opportunities"
+    url: "https://dos.fl.gov/cultural/info-and-opportunities/jobs-and-opportunities/find-an-opportunity/"
+
+calls:
+  # ---------------- Florida ----------------
+  - id: alachua-county-admin-building-art-loan
+    title: "Arts in the County Administration Building Program"
+    organization: "Alachua County Board of County Commissioners / Alachua County Arts Council"
+    kind: other
+    city: "Gainesville"
+    state: "FL"
+    address: "Alachua County Administration Building, 12 SE 1st Street, Gainesville, FL 32601"
+    budget_usd: null
+    budget_note: "No payment stated; artwork is loaned for display"
+    deadline: null
+    rolling: true
+    eligibility: "local artists (not defined further); must sign a Public Art Loan and Display Agreement"
+    source_url: "https://alachuacounty.us/news/Article/Pages/Local-Artists-Invited-to-Display-Work-at-County-Building.aspx"
+    retrieved: "2026-10-05"
+    notes: "Rotating loan display of about three months in the county building. Artists handle delivery, install, insurance and removal. Not a commission."
+
+  - id: pbc-aqua-crest-aquatic-complex-tile
+    title: "Call to \"Tile\" Artists – Aqua Crest Aquatic Complex"
+    organization: "Palm Beach County Art in Public Places"
+    kind: commission
+    city: "Delray Beach"
+    state: "FL"
+    address: "2503 Seacrest Blvd, Delray Beach, FL 33444"
+    budget_usd: 348000
+    budget_note: "Maximum fixed fee $348,000, all-inclusive; shortlisted artists get a $1,000 honorarium"
+    deadline: "2026-10-19"
+    rolling: false
+    eligibility: "adult professional artists with experience in architecturally integrated tile art"
+    source_url: "https://discover.pbc.gov/fdo/art/PDF/Final_ACAC_Call_to_Artists_7.14.26.pdf"
+    retrieved: "2026-10-05"
+    notes: "Tile artwork wrapping the upper part of the entrance/ticketing building. Applications go through CODAworx."
+
+  - id: orlando-lake-nona-monumental-sculpture
+    title: "Call to Artists: Monumental Public Art Sculpture"
+    organization: "City of Orlando"
+    kind: rfp
+    city: "Orlando"
+    state: "FL"
+    address: "Lake Nona Community Park, along Luminary Boulevard, Orlando, FL"
+    budget_usd: null
+    budget_note: null
+    deadline: "2026-10-18"
+    rolling: false
+    eligibility: "professional artists and artist teams"
+    source_url: "https://www.orlando.gov/Events/Call-to-Artists-Monumental-Public-Art-Sculpture"
+    retrieved: "2026-10-05"
+    notes: "Asks for preliminary concept proposals for a large contemporary sculpture in a new 14.2-acre park. The city page gives no budget. Utah Division of Arts & Museums lists this call at $130,000, but that figure is not on the city page."
+
+  - id: vizcaya-2027-arts-residency-commission
+    title: "Open Call: 2027 Vizcaya Arts Residency + Commission"
+    organization: "Vizcaya Museum and Gardens"
+    kind: residency
+    city: "Miami"
+    state: "FL"
+    address: "3251 South Miami Ave, Miami, FL 33129"
+    budget_usd: 37500
+    budget_note: "$12,500 artist fee plus a production budget of up to $25,000"
+    deadline: "2026-11-02"
+    rolling: false
+    eligibility: "South Florida-based artists (Miami-Dade, Broward, Palm Beach) at any career stage, any discipline"
+    source_url: "https://vizcaya.org/opencall/"
+    retrieved: "2026-10-05"
+    notes: "Residency with a site-responsive commission for the Main House on the theme 'Holding Time', exhibited Nov 2027 to May 2028."
+
+  - id: orange-county-tangelo-park-community-center-rfq
+    title: "Tangelo Park Community Center—RFQ"
+    organization: "Orange County Arts & Cultural Affairs / Public Art Review Board"
+    kind: rfq
+    city: "Tangelo Park"
+    state: "FL"
+    address: "Tangelo Park Community Center"
+    budget_usd: null
+    budget_note: null
+    deadline: "2026-11-04"
+    rolling: false
+    eligibility: null
+    source_url: "https://www.orangecountyfl.net/ArtsCulture.aspx"
+    retrieved: "2026-10-05"
+    notes: "The county page lists the RFQ and the deadline but not the budget or eligibility. A news report gives a $28,200 budget; we did not confirm it on an agency page."
+
+  - id: jfsm-holocaust-outdoor-sculpture-rfq
+    title: "Holocaust Art RFQ"
+    organization: "The Jewish Federation of Sarasota-Manatee"
+    kind: rfq
+    city: "Sarasota"
+    state: "FL"
+    address: "Greenspon Campus for Jewish Life / Klingenstein Jewish Center, 580 McIntosh Road, Sarasota, FL 34232"
+    budget_usd: 200000
+    budget_note: "Budgets stated as approximately $100,000 to $200,000; three commissions; design honorariums available"
+    deadline: "2026-11-15"
+    rolling: false
+    eligibility: "professional artists or teams with outdoor public art experience and materials suited to Florida's climate"
+    source_url: "https://jfedsrq.org/holocaust-art-rfq/"
+    retrieved: "2026-10-05"
+    notes: "Three outdoor works for a Holocaust art and history installation: resistance, survivor resilience, and a photography-based piece. The Florida Division of Arts and Culture also lists this call."
+
+  - id: broward-public-art-conservation-pool
+    title: "Public Art Restoration – Conservation"
+    organization: "Broward County Cultural Division, Public Art & Design Program"
+    kind: other
+    city: null
+    state: "FL"
+    address: null
+    budget_usd: null
+    budget_note: null
+    deadline: "2026-11-20"
+    rolling: false
+    eligibility: "professional visual artists, artist-led teams and conservation specialists based in South Florida"
+    source_url: "https://artscalendar.com/classifieds/36206/"
+    retrieved: "2026-10-05"
+    notes: "Builds a pool of specialists to repair and restore works in the county's public art collection. Not a new commission. ArtsCalendar.com is run by the Broward Cultural Division."
+
+  - id: fl-dos-gallery-innovation-arts-exhibition
+    title: "Exhibition Program – Gallery for Innovation and the Arts"
+    organization: "Florida Department of State, Division of Arts and Culture"
+    kind: other
+    city: "Tallahassee"
+    state: "FL"
+    address: "R. A. Gray Building, 500 South Bronough Street, Tallahassee, FL"
+    budget_usd: null
+    budget_note: "No fee stated; the Division covers insurance and installation, and the artist covers shipping"
+    deadline: null
+    rolling: true
+    eligibility: "Florida artists and organizations"
+    source_url: "https://dos.fl.gov/cultural/programs/exhibitions/"
+    retrieved: "2026-10-05"
+    notes: "A rolling call for exhibitions in a state building, scheduled up to 2–3 years ahead. Borderline: this is an exhibition program, not a commission."
+
+  # ---------------- Elsewhere in the US ----------------
+  - id: huntington-theatre-east-wing-rfq
+    title: "Huntington Theatre – East Wing Art Commission – Request for Qualifications"
+    organization: "Huntington Theatre Company"
+    kind: rfq
+    city: "Boston"
+    state: "MA"
+    address: "East Wing, 264 Huntington Avenue, Boston, MA 02115"
+    budget_usd: 25000
+    budget_note: "$25,000 for artist fee and fabrication combined"
+    deadline: "2026-10-07"
+    rolling: false
+    eligibility: "mid-career or established artists with 15+ years of practice and large-scale public work experience; Boston residency not required"
+    source_url: "https://www.huntingtontheatre.org/gallery-submissions/"
+    retrieved: "2026-10-05"
+    notes: "Large-scale artwork for public space on the Avenue of the Arts. Murals are excluded and a community jury reviews entries anonymously."
+
+  - id: portsmouth-nh-hanover-garage
+    title: "Public Art Review Committee Seeks Artists for Hanover Garage Project"
+    organization: "City of Portsmouth Public Art Review Committee"
+    kind: rfp
+    city: "Portsmouth"
+    state: "NH"
+    address: "Hanover Street Parking Garage, Portsmouth, NH"
+    budget_usd: 60000
+    budget_note: "Maximum $60,000 covering all project expenses"
+    deadline: "2026-10-09"
+    rolling: false
+    eligibility: "any type of artist (no restrictions stated)"
+    source_url: "https://www.portsmouthnh.gov/city/press-releases/public-art-review-committee-seeks-artists-hanover-garage-project"
+    retrieved: "2026-10-05"
+    notes: "A mural is preferred, but sculpture or projection/lighting on the garage also qualifies. The full RFP is on the city's purchasing page."
+
+  - id: utah-usu-animal-sciences-building
+    title: "Utah Public Art Program Opportunity – Utah State University Animal Sciences Building"
+    organization: "Utah Division of Arts & Museums, Utah Public Art Program"
+    kind: rfq
+    city: null
+    state: "UT"
+    address: "Utah State University Animal Sciences Building (addition)"
+    budget_usd: 164000
+    budget_note: null
+    deadline: "2026-10-12"
+    rolling: false
+    eligibility: "artists or artist teams (no further restrictions stated)"
+    source_url: "https://artsandmuseums.utah.gov/public-art-opportunities/"
+    retrieved: "2026-10-05"
+    notes: "State percent-for-art project for interior artwork on learning and collaboration. The page does not name the campus city."
+
+  - id: bellevue-portable-artworks-2026
+    title: "City seeks portable artworks for Public Art Collection"
+    organization: "City of Bellevue Arts Program"
+    kind: other
+    city: "Bellevue"
+    state: "WA"
+    address: null
+    budget_usd: 12000
+    budget_note: "Maximum total purchase of $12,000 per artist (up to five pieces)"
+    deadline: "2026-10-13"
+    rolling: false
+    eligibility: "professional visual artists in Island, King, Kitsap, Kittitas, Chelan, Pierce, San Juan, Skagit or Snohomish counties"
+    source_url: "https://bellevuewa.gov/city-news/portable-art-call-26"
+    retrieved: "2026-10-05"
+    notes: "Buys existing 2D and 3D works for display in city-owned public buildings."
+
+  - id: las-vegas-sculptors-fabricators-roster
+    title: "Call for Sculptors and Fabricators"
+    organization: "City of Las Vegas Public Art Program"
+    kind: rfq
+    city: "Las Vegas"
+    state: "NV"
+    address: null
+    budget_usd: 300000
+    budget_note: "Pre-qualified roster; future project budgets range from under $10,000 to up to $300,000 per project"
+    deadline: "2026-10-15"
+    rolling: false
+    eligibility: "sculptors and fabricators (no geographic restriction stated)"
+    source_url: "https://www.lasvegasnevada.gov/Residents/Arts-Culture/Arts-Registry/Details?id=call-for-sculptors-and-fabricators-10-15-2026"
+    retrieved: "2026-10-05"
+    notes: "Roster valid for about three years for upcoming city sculpture projects. The budget is per future project, not a single commission."
+
+  - id: denver-la-raza-park-rfq
+    title: "Request for Qualifications: La Raza Park Public Art Commission"
+    organization: "Denver Arts & Venues – Denver Public Art"
+    kind: rfq
+    city: "Denver"
+    state: "CO"
+    address: "La Raza Park, bounded by 38th and 39th Avenues and Osage and Navajo Streets, Denver"
+    budget_usd: 136000
+    budget_note: "$136,000, all-inclusive (Denver 1% for Public Art)"
+    deadline: "2026-10-15"
+    rolling: false
+    eligibility: "artists or artist teams residing in the United States"
+    source_url: "https://denverpublicart.org/for-artists/la-raza-park-rfq/"
+    retrieved: "2026-10-05"
+    notes: "Durable exterior sculpture rooted in Northside Denver heritage. First-time public artists are welcome."
+
+  - id: mecklenburg-bryant-park-rfq
+    title: "ASC Call to Artists – Mecklenburg County – Bryant Park"
+    organization: "Arts & Science Council for Mecklenburg County"
+    kind: rfq
+    city: "Charlotte"
+    state: "NC"
+    address: "Bryant Park, 1701 West Morehead St, Charlotte, NC 28208"
+    budget_usd: 130492
+    budget_note: "$130,492, all-inclusive"
+    deadline: "2026-10-15"
+    rolling: false
+    eligibility: "US-based professional artists/teams who have completed public art commissions in the past 10 years"
+    source_url: "https://artsandscience.org/wp-content/uploads/2026/09/ASC_Mecklenburg-County-Bryant-Park_RFQ_Final.pdf"
+    retrieved: "2026-10-05"
+    notes: "Interactive work at the park's Lover's Leap area, such as seating, paving, sculpture or wayfinding. Must withstand flood water. Installation is planned for 2029."
+
+  - id: risca-davies-cths-lincoln
+    title: "National Public Art Call for Artists Managed by RISCA"
+    organization: "Rhode Island State Council on the Arts (RISCA)"
+    kind: commission
+    city: "Lincoln"
+    state: "RI"
+    address: "Front entrance plaza, William M. Davies Jr. Career and Technical High School, 50 Jenckes Hill Road, Lincoln, RI"
+    budget_usd: 225000
+    budget_note: "$225,000, all-inclusive"
+    deadline: "2026-10-15"
+    rolling: false
+    eligibility: "professional artists nationally; undergraduate students not eligible"
+    source_url: "https://arts.ri.gov/opportunities/arts-calls"
+    retrieved: "2026-10-05"
+    notes: "The page says 'Oct. 15' with no year. 2026 is inferred from the other current listings on the page."
+
+  - id: angels-path-sculpture-walk-tucson
+    title: "Call to Artist Brandi Fenton Angels Path Sculpture Walk"
+    organization: "Angels Path Sculpture Walk"
+    kind: commission
+    city: "Tucson"
+    state: "AZ"
+    address: null
+    budget_usd: 15000
+    budget_note: "$15,000, all-inclusive (design, fabrication, delivery to Tucson)"
+    deadline: "2026-10-16"
+    rolling: false
+    eligibility: null
+    source_url: "https://azarts.gov/arts-op/call-to-artist-brandi-fenton-angels-path-sculpture-walk/"
+    retrieved: "2026-10-05"
+    notes: "Permanent, durable sculpture depicting an angel or the essence of one. Listed by the Arizona Commission on the Arts."
+
+  - id: welcome-race-fans-2027
+    title: "Welcome Race Fans 2027 Seeks Artists"
+    organization: "Indy Arts Council (with Indianapolis Motor Speedway)"
+    kind: temporary
+    city: "Indianapolis"
+    state: "IN"
+    address: null
+    budget_usd: 3000
+    budget_note: "$3,000 per artist ($2,500 commission + $500 licensing); five artists"
+    deadline: "2026-10-18"
+    rolling: false
+    eligibility: "professional artists 18+ living in or strongly tied to nine central Indiana counties"
+    source_url: "https://indyarts.org/opportunity/welcome-race-fans-2027-seeks-artists/"
+    retrieved: "2026-10-05"
+    notes: "Original 2D/3D works on the theme 'This is May', shown at public sites around Indianapolis and Speedway in April–June 2027."
+
+  - id: louisville-downtown-functional-public-art
+    title: "Request for Qualifications: Functional Public Art Installation"
+    organization: "Louisville Downtown Partnership"
+    kind: rfq
+    city: "Louisville"
+    state: "KY"
+    address: "Park of the Four Fountains (Aegon Plaza), 220 S 4th Street at W Jefferson Street, Louisville, KY"
+    budget_usd: 75000
+    budget_note: "$70,000–$75,000"
+    deadline: "2026-10-19"
+    rolling: false
+    eligibility: "open to all; Kentucky residents get bonus scoring points"
+    source_url: "https://louisvilledowntown.org/news/request-for-qualifications-functional-public-art-installation/"
+    retrieved: "2026-10-05"
+    notes: "A relocatable installation that provides seating, shade or lighting on a downtown lawn."
+
+  - id: wilsonville-wrapped-utility-boxes
+    title: "Wilsonville Wrapped – A Utility Box Public Art Program"
+    organization: "City of Wilsonville / Arts, Culture, and Heritage Commission"
+    kind: temporary
+    city: "Wilsonville"
+    state: "OR"
+    address: null
+    budget_usd: 500
+    budget_note: "$500 stipend per box"
+    deadline: "2026-10-21"
+    rolling: false
+    eligibility: "visual artists of any medium, designers, illustrators, photographers and students aged 16+"
+    source_url: "https://wilsonvilleoregon.gov/DocumentCenter/View/24039/Wilsonville-Utility-Box-Vinyl-Wrap-Call--updatedpdf"
+    retrieved: "2026-10-05"
+    notes: "Pilot program putting existing artwork on traffic signal boxes as vinyl wraps."
+
+  - id: minneapolis-graco-park-tunnel
+    title: "Graco Park tunnel art project"
+    organization: "City of Minneapolis Arts & Cultural Affairs"
+    kind: commission
+    city: "Minneapolis"
+    state: "MN"
+    address: "Tunnel connecting Graco Park to an adjacent park (no street address stated)"
+    budget_usd: 250000
+    budget_note: null
+    deadline: "2026-10-26"
+    rolling: false
+    eligibility: "artists at all skill levels (no residency restriction stated); community-engagement experience expected"
+    source_url: "https://www.minneapolismn.gov/government/departments/arts/public-art/public-art-projects/call-for-artists/"
+    retrieved: "2026-10-05"
+    notes: "An intent-to-apply form is due Oct 16. The page shows no year on the deadline; 2026 is inferred from the page's Sept 18, 2026 update."
+
+  - id: sacramento-mlk-library-public-art
+    title: "City seeks artist for public art project at Martin Luther King Jr. Library"
+    organization: "City of Sacramento Office of Arts and Culture (Art in Public Places)"
+    kind: commission
+    city: "Sacramento"
+    state: "CA"
+    address: "Martin Luther King Jr. Library, 7340 24th Street Bypass, Sacramento, CA"
+    budget_usd: 151500
+    budget_note: "Total award $151,500 (City 2% for Public Art)"
+    deadline: "2026-10-26"
+    rolling: false
+    eligibility: "professional artists; extra consideration for experience in or ties to south Sacramento"
+    source_url: "https://sacramentocityexpress.com/2026/09/11/city-seeks-artist-for-public-art-project-at-martin-luther-king-jr-library/"
+    retrieved: "2026-10-05"
+    notes: "A 3D wall-hung work on civil rights at the library entrance. Painted murals on the brick are not allowed."
+
+  - id: avondale-visitor-conference-center
+    title: "Call to Artists | Visitor & Conference Center | City of Avondale"
+    organization: "City of Avondale"
+    kind: rfp
+    city: "Avondale"
+    state: "AZ"
+    address: "Courtyard, Visitor & Conference Center, Avondale Civic Center campus"
+    budget_usd: 50000
+    budget_note: "$50,000, all-inclusive"
+    deadline: "2026-10-27"
+    rolling: false
+    eligibility: "professional sculpture artists and design architects"
+    source_url: "https://azarts.gov/arts-op/call-to-artists-visitor-conference-center-city-of-avondale/"
+    retrieved: "2026-10-05"
+    notes: "Large 3D sculpture with a water element on the theme of agricultural heritage (blooming cotton), to be completed by May 2027."
+
+  - id: fairport-perinton-art-trail
+    title: "Fairport-Perinton Art Trail – Art Installation"
+    organization: "Fairport Public Arts Committee"
+    kind: rfq
+    city: "Fairport"
+    state: "NY"
+    address: "Erie Canal, Village of Fairport and Town of Perinton, NY"
+    budget_usd: 30000
+    budget_note: "$30,000 total project budget"
+    deadline: "2026-10-30"
+    rolling: false
+    eligibility: "artists and artist teams (no further restrictions on page)"
+    source_url: "https://www.fairportart.org/call-for-art.html"
+    retrieved: "2026-10-05"
+    notes: "Site-specific work for the canal-side art trail. Funded by the Canal Days Committee."
+
+  - id: tamu-aplin-center-signature-commission
+    title: "Signature Public Art Commission for the Aplin Center at Texas A&M University"
+    organization: "Texas A&M University (University Art Galleries)"
+    kind: rfq
+    city: "College Station"
+    state: "TX"
+    address: "Corner of John Kimbrough Blvd and Olsen Blvd, Texas A&M campus (Aplin Center)"
+    budget_usd: null
+    budget_note: "Not stated; finalists receive a design stipend (amount given on invitation)"
+    deadline: "2026-10-31"
+    rolling: false
+    eligibility: "professional artists/artist-led teams with large-scale public art commission experience"
+    source_url: "https://uart.tamu.edu/aplin/"
+    retrieved: "2026-10-05"
+    notes: "The page says applications are accepted 'through October of 2026'. Oct 31 is inferred because no exact date is given. Monumental work, installation targeted for spring 2028."
+
+  - id: artfields-2027-public-art-proposals
+    title: "Public Art Proposals – Site Specific Installations (2027 ArtFields Festival)"
+    organization: "ArtFields"
+    kind: temporary
+    city: "Lake City"
+    state: "SC"
+    address: null
+    budget_usd: null
+    budget_note: null
+    deadline: "2026-11-01"
+    rolling: false
+    eligibility: "artists in AL, AR, FL, GA, KY, LA, MS, NC, SC, TN, VA or WV (stated for most festival opportunities)"
+    source_url: "https://www.artfieldssc.org/artist-opportunities/festival/"
+    retrieved: "2026-10-05"
+    notes: "Large site-specific installations around town for the April 9–May 1, 2027 festival. Florida artists are eligible."
+
+  - id: avondale-donatela-park
+    title: "Call to Artists | Donatela Park"
+    organization: "City of Avondale"
+    kind: rfp
+    city: "Avondale"
+    state: "AZ"
+    address: "Donatela Park, Avondale, AZ"
+    budget_usd: 100000
+    budget_note: "$100,000, all-inclusive"
+    deadline: "2026-11-03"
+    rolling: false
+    eligibility: "professional sculpture artists and design architects"
+    source_url: "https://azarts.gov/arts-op/call-to-artists-donatela-park/"
+    retrieved: "2026-10-05"
+    notes: "Sculpture for a new 5.4-acre neighborhood park, to be installed by February 2027. Listed by the Arizona Commission on the Arts."
+
+  - id: albuquerque-sawmural-mini-mural-festival
+    title: "SawMural Mini-Mural Festival Request for Qualifications"
+    organization: "City of Albuquerque Public Art Program"
+    kind: mural
+    city: "Albuquerque"
+    state: "NM"
+    address: "Sawmill segment of the Rail Trail, east side between Bellamah Ave NW and Mountain Rd NW"
+    budget_usd: 4000
+    budget_note: "$4,000 per selected artist; up to 20 artists"
+    deadline: "2026-11-13"
+    rolling: false
+    eligibility: "legal residents of Bernalillo, Sandoval, Torrance or Valencia counties"
+    source_url: "https://www.cabq.gov/artsculture/public-art/for-artists/opportunities-for-artists/sawmural"
+    retrieved: "2026-10-05"
+    notes: "Mini-mural panels on view May–Aug 2027. Up to three may enter the city collection."
+
+  - id: olympia-art-crossings-4-5
+    title: "Call for Art – Art Crossings #4 and #5"
+    organization: "City of Olympia Parks, Arts & Recreation"
+    kind: commission
+    city: "Olympia"
+    state: "WA"
+    address: "Art Crossing #4 Harrison/Division and Art Crossing #5 Henderson/Eskridge, Olympia, WA"
+    budget_usd: 55000
+    budget_note: "$55,000 per project; two projects awarded to separate artists"
+    deadline: "2026-12-08"
+    rolling: false
+    eligibility: "artists with a connection to Olympia, WA; Olympia-based artists strongly encouraged"
+    source_url: "https://www.olympiawa.gov/community/arts,_culture___heritage/art_crossing_call_for_art.php"
+    retrieved: "2026-10-05"
+    notes: "Paired gateway markers on civic boulevards. The city handles foundations and installation."
+
+  - id: wmata-art-in-transit-open-call
+    title: "Art in Transit Open Call for Artwork"
+    organization: "Washington Metropolitan Area Transit Authority (WMATA)"
+    kind: rfq
+    city: "Washington"
+    state: "DC"
+    address: null
+    budget_usd: null
+    budget_note: "Not stated; an artist fee is provided per project"
+    deadline: null
+    rolling: true
+    eligibility: "residents of DC, Maryland or Virginia aged 18+, priority to Metro's service area"
+    source_url: "https://www.wmata.com/initiatives/art-in-transit/art-in-transit-open-call-for-artwork.html"
+    retrieved: "2026-10-05"
+    notes: "A rolling artist pool for barricade wraps, digital screens and station installations."
+
+  - id: ind-airport-temporary-exhibitions
+    title: "Art at the Airport Temporary Exhibitions Request for Proposals"
+    organization: "Indianapolis Airport Authority and Indy Arts Council"
+    kind: temporary
+    city: "Indianapolis"
+    state: "IN"
+    address: "Col. H. Weir Cook Memorial Terminal, Indianapolis International Airport"
+    budget_usd: 500
+    budget_note: "Loan fee up to $500 per location; artist covers other costs"
+    deadline: null
+    rolling: true
+    eligibility: "artists 18+; preference for Indiana and especially central Indiana artists"
+    source_url: "https://indyarts.org/opportunity/indy-arts-council-and-indianapolis-airport-authority-seek-proposals-for-airport-exhibitions-and-video/"
+    retrieved: "2026-10-05"
+    notes: "Four- to six-month installations in terminal cases and gallery space, plus 60-second video slots."

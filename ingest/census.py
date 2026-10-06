@@ -87,3 +87,40 @@ def major_roads(bbox, refresh=False):
             feats.extend(fc["features"])
         return {"type": "FeatureCollection", "features": feats}
     return cached_json("census_major_roads.json", fetch, refresh)
+
+
+GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_{kind}_national.zip"
+
+
+def gazetteer(kind: str, refresh=False):
+    """Census Gazetteer internal points for every ZCTA ("zcta"), county ("counties") or place ("place"):
+    {"rows": {key: [lon, lat]}}; keys are the ZCTA, the county GEOID, or "ST|place name" (lower case, without the
+    trailing type such as 'city', 'town', 'CDP' or 'metro government', or '(balance)'; consolidated names also get a
+    short key, e.g. "KY|louisville"). Counties also carry {"names": {"ST|name county": GEOID}}."""
+    import io
+    import re
+    import zipfile
+
+    from .common import http
+
+    def fetch():
+        z = zipfile.ZipFile(io.BytesIO(http("GET", GAZETTEER.format(kind=kind), binary=True)))
+        lines = z.read(z.namelist()[0]).decode("latin-1").splitlines()
+        head = [h.strip() for h in lines[0].split("\t")]
+        rows, names = {}, {}
+        for line in lines[1:]:
+            r = dict(zip(head, (v.strip() for v in line.split("\t"))))
+            pt = [round(float(r["INTPTLONG"]), 5), round(float(r["INTPTLAT"]), 5)]
+            if kind == "place":
+                name = re.sub(r"\s*\(balance\)$", "", r["NAME"])           # consolidated cities: "Indianapolis city (balance)"
+                name = re.sub(r"\s+(city|town|village|CDP|borough|municipality|city and borough|metro(politan)? government|"
+                              r"unified government|consolidated government)$", "", name, flags=re.I)
+                rows[f'{r["USPS"]}|{name.lower()}'] = pt
+                short = re.split(r"[/-]", name)[0].strip()                 # "Louisville/Jefferson County", "Nashville-Davidson"
+                rows.setdefault(f'{r["USPS"]}|{short.lower()}', pt)
+            else:
+                rows[r["GEOID"]] = pt
+                if kind == "counties":
+                    names[f'{r["USPS"]}|{r["NAME"].lower()}'] = r["GEOID"]
+        return {"vintage": "2024 Gazetteer", "rows": rows} | ({"names": names} if names else {})
+    return cached_json(f"census_gazetteer_{kind}.json", fetch, refresh)

@@ -30,6 +30,11 @@ items are not law, and the app draws no legal conclusions.
   Gainesville, and a ranking of places for pooled funds.
 - **Economics:** visitor spending and 5% tourist-tax revenue induced by proposed works, built from stops and AEP6
   per-visitor spending; AEP6 Alachua sector figures as context.
+- **Funding:** arts grants and calls to artists across the US, searchable and on the map with dollar amounts:
+  22,104 NEA, NEH and IMLS awards with activity in FY2021-FY2025 (USAspending.gov, at the recipient's ZIP centre;
+  clusters show their dollar total), 2,558 Florida Division of Arts and Culture awards (2021-22 to 2026-27 except 2024-25, by
+  county), 20 federal grants open now (Grants.gov), and 31 curated calls to artists (budget and deadline, closed ones
+  hidden). Totals follow the map view; links go to each award record, listing or call. ADR 0003.
 - **Staff study (exploratory):** a voluntary Chapter 30 incentive (options A/B/C, bonuses), GRU/enterprise
   sub-accounts with a nexus checklist, City-County shared services, the local-artist target.
 - **Brief:** a PDF whose figures link back to the scenario.
@@ -45,19 +50,26 @@ publicart/                     this folder
   seed.yaml                    every assumption with its source or an "assumption" label
   ingest.py                    City of Gainesville ArcGIS layers (GCRA, zoning, counters), RTS feed URL
   build.py                     data package            (python -m publicart.build, ~15 s with a warm cache)
+  grants.py                    arts funding index      (python -m publicart.grants; ~20 min cold, seconds cached)
+  calls.yaml                   curated calls to artists, a source per call (edit to add calls), and link-outs
   tests/test_build.py          inputs and data-package tests
+  tests/test_grants.py         funding index: parsers, curated calls, built index
   docs/adr/                    design records
 web/public-art/index.html      app page (/public-art/)
-web/src/publicart/             app: App, MapView, map/ (Three.js layer, meshes), engine/ (ledger, conservation,
-                               impressions, equity, economics, exploratory), panels/, state, model, test/
+web/src/publicart/             app: App, MapView, map/ (Three.js layer, meshes, grant layers), engine/ (ledger,
+                               conservation, impressions, equity, economics, exploratory, grants), panels/, state,
+                               funding (Funding tab store), model, test/
 web/public/public-art/data/    data package (roads, cells, artworks, equity, areas, counters, transit, cpi, meta, ...)
+                               and grants.json (the funding index, loaded when the Funding tab opens)
 ```
 Shared platform used here: `web/src/shared` (map core, terrain and buildings, astronomy, UI, share URLs, PDF writer)
-and `ingest/` (ArcGIS, OSM, Census, ACS via Census Reporter, BLS CPI-U, GTFS, geocoding, FDOT traffic).
+and `ingest/` (ArcGIS, OSM, Census and its Gazetteer, ACS via Census Reporter, BLS CPI-U, GTFS, geocoding, FDOT
+traffic, USAspending.gov, Grants.gov).
 
 ## Commands
 ```
 python -m publicart.build                     # rebuild the data package
+python -m publicart.grants [--refresh]        # rebuild the funding index (--refresh refetches every source)
 python -m pytest publicart/tests              # pipeline tests
 cd web && npx vitest run src/publicart        # model tests
 cd web && npm run dev                         # http://localhost:5173/public-art/
@@ -77,6 +89,11 @@ cd web && npm run dev                         # http://localhost:5173/public-art
 | Americans for the Arts AEP6, Alachua County (2023) | per-visitor spending; sector context |
 | Visit Gainesville; Alachua County Tax Collector | room-night rate (derived), 5% tourist tax |
 | Dark Sky streetlight inventory (City of Gainesville, OSM) | night visibility of unlit works |
+| USAspending.gov award search: NEA, NEH, IMLS prime grants (public domain) | Funding: federal awards |
+| Grants.gov opportunity listings (public domain) | Funding: federal grants open now |
+| Florida Division of Arts and Culture, awards by county (published sheets) | Funding: Florida state awards |
+| Census Gazetteer 2024: ZCTA, county and place centres | Funding: award and call locations |
+| Curated calls to artists (commissioning bodies' own pages; calls.yaml) | Funding: calls to artists |
 
 ## Caveats
 - The registry is incomplete (most murals' current status is unchecked); 1 entry could not be located. Of the
