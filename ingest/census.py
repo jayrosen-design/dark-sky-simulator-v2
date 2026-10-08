@@ -124,3 +124,9 @@ def gazetteer(kind: str, refresh=False):
                     names[f'{r["USPS"]}|{r["NAME"].lower()}'] = r["GEOID"]
         return {"vintage": "2024 Gazetteer", "rows": rows} | ({"names": names} if names else {})
     return cached_json(f"census_gazetteer_{kind}.json", fetch, refresh)
+
+
+def state_counties(state_fips: str, refresh=False):
+    """2020 county polygons for one state (generalized to ~200 m) with GEOID and NAME."""
+    return cached_json(f"census_counties_state{state_fips}.json", lambda: arcgis_query(
+        f"{C2020}/82", where=f"STATE='{state_fips}'", out_fields="GEOID,BASENAME,NAME", max_offset=0.002), refresh)

@@ -29,6 +29,9 @@ export interface Seed {
     aep6: V<Aep6>; share_nonlocal: V; incremental_visit_share: V; destination_visits: V<Record<Scale, number>>;
     realisation: V; overnight_share: V; persons_per_room: V; adr: V; tdt_rate: V; retail_lift: V; sales_per_establishment: V;
   };
+  facilities: {
+    expansion_min_sqft: V; expansion_min_share: V; state_rule: V<{ rate: number; cap: number; applies_to: string }>; county_rule: V<null>; city_rule_note: V<string>;
+  };
   staff_study: {
     ch30_options: V<Record<"A" | "B" | "C", { label: string; rate: number }>>; ch30_bonus_caps: V<{ far: number; stories: number; parking: number }>;
     ch30_uptake: V; ch30_private_construction: V; ch30_land_value_per_buildable_sf: V; gru_nexus: V<string[]>;

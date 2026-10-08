@@ -11,6 +11,7 @@ import ConservationPanel from "./panels/ConservationPanel";
 import EconomicsPanel from "./panels/EconomicsPanel";
 import EquityPanel from "./panels/EquityPanel";
 import FundingPanel from "./panels/FundingPanel";
+import BuildingsPanel from "./panels/BuildingsPanel";
 import PlacePanel from "./panels/PlacePanel";
 import PolicyPanel from "./panels/PolicyPanel";
 import StaffPanel from "./panels/StaffPanel";
@@ -20,7 +21,7 @@ const MapView = lazy(() => import("./MapView"));
 const TABS: { id: Tab; label: string }[] = [
   { id: "collection", label: "Collection" }, { id: "place", label: "Place" }, { id: "activity", label: "Activity" },
   { id: "policy", label: "Policy" }, { id: "conservation", label: "Conservation" }, { id: "equity", label: "Equity" },
-  { id: "economics", label: "Economics" }, { id: "funding", label: "Funding" }, { id: "staff", label: "Staff study" }, { id: "brief", label: "Brief" },
+  { id: "economics", label: "Economics" }, { id: "funding", label: "Funding" }, { id: "buildings", label: "Buildings" }, { id: "staff", label: "Staff study" }, { id: "brief", label: "Brief" },
 ];
 
 function Panel({ m, agents, setAgents, setSugs }: { m: Model; agents: boolean; setAgents: (v: boolean) => void; setSugs: (s: Suggestion[]) => void }) {
@@ -34,6 +35,7 @@ function Panel({ m, agents, setAgents, setSugs }: { m: Model; agents: boolean; s
     case "equity": return <EquityPanel m={m} onSuggest={setSugs} />;
     case "economics": return <EconomicsPanel m={m} />;
     case "funding": return <FundingPanel />;
+    case "buildings": return <BuildingsPanel m={m} />;
     case "staff": return <StaffPanel m={m} />;
     case "brief": return <BriefPanel m={m} />;
   }

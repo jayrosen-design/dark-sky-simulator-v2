@@ -18,7 +18,7 @@ python -m uv venv --python 3.12 .venv
 python -m uv pip install --python .venv -e ".[dev,ml,viirs]"
 .venv/Scripts/python -m pipeline.ingest_all      # pull public sources into data_raw/ (cached)
 .venv/Scripts/python -m pipeline.build           # precompute web/public/dark-sky/data/ and docs/sanity_check.md
-.venv/Scripts/python -m pytest                   # 65 tests (49 Dark Sky, 5 WildSight, 11 Public Art)
+.venv/Scripts/python -m pytest                   # 75 tests (49 Dark Sky, 5 WildSight, 21 Public Art; 1 skips until florida_budgets.yaml exists)
 
 # Web client
 cd web

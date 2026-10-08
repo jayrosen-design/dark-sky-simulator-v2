@@ -16,6 +16,12 @@ import { ArtLayer, type PlacedArt } from "./map/ArtLayer";
 import { addGrantLayers, setGrantData, showGrantLayers } from "./map/grantLayers";
 import { allItems, CALL_COLOR, filterCalls, filterItems, SOURCE_COLOR } from "./engine/grants";
 import { todayIso, useFunding } from "./funding";
+import { addCatalogLayers, CATALOG_COLOR, setCatalogData, showCatalogLayers } from "./map/catalogLayers";
+import { allWorks, filterWorks } from "./engine/catalog";
+import { useCatalog } from "./catalog";
+import { addFacilityLayers, setFacilityData, showFacilityLayers } from "./map/facilityLayers";
+import { allFacilities, CLASS_COLOR, CLASS_LABEL, filterFacilities, onLand, type FacClass } from "./engine/facilities";
+import { useBuildings } from "./buildings";
 import { ACCENT, GNV_BOUNDS, GNV_CENTER, PROVENANCE_COLOR } from "./constants";
 import { contextOf, type Model } from "./model";
 import type { Suggestion } from "./engine/equity";
@@ -134,6 +140,8 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
         if (kind === "county") { const it = allItems(f.pkg!).find((x) => x.place === id); if (it) f.fly(it.lon, it.lat, 8); return; }
         f.set({ sel: { kind, id } });
       });
+      addCatalogLayers(map, (id) => useCatalog.getState().set({ sel: id }));
+      addFacilityLayers(map, firstSymbol, (id) => { const s = usePaps.getState(); if (s.tab !== "buildings") s.setTab("buildings"); useBuildings.getState().set({ sel: id }); });
       add("art");
       map.addLayer({ id: "art-halo", type: "circle", source: "art",
         paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 6, 16, 14], "circle-color": ["get", "color"], "circle-opacity": 0.18, "circle-blur": 0.6 } });
@@ -282,6 +290,58 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
     map.easeTo({ center: [t.lon, t.lat], zoom: t.zoom, pitch: 0, duration: 900 });
   }, [ready, funding.flyTo?.n]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Collection tab, Florida scope: the statewide catalog replaces the Gainesville registry markers.
+  const catalog = useCatalog();
+  const bld = useBuildings();
+  const statewide = tab === "collection" && catalog.scope === "florida";
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const on = statewide && !!catalog.pkg;
+    showCatalogLayers(map, on);
+    for (const id of ["art", "art-halo"]) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", statewide ? "none" : "visible");
+    if (on) setCatalogData(map, onLand(filterWorks(allWorks(catalog.pkg!), { q: catalog.q, county: catalog.county, collection: catalog.collection,
+      budgetOnly: catalog.budgetOnly, bounds: null }), catalog.land, bld.pkg), catalog.sel);
+  }, [ready, statewide, catalog.pkg, catalog.q, catalog.county, catalog.collection, catalog.budgetOnly, catalog.land, catalog.sel, bld.pkg]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !statewide) return;
+    const report = () => { const b = map.getBounds(); useCatalog.getState().set({ view: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()] }); };
+    report();
+    map.on("moveend", report);
+    return () => { map.off("moveend", report); };
+  }, [ready, statewide]);
+  useEffect(() => {
+    const map = mapRef.current, t = catalog.flyTo;
+    if (!ready || !map || !t) return;
+    map.easeTo({ center: [t.lon, t.lat], zoom: t.zoom, pitch: 0, duration: 900 });
+  }, [ready, catalog.flyTo?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Public buildings: the Buildings tab, or the overlay on the Collection tab.
+  const facOn = tab === "buildings" || (tab === "collection" && bld.overlay);
+  useEffect(() => { if (facOn) bld.load(); }, [facOn]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const on = facOn && !!bld.pkg;
+    showFacilityLayers(map, on);
+    if (on) setFacilityData(map, bld.pkg!, filterFacilities(allFacilities(bld.pkg!), { q: bld.q, classes: bld.classes, since: bld.since, bounds: null }),
+      bld.sel, bld.since ?? 2015);
+  }, [ready, facOn, bld.pkg, bld.q, bld.classes, bld.since, bld.sel]);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || tab !== "buildings") return;
+    const report = () => { const b = map.getBounds(); useBuildings.getState().set({ view: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()] }); };
+    report();
+    map.on("moveend", report);
+    return () => { map.off("moveend", report); };
+  }, [ready, tab]);
+  useEffect(() => {
+    const map = mapRef.current, t = bld.flyTo;
+    if (!ready || !map || !t) return;
+    map.easeTo({ center: [t.lon, t.lat], zoom: t.zoom, pitch: 0, duration: 900 });
+  }, [ready, bld.flyTo?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Moving people and vehicles (Activity tab).
   useEffect(() => {
     const map = mapRef.current;
@@ -319,24 +379,29 @@ export default function MapView({ m, agents, suggestions }: { m: Model | null; a
         <button onClick={() => setShow3D(!show3D)} aria-pressed={show3D} title="3D buildings and artworks lit by the Sun"
           className={`rounded border px-2 py-1 text-xs font-semibold ${show3D ? "border-[#b79cff] bg-[#b79cff]/20 text-[#b79cff]" : "border-ink-600 bg-ink-950/85 text-star-300 hover:bg-ink-800"}`}>3D</button>
       </div>
-      {m && tab !== "funding" && <div className="absolute right-12 top-2 w-[440px] max-w-[70%]"><KpiHud m={m} /></div>}
+      {m && tab !== "funding" && tab !== "buildings" && !statewide && <div className="absolute right-12 top-2 w-[440px] max-w-[70%]"><KpiHud m={m} /></div>}
       {!m && <div className="absolute left-14 top-2 rounded bg-ink-900/90 px-2 py-1 text-[11px] text-star-300">Loading the art registry and city data…</div>}
       {ready && show3D && <CameraPad map={mapRef.current} maxPitch={75} resetPitch={62} />}
-      {tab !== "funding" && <div className="pointer-events-none absolute bottom-6 left-1/2 w-[min(560px,70%)] -translate-x-1/2"><TimeBar /></div>}
-      <Legend tab={tab} agents={agents} />
+      {tab !== "funding" && tab !== "buildings" && !statewide && <div className="pointer-events-none absolute bottom-6 left-1/2 w-[min(560px,70%)] -translate-x-1/2"><TimeBar /></div>}
+      <Legend tab={statewide ? "florida" : tab} agents={agents} buildings={facOn} />
     </div>
   );
 }
 
-function Legend({ tab, agents }: { tab: string; agents: boolean }) {
+function Legend({ tab, agents, buildings }: { tab: string; agents: boolean; buildings: boolean }) {
   return (
     <div className="pointer-events-none absolute bottom-28 left-2 max-w-[240px] rounded-lg bg-ink-950/80 p-2 text-[10px] text-star-300 backdrop-blur">
-      {tab === "conservation" ? <div>Condition at the end: <span className="text-[#8fe38f]">●</span> good <span className="text-[#e3c34a]">●</span> fair <span className="text-[#f08a3c]">●</span> poor <span className="text-[#e0453a]">●</span> needs work</div>
+      {tab === "florida" ? <div>Florida catalog (Public Art Archive): <span style={{ color: CATALOG_COLOR }}>●</span> work{" "}
+        <span className="text-amber-400">●</span> with a stated budget · circles: number of works, click to expand</div>
+        : tab === "conservation" ? <div>Condition at the end: <span className="text-[#8fe38f]">●</span> good <span className="text-[#e3c34a]">●</span> fair <span className="text-[#f08a3c]">●</span> poor <span className="text-[#e0453a]">●</span> needs work</div>
         : <div className="flex flex-wrap gap-x-2">{Object.entries({ municipal: "City", county: "County", cra: "CRA", uf: "UF", private: "Private", partner: "Partner/other", proposed: "Proposed" }).map(([k, l]) =>
           <span key={k}><span style={{ color: PROVENANCE_COLOR[k] }}>●</span> {l}</span>)}<span>○ planned</span><span>· small: indoors</span></div>}
       {tab === "place" && <div className="mt-1">Heatmap: daily impressions a medium sculpture would get (low → <span className="text-[#ffdc96]">high</span>)</div>}
       {tab === "equity" && <div className="mt-1">Shading: median household income (darker purple = lower); <span className="text-[#f08ab8]">pink edge</span> low-income; rings ½ mile;
         <span className="text-amber-400"> East Gainesville</span>; <span className="text-[#5fd6c4]">GCRA</span> dashed</div>}
+      {buildings && <div className="mt-1">Public buildings: {(Object.keys(CLASS_LABEL) as FacClass[]).map((c) =>
+        <span key={c} className="mr-1.5"><span style={{ color: CLASS_COLOR[c] }}>■</span> {CLASS_LABEL[c]}</span>)}· outlines in Alachua County, circles
+        elsewhere; brighter = built or expanded recently</div>}
       {tab === "funding" && <div className="mt-1">Arts funding: <span style={{ color: SOURCE_COLOR.NEA }}>●</span> NEA <span style={{ color: SOURCE_COLOR.NEH }}>●</span> NEH{" "}
         <span style={{ color: SOURCE_COLOR.IMLS }}>●</span> IMLS awards (circles: totals, click to expand) · <span style={{ color: SOURCE_COLOR.FL }}>◯</span> Florida awards by county
         · <span style={{ color: CALL_COLOR }}>○</span> open calls (budget)</div>}

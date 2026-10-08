@@ -5,8 +5,30 @@ import { PROVENANCE_COLOR, PROVENANCE_LABEL } from "../constants";
 import type { Model } from "../model";
 import { usePaps } from "../state";
 import ArtCard, { artTitle } from "./ArtCard";
+import FloridaCatalog from "./FloridaCatalog";
+import { useCatalog } from "../catalog";
+import { useBuildings } from "../buildings";
 
+/** Collection: the Gainesville registry (which the models use) or the statewide Florida catalog (identification only). */
 export default function CollectionPanel({ m }: { m: Model }) {
+  const { scope, set } = useCatalog();
+  const { overlay, set: setB } = useBuildings();
+  return (
+    <div className="space-y-3">
+      <div className="flex overflow-hidden rounded-lg border border-ink-700 text-xs" role="radiogroup" aria-label="Collection scope">
+        {([["gainesville", "Gainesville registry"], ["florida", "All of Florida"]] as const).map(([k, label]) => (
+          <button key={k} role="radio" aria-checked={scope === k} onClick={() => set({ scope: k })}
+            className={`flex-1 px-2 py-1 ${scope === k ? "bg-ink-700 text-star-100" : "bg-ink-900 text-star-500 hover:text-star-300"}`}>{label}</button>
+        ))}
+      </div>
+      <label className="flex items-center gap-2 text-[11px] text-star-300"><input type="checkbox" checked={overlay} onChange={(e) => setB({ overlay: e.target.checked })} />
+        Show public buildings (state, county, city, school board, federal) to see which works stand on public land</label>
+      {scope === "florida" ? <FloridaCatalog /> : <GainesvilleRegistry m={m} />}
+    </div>
+  );
+}
+
+function GainesvilleRegistry({ m }: { m: Model }) {
   const { selected, select, showPlanned, setShowPlanned } = usePaps();
   const [q, setQ] = useState("");
   const r = m.data.meta.report.registry;

@@ -14,6 +14,10 @@ items are not law, and the app draws no legal conclusions.
   existing and 2 planned works on the map; 4 removed and 10 off-view works listed but not drawn; 1 not located.
   Works indoors, or whose setting is not yet checked, are drawn small and get no street impressions or 3D model.
   Markers by funding source; planned works (Common Light, 2027) can be shown or hidden.
+- **All of Florida (Collection tab):** a statewide catalog of the 1,354 Florida works listed in the Public Art Archive
+  (facts only, each linked to its record): title, artist, year, medium, work type, collection, building, city and
+  county, with budgets where a commissioning body's own document states one. Search, county and collection filters,
+  counts for the map view. Identification only; the models run on the Gainesville registry. ADR 0004.
 - **3D:** buildings plus procedural artworks (figure, sculpture, mural, fence, mosaic wall) in a Three.js layer lit
   by the Sun for the chosen date and time, with ground shadows; lit works keep spotlights at night. Murals snap onto
   the nearest building wall.
@@ -35,6 +39,12 @@ items are not law, and the app draws no legal conclusions.
   clusters show their dollar total), 2,558 Florida Division of Arts and Culture awards (2021-22 to 2026-27 except 2024-25, by
   county), 20 federal grants open now (Grants.gov), and 31 curated calls to artists (budget and deadline, closed ones
   hidden). Totals follow the map view; links go to each award record, listing or call. ADR 0003.
+- **Buildings:** publicly owned buildings (state, county, city, school board, federal, districts): outlined in Alachua
+  County with each parcel's building-area history (usable from 2017), marked elsewhere in Florida from the 2025 state
+  roll (26 of the other 66 counties loaded so far; `python -m publicart.facilities` fetches the rest).
+  Shows just and building value, recorded expansions or new construction and their estimated value, the art money the
+  written rules would attach (Gainesville Ch. 5.5 for City/GRU buildings; s. 255.043, F.S., for new state buildings),
+  and the artworks already on each parcel. Every artwork card says who owns the land it stands on. ADR 0005.
 - **Staff study (exploratory):** a voluntary Chapter 30 incentive (options A/B/C, bonuses), GRU/enterprise
   sub-accounts with a nexus checklist, City-County shared services, the local-artist target.
 - **Brief:** a PDF whose figures link back to the scenario.
@@ -52,15 +62,22 @@ publicart/                     this folder
   build.py                     data package            (python -m publicart.build, ~15 s with a warm cache)
   grants.py                    arts funding index      (python -m publicart.grants; ~20 min cold, seconds cached)
   calls.yaml                   curated calls to artists, a source per call (edit to add calls), and link-outs
+  florida.py                   Florida catalog         (python -m publicart.florida; ~1 min cold)
+  florida_budgets.yaml         artwork budgets from commissioning bodies' documents, a source per amount (none yet)
+  facilities.py                public buildings        (python -m publicart.facilities; ~1 h cold for the statewide roll)
   tests/test_build.py          inputs and data-package tests
   tests/test_grants.py         funding index: parsers, curated calls, built index
+  tests/test_florida.py        Florida catalog: term cleaning, budget matching, budgets file, built catalog
+  tests/test_facilities.py     public buildings: owner classes, expansion detection and the 2023 area artifact, rules
   docs/adr/                    design records
 web/public-art/index.html      app page (/public-art/)
 web/src/publicart/             app: App, MapView, map/ (Three.js layer, meshes, grant layers), engine/ (ledger,
                                conservation, impressions, equity, economics, exploratory, grants), panels/, state,
                                funding (Funding tab store), model, test/
 web/public/public-art/data/    data package (roads, cells, artworks, equity, areas, counters, transit, cpi, meta, ...)
-                               and grants.json (the funding index, loaded when the Funding tab opens)
+                               and grants.json (the funding index, loaded when the Funding tab opens) and
+                               florida.json (the statewide catalog, loaded when "All of Florida" is chosen) and
+                               facilities.json (public buildings and land owners, loaded by the Buildings tab or overlay)
 ```
 Shared platform used here: `web/src/shared` (map core, terrain and buildings, astronomy, UI, share URLs, PDF writer)
 and `ingest/` (ArcGIS, OSM, Census and its Gazetteer, ACS via Census Reporter, BLS CPI-U, GTFS, geocoding, FDOT
@@ -70,6 +87,8 @@ traffic, USAspending.gov, Grants.gov).
 ```
 python -m publicart.build                     # rebuild the data package
 python -m publicart.grants [--refresh]        # rebuild the funding index (--refresh refetches every source)
+python -m publicart.florida [--refresh]       # rebuild the Florida catalog (--refresh refetches the archive)
+python -m publicart.facilities [--refresh]    # rebuild public buildings (after florida; tags its works with land owners)
 python -m pytest publicart/tests              # pipeline tests
 cd web && npx vitest run src/publicart        # model tests
 cd web && npm run dev                         # http://localhost:5173/public-art/
@@ -80,6 +99,12 @@ cd web && npm run dev                         # http://localhost:5173/public-art
 | --- | --- |
 | Hand-compiled registry (City and County releases, news, OpenStreetMap artworks) | the collection |
 | Public Art Archive, a publication of Creative West (publicartarchive.org), imported Oct 4 2026, facts only | the collection (mostly UF's Art in State Buildings works) |
+| Public Art Archive, all Florida records, pulled Oct 5 2026, facts only | the Florida catalog |
+| 2020 Census county polygons (TIGERweb) | the Florida catalog's counties |
+| Commissioning bodies' documents (florida_budgets.yaml) | Florida catalog budgets |
+| Alachua County parcel layers, tax years 2001-2024 (maps.alachuacounty.us) | Buildings: outlines, values, area history |
+| FL Department of Revenue 2025 parcel roll, centres and outlines (Florida Geographic Information Office) | Buildings statewide; land owner under each catalog work |
+| Section 255.043, Florida Statutes (Art in State Buildings) | Buildings: state art rule |
 | City of Gainesville ArcGIS: GCRA boundary and priority areas, zoning (Jan 2025), bike/ped counters (2025) | equity overlays, zoning, walking-model calibration |
 | OpenStreetMap (ODbL): streets, paths, rail-trails, points of interest | streets, trails, destinations |
 | FDOT annual average daily traffic | vehicle volumes on state roads (class defaults elsewhere) |
@@ -96,6 +121,8 @@ cd web && npm run dev                         # http://localhost:5173/public-art
 | Curated calls to artists (commissioning bodies' own pages; calls.yaml) | Funding: calls to artists |
 
 ## Caveats
+- The Florida catalog is only as complete as the Public Art Archive, which covers some programs well and others
+  barely (Miami-Dade County's program has 13 records); budgets are shown only where an official document states one.
 - The registry is incomplete (most murals' current status is unchecked); 1 entry could not be located. Of the
   archive's works, 35 have no stated setting and are treated as indoor until someone checks them; the archive does
   not warrant its records. The capital program is illustrative, with estimated amounts marked.

@@ -141,6 +141,17 @@ staff_study:
     provenance: "Assumption: loaded annual cost of a public art program manager and a contract conservator; overhead shares and the 25% extra capacity a shared program needs are planning guesses. The handout lists City-County coordination for separate study."
   populations: {value: {city: 145000, county_unincorporated: 110000}, provenance: "Approximate (Census 2020: Gainesville 141,085; Alachua County 278,468)"}
 
+facilities:
+  expansion_min_sqft: {value: 1000, low: 500, high: 5000, provenance: "Assumption: the smallest increase in a parcel's recorded building area counted as an expansion (filters re-measurement noise)"}
+  expansion_min_share: {value: 0.10, provenance: "Assumption: an expansion also adds at least 10% to the previous building area"}
+  state_rule:
+    value: {rate: 0.005, cap: 100000, applies_to: "original construction of a state building which provides public access"}
+    provenance: "s. 255.043(1), Florida Statutes (Art in State Buildings): up to 0.5 percent of the total construction appropriation, not to exceed $100,000; renovations and additions are not covered. https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0200-0299/0255/Sections/0255.043.html"
+  county_rule:
+    value: null
+    provenance: "No Alachua County percent-for-art ordinance was found; the County Arts Council page names no funding rule, and County works (Sankofa, Bounce) were budgeted project by project. Verify with the Arts Council."
+  city_rule_note: {value: "Gainesville Ch. 5.5 (policy.allocation_rate and the cap of the selected code version) for buildings owned by the City or GRU; other cities' programs are not modelled", provenance: "Ch. 5.5-3(c)"}
+
 sources:
   - "Gainesville Code of Ordinances, Chapter 5.5 Art in Public Places (Municode)"
   - "Art in Public Places Trust, Priorities for Modernizing Chapter 5.5, agenda discussion handout, Aug 31 2026"
@@ -150,3 +161,4 @@ sources:
   - "City of Gainesville ArcGIS Online: GCRA boundary and priority areas, zoning (Jan 2025), bicycle/pedestrian counts 2025"
   - "FDOT annual average daily traffic; OpenStreetMap (ODbL); RTS GTFS"
   - "Visit Gainesville visitor revenue statistics (2025); Alachua County Tax Collector (TDT 5%)"
+  - "Section 255.043, Florida Statutes (Art in State Buildings); Alachua County parcel layers 2001-2024; FL DOR 2025 parcel roll (FGIO)"

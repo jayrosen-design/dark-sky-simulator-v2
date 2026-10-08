@@ -4,6 +4,7 @@ import { PROVENANCE_COLOR, PROVENANCE_LABEL } from "../constants";
 import type { Model } from "../model";
 import { usePaps } from "../state";
 import { isOutdoor } from "../engine/impressions";
+import LandLine from "./LandLine";
 import type { Artwork } from "../types";
 
 const SETTING_NOTE: Record<string, string> = { indoor: "Indoors: not seen from the street, so no impressions are modeled.",
@@ -26,6 +27,7 @@ export default function ArtCard({ m, a }: { m: Model; a: Artwork }) {
         <p className="text-star-500">{a.material.replace("_", " ")} · about {a.height} m high{a.width ? `, ${a.width} m wide` : ""}{a.dims_estimated ? " (estimated)" : ""} · {a.lit ? "lit at night" : "not lit"}</p>
         {a.budget ? <p>Budget {fmtUsd(a.budget)}{a.budget_note ? ` · ${a.budget_note}` : ""}</p> : null}
         {a.notes && <p className="text-[11px] text-star-500">{a.notes}</p>}
+        {a.status !== "proposed" && <LandLine artId={a.id} />}
         {a.source_url && <p><a className="text-glow-400 underline" href={a.source_url} target="_blank" rel="noreferrer">
           {a.source_url.includes("publicartarchive.org") ? "Public Art Archive record (Creative West) ↗" : "Source ↗"}</a>{a.located_by ? <span className="ml-2 text-[10px] text-star-500">location: {a.located_by}</span> : null}</p>}
       </div>

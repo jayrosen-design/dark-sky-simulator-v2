@@ -9,8 +9,8 @@ import { defaultPolicy, type PolicyParams } from "./engine/ledger";
 import { defaultEcon, type EconParams } from "./engine/economics";
 import type { ArtTypeName, Artwork, Block, Cells, Cip, Meta, Pkg, RoadPiece, Scale } from "./types";
 
-export type Tab = "collection" | "place" | "activity" | "policy" | "conservation" | "equity" | "economics" | "funding" | "staff" | "brief";
-export const TABS: Tab[] = ["collection", "place", "activity", "policy", "conservation", "equity", "economics", "funding", "staff", "brief"];
+export type Tab = "collection" | "place" | "activity" | "policy" | "conservation" | "equity" | "economics" | "funding" | "buildings" | "staff" | "brief";
+export const TABS: Tab[] = ["collection", "place", "activity", "policy", "conservation", "equity", "economics", "funding", "buildings", "staff", "brief"];
 export interface DateParts { y: number; mo: number; d: number }
 
 export interface Proposal {
