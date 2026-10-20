@@ -17,7 +17,9 @@ import { buildLamps, lampLayers, slotLooks } from "../map/lights3d";
 import { basemapRoads } from "../shared/map/geo";
 import type { GridMeta } from "../engine/types";
 import type { FeatureCollection } from "geojson";
-import { fetchJson, loadLin16, loadLog16 } from "../data/load";
+import { fetchJson } from "../data/load";
+import { useViirsLayers } from "../state/viirs";
+import { cellAt } from "../engine/changes";
 import { fmtInt, fmtUsd } from "./ui";
 
 function corners(g: GridMeta): [[number, number], [number, number], [number, number], [number, number]] {
@@ -59,7 +61,7 @@ const usdShort = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(v >= 1e7 ? 0 :
 const VIEWS: { value: View; label: string }[] = [
   { value: "scenario", label: "Sky (scenario)" }, { value: "delta", label: "Change" }, { value: "baseline", label: "Sky (today)" }, { value: "fixtures", label: "Streetlights" },
 ];
-const VIIRS_VIEWS: { value: View; label: string }[] = [{ value: "viirs", label: "VIIRS" }, { value: "trend", label: "Trend 2012–24" }];
+const VIIRS_VIEWS: { value: View; label: string }[] = [{ value: "viirs", label: "VIIRS" }, { value: "trend", label: "Trend 2012–24" }, { value: "changes", label: "Change events" }];
 
 export default function MapView() {
   const d = useData();
@@ -93,11 +95,8 @@ export default function MapView() {
   const costAnchor = e.seed.mcda.anchors.land_cost_usd_acre as { best: number; worst: number } | undefined;
   const year = useStore((s) => s.viirsYear);
   const setYear = useStore((s) => s.setViirsYear);
-  const [viirs, setViirs] = useState<{ years: Float32Array[]; trend: Float32Array[] } | null>(null);
-  useEffect(() => {
-    if ((view === "viirs" || view === "trend") && !viirs && e.files.viirs_a15 && e.files.viirs_trend_a15)
-      Promise.all([loadLog16(e.files.viirs_a15), loadLin16(e.files.viirs_trend_a15)]).then(([years, trend]) => setViirs({ years, trend }));
-  }, [view, viirs, e]);
+  const viirs = useViirsLayers(e, view === "viirs" || view === "trend" || view === "changes" || tab === "ai");
+  const aiCell = useStore((s) => s.aiCell);
 
   // ---- init once
   useEffect(() => {
@@ -151,8 +150,17 @@ export default function MapView() {
       map.addLayer({ id: "spot-labels", type: "symbol", source: "spots", layout: { visibility: "none", "text-field": ["get", "rank"], "text-size": 10, "text-font": ["Noto Sans Regular"], "text-allow-overlap": true }, paint: { "text-color": "#05070d" } });
       map.addSource("spot-sel", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({ id: "spot-sel", type: "circle", source: "spot-sel", layout: { visibility: "none" }, paint: { "circle-radius": 11, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#f6b44b", "circle-stroke-width": 2.5 } });
+      // AI tab: the cell outline, and a click picks the cell whose 13-year series the panel explains.
+      map.addSource("ai-cell", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+      map.addLayer({ id: "ai-cell", type: "line", source: "ai-cell", layout: { visibility: "none" }, paint: { "line-color": "#f6b44b", "line-width": 2.5 } });
       map.on("click", (ev) => {
-        if (useStore.getState().tab !== "stargaze") return;
+        const st = useStore.getState();
+        if (st.tab === "ai") {
+          const i = cellAt(e.grids.a15, ev.lngLat.lng, ev.lngLat.lat);
+          if (i !== null) st.setAiCell({ i, fly: false });
+          return;
+        }
+        if (st.tab !== "stargaze") return;
         const f = map.queryRenderedFeatures(ev.point, { layers: ["spots"] })[0];
         if (f) {
           const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
@@ -208,8 +216,15 @@ export default function MapView() {
   // ---- sky / change raster
   const skyUrl = useMemo(() => {
     const g = e.grids.a15;
-    if (view === "viirs" || view === "trend") {
+    if (view === "viirs" || view === "trend" || view === "changes") {
       if (!viirs || !e.viirs) return null;
+      if (view === "changes") {
+        // Flagged steps: orange = new or brighter light, blue = a drop; other lit cells faint for context.
+        const [, stepYear, stepPct] = viirs.trend;
+        const [first, last] = [viirs.years[0], viirs.years[viirs.years.length - 1]];
+        return paint(g, (i) => (Math.round(stepYear[i]) > 0 ? (stepPct[i] > 0 ? [255, 140, 60, 235] : [80, 165, 255, 235])
+          : Math.max(first[i], last[i]) > 1 ? [150, 150, 165, 45] : [0, 0, 0, 0]));
+      }
       if (view === "viirs") {
         const r = viirs.years[e.viirs.years.indexOf(year)];
         return paint(g, (i) => { const t = Math.min(1, Math.max(0, Math.log10(r[i] / 0.1) / 3)); return [255 * t, 200 * t ** 1.5, 90 * t ** 3, r[i] > 0.1 ? 60 + 195 * t : 0]; });
@@ -245,6 +260,21 @@ export default function MapView() {
     if (!ready || !map || !skyUrl || !map.getSource("sky")) return;
     (map.getSource("sky") as ImageSource).updateImage({ url: skyUrl, coordinates: corners(e.grids.a15) });
   }, [ready, skyUrl, e]);
+
+  // ---- AI tab: outline the inspected cell, and move to it when it was picked from the event list
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const on = tab === "ai" && aiCell !== null;
+    map.setLayoutProperty("ai-cell", "visibility", on ? "visible" : "none");
+    if (!on) return;
+    const g = e.grids.a15;
+    const dx = (g.east - g.west) / g.nx, dy = (g.north - g.south) / g.ny;
+    const w = g.west + (aiCell.i % g.nx) * dx, n = g.north - Math.floor(aiCell.i / g.nx) * dy;
+    (map.getSource("ai-cell") as GeoJSONSource).setData({ type: "Feature", properties: {},
+      geometry: { type: "Polygon", coordinates: [[[w, n], [w + dx, n], [w + dx, n - dy], [w, n - dy], [w, n]]] } });
+    if (aiCell.fly) map.flyTo({ center: [w + dx / 2, n - dy / 2], zoom: Math.max(map.getZoom(), 11), duration: 900 });
+  }, [ready, tab, aiCell, e]);
 
   // ---- vectors: sites, rings, fixtures
   useEffect(() => {
@@ -663,6 +693,11 @@ function Legend({ view, mode, lift, anchor }: { view: string; mode: string; lift
   } else if (view === "trend") {
     body = <><div className="h-2 w-40 rounded" style={{ background: "linear-gradient(90deg, rgb(60,150,255), rgba(0,0,0,0), rgb(255,110,70))" }} />
       <div className="flex justify-between gap-2 text-[10px]"><span>−50%</span><span>radiance 2012–14 → 2022–24, lit cells</span><span>+50%</span></div></>;
+  } else if (view === "changes") {
+    body = <div className="space-y-0.5 text-[10px]">
+      <div><span className="mr-1 inline-block h-2 w-3 rounded-sm" style={{ background: "rgb(255,140,60)" }} />step up (new or brighter light)</div>
+      <div><span className="mr-1 inline-block h-2 w-3 rounded-sm" style={{ background: "rgb(80,165,255)" }} />step down (e.g. a retrofit)</div>
+      <div className="text-star-500">VIIRS 2012–24 · steps 2015–22 on top of each cell's trend</div></div>;
   } else if (view === "fixtures") {
     body = <div className="max-w-[16rem] text-[10px]"><span className="text-amber-400">●</span> Gainesville Socrata <span className="ml-2 text-glow-400">●</span> OSM (surveyed) · shading = <b>modeled</b> public fixtures expected per ~500 m cell, placed on OSM roads (lit roads first); 8 counties</div>;
   } else {

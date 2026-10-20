@@ -52,6 +52,21 @@ export interface Component {
   layers: Record<Term, number>;
 }
 
+/** VIIRS step detector settings and results (ml/trends.py step_change / trend_rasters). */
+export interface StepsMeta {
+  alpha: number; critical_f: number; min_step_pct: number; lit_nw: number; floor_nw: number;
+  n_lit: number; n_flagged: number; expected_false: number; first_year: number; last_year: number;
+  common_log: number[] | null; common_mode_pct: number[] | null;
+  noise_pct: { p25: number; median: number; p75: number };
+  detection_at_median_noise: Record<string, number>;
+  events: { rises: number; drops: number };
+}
+
+/** A group of neighbouring pixels flagged with a step in the same direction (pipeline/viirs_mode.change_events). */
+export interface ChangeEvent {
+  year: number; pct: number; pixels: number; change: number; lon: number; lat: number; cell: number; near: string; near_km: number;
+}
+
 export interface GridMeta {
   west: number; south: number; east: number; north: number;
   res_deg: number; nx: number; ny: number; dx_km: number; dy_km: number;
@@ -109,11 +124,15 @@ export interface EngineData {
     viirs_a15?: Log16Meta;
     viirs_trend_a15?: Lin16Meta;
   };
-  viirs: null | { years: number[]; background_nw: Record<string, Record<string, number>>; county_pct_change: Record<string, number> };
+  viirs: null | {
+    years: number[]; background_nw: Record<string, Record<string, number>>; county_pct_change: Record<string, number>;
+    steps: StepsMeta; events: ChangeEvent[];
+  };
   growth_model: {
     method: string; source?: string; median_ape_pct?: number; nochange_median_ape_pct?: number; naive_median_ape_pct?: number;
     rmse_log?: number; nochange_rmse_log?: number; rate_corr?: number; cv_r2?: number;
     lit_change_pct?: Record<"2012-2018" | "2018-2024", number>; n_cells?: number; note?: string;
+    importance?: Record<string, number>; deciles_pct_per_yr?: [number, number][];
   };
   physics: {
     kernel_fits: Record<Term, { coeffs: number[]; d_min_km: number; d_max_km: number; max_rel_error: number }>;

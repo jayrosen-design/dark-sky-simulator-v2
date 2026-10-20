@@ -15,10 +15,11 @@ const MapView = lazy(() => import("./components/MapView"));
 const ObservatoryPanel = lazy(() => import("./components/ObservatoryPanel"));
 const BuildTray = lazy(() => import("./components/BuildTray"));
 const StargazePanel = lazy(() => import("./components/StargazePanel"));
+const AiPanel = lazy(() => import("./components/AiPanel"));
 
 const TABS: { value: Tab; label: string }[] = [
   { value: "scenario", label: "Scenario" }, { value: "sites", label: "Sites" }, { value: "economics", label: "Costs" },
-  { value: "observatory", label: "Observatory" }, { value: "stargaze", label: "Stargaze" }, { value: "brief", label: "Brief" },
+  { value: "observatory", label: "Observatory" }, { value: "stargaze", label: "Stargaze" }, { value: "ai", label: "AI" }, { value: "brief", label: "Brief" },
 ];
 
 export default function App() {
@@ -29,7 +30,7 @@ export default function App() {
   const setTab = useStore((s) => s.setTab);
   const buildOpen = useStore((s) => s.buildOpen);
   const setBuildOpen = useStore((s) => s.setBuildOpen);
-  const planner = tab !== "observatory" && tab !== "stargaze"; // lighting-scenario tabs (budget + build mode)
+  const planner = tab !== "observatory" && tab !== "stargaze" && tab !== "ai"; // lighting-scenario tabs (budget + build mode)
 
   useEffect(() => {
     (async () => {
@@ -71,7 +72,7 @@ export default function App() {
             <nav className="flex shrink-0 flex-wrap gap-1 border-b border-ink-700 bg-ink-950 px-2 py-1.5" role="tablist" aria-label="Modules">
               {TABS.map((t) => (
                 <button key={t.value} role="tab" aria-selected={tab === t.value} onClick={() => setTab(t.value)}
-                  className={`whitespace-nowrap rounded-md px-2 py-1 text-sm ${tab === t.value ? "bg-ink-700 text-star-100" : "text-star-500 hover:text-star-300"}`}>{t.label}</button>
+                  className={`whitespace-nowrap rounded-md px-1.5 py-1 text-sm ${tab === t.value ? "bg-ink-700 text-star-100" : "text-star-500 hover:text-star-300"}`}>{t.label}</button>
               ))}
             </nav>
             <div className="min-h-0 flex-1 overflow-y-auto p-3" role="tabpanel">
@@ -81,6 +82,7 @@ export default function App() {
                 {tab === "economics" && <EconomicsPanel />}
                 {tab === "observatory" && <Suspense fallback={null}><ObservatoryPanel /></Suspense>}
                 {tab === "stargaze" && <Suspense fallback={null}><StargazePanel /></Suspense>}
+                {tab === "ai" && <Suspense fallback={null}><AiPanel /></Suspense>}
                 {tab === "brief" && <BriefPanel />}
               </ErrorBoundary>
             </div>

@@ -54,3 +54,9 @@ export function mcdaData(): McdaData {
     countyFips: engine.files.mcda_b_county.values,
   };
 }
+
+/** The VIIRS stack (one layer per year) and trend layers [pct_change, step_year, step_pct], when built. */
+export function viirsLayers() {
+  if (!engine.files.viirs_a15 || !engine.files.viirs_trend_a15) return null;
+  return { years: log16(engine.files.viirs_a15), trend: lin16(engine.files.viirs_trend_a15) };
+}

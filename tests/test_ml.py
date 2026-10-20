@@ -20,15 +20,42 @@ def test_step_change_detects_retrofit_drop():
     rng = np.random.default_rng(2)
     stack = 20 * np.exp(rng.normal(0, 0.03, (13, 4, 4)))
     stack[7:, :, :2] *= 0.6  # 2019 retrofit in the left two columns
-    sy, sp, _ = trends.step_change(YEARS, stack)
+    sy, sp, _, _ = trends.step_change(YEARS, stack)
     assert np.all(sy[:, :2] == 2019)
     assert np.allclose(sp[:, :2], -40, atol=6)
     assert np.all(sy[:, 2:] == 0)
 
 
+def test_a_steady_trend_is_not_a_step():
+    # The first real run flagged two thirds of lit pixels: a steady trend also separates any two segments' means.
+    rng = np.random.default_rng(6)
+    for r in (-0.04, 0.06):
+        stack = 20 * np.exp(r * (YEARS - 2012))[:, None, None] * np.exp(rng.normal(0, 0.03, (13, 40, 50)))
+        assert (trends.step_change(YEARS, stack)[0] > 0).sum() == 0
+
+
+def test_false_alarm_rate_matches_alpha():
+    # Pure noise around a line, no size rule: the share flagged should be alpha (0.001), the simulated critical value.
+    rng = np.random.default_rng(7)
+    stack = 20 * np.exp(rng.normal(0, 0.10, (13, 200, 500)))
+    rate = (trends.step_change(YEARS, stack, min_step=0.0)[0] > 0).mean()
+    assert 0.0005 < rate < 0.002
+
+
+def test_a_shared_regional_jump_is_not_a_local_event():
+    # Every pixel brightens 30% in 2022 (regional growth or a sensor change); only the two local steps should count.
+    rng = np.random.default_rng(8)
+    stack = 20 * np.exp(rng.normal(0, 0.03, (13, 30, 30)))
+    stack[10:] *= 1.3
+    stack[5:, 0, :2] *= 2.0
+    t = trends.trend_rasters(YEARS, stack)
+    assert np.all(t["step_year"][0, :2] == 2017) and (t["step_year"] > 0).sum() == 2
+    assert t["step_meta"]["common_mode_pct"][-1] == pytest.approx(30, abs=4)
+
+
 def test_dark_pixels_are_not_flagged():
     stack = np.full((13, 3, 3), 0.01)
-    sy, _, _ = trends.step_change(YEARS, stack)
+    sy, _, _, _ = trends.step_change(YEARS, stack)
     assert np.all(sy == 0)
 
 

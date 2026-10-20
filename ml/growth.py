@@ -59,7 +59,13 @@ def backtest(stack: dict[int, np.ndarray], cov: dict[str, np.ndarray], mask: np.
 
     zero = np.zeros_like(r_hat)
     x_last = state(2018)
-    return {"model": _fit(x_last, future, seed),
+    model = _fit(x_last, future, seed)
+    gain = model.booster_.feature_importance(importance_type="gain")
+    order = np.argsort(r_hat)
+    deciles = [[float(r_hat[g].mean() * 100), float(future[g].mean() * 100)] for g in np.array_split(order, 10)]
+    return {"model": model,
+            "importance": {k: float(v) for k, v in zip(FEATURES, gain / max(gain.sum(), 1e-12))},
+            "deciles_pct_per_yr": deciles,
             "median_ape_pct": mape(r_hat), "nochange_median_ape_pct": mape(zero), "naive_median_ape_pct": mape(past),
             "rmse_log": rmse(r_hat), "nochange_rmse_log": rmse(zero),
             "rate_corr": float(np.corrcoef(r_hat, future)[0, 1]),

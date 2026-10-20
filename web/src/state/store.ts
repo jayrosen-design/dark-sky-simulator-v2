@@ -4,8 +4,8 @@ import type { Mode } from "../engine/types";
 import type { Weights } from "../engine/mcda";
 import { decodeState, encodeState, readHash, shareHref } from "../shared/share";
 
-export type Tab = "scenario" | "sites" | "economics" | "observatory" | "stargaze" | "brief";
-export type MapView = "scenario" | "delta" | "baseline" | "fixtures" | "viirs" | "trend";
+export type Tab = "scenario" | "sites" | "economics" | "observatory" | "stargaze" | "brief" | "ai";
+export type MapView = "scenario" | "delta" | "baseline" | "fixtures" | "viirs" | "trend" | "changes";
 
 interface State {
   params: ScenarioParams;
@@ -17,6 +17,8 @@ interface State {
   weights: Weights | null;
   viirsYear: number;
   setViirsYear: (y: number) => void;
+  aiCell: { i: number; fly: boolean } | null;   // AI tab: the a15 cell being inspected (fly = move the map to it)
+  setAiCell: (c: { i: number; fly: boolean } | null) => void;
   showInstalls: boolean;
   setShowInstalls: (v: boolean) => void;
   buildOpen: boolean;
@@ -57,6 +59,8 @@ export const useStore = create<State>((set) => ({
   weights: null,
   viirsYear: 2024,
   setViirsYear: (viirsYear) => set({ viirsYear }),
+  aiCell: null,
+  setAiCell: (aiCell) => set({ aiCell }),
   showInstalls: true,
   setShowInstalls: (showInstalls) => set({ showInstalls }),
   buildOpen: false,

@@ -10,6 +10,168 @@ seed economics with provenance, an observatory site-selection engine, and a brow
 streetlight counts are modeled, and Bortle classes are labels on a computed magnitude (PRD 0A.5). The app says
 so on every screen.
 
+## A tour of the app
+
+Live at [dark-sky-simulator-v2.vercel.app/dark-sky/](https://dark-sky-simulator-v2.vercel.app/dark-sky/). Screenshots are from
+the 2026-10-19 build (VIIRS mode) at 1440 × 860 unless noted; they are a snapshot, so retake them after visible changes.
+The left panel has seven tabs (Scenario, Sites, Costs, Observatory, Stargaze, AI, Brief); the map on the right follows
+the tab, and its layer buttons switch what it shows.
+
+### Lighting scenarios and the map
+
+![Scenario tab with the modeled sky](docs/screenshots/01-overview.jpg)
+
+**Scenario tab, *Sky (scenario)* layer.** The panel builds a lighting scenario: which fixtures it applies to (by owner
+and county), then the controls. The map shows the modeled zenith sky brightness for that scenario across the eight
+counties (mag/arcsec²; yellow is a bright urban sky, dark is close to natural), and the reference sites carry their
+magnitude and Bortle class. The amber badge in the header is on every screen: all skyglow values are uncalibrated
+planning projections.
+
+![Groveland-style ordinance on the Change layer](docs/screenshots/02-ordinance-change.jpg)
+
+**One-click ordinance and the *Change* layer.** The *Groveland-style ordinance* preset makes every selected fixture
+(public and private, Alachua + Levy) fully shielded (U0), caps color temperature at 3000 K and dims to 50% from 22:00
+to 06:30. *Change* shows where the sky gets darker (blue) or brighter (red): Paynes Prairie goes from 20.98 to 21.62
+mag/arcsec². The **Budget** card on the map prices the public part (here $26.6M capital, $1.43M a year saved, 18.6-year
+payback) on the Scenario, Sites, Costs and Brief tabs.
+
+![Dark-sky overlay zones around the observatories](docs/screenshots/03-overlay-zones.jpg)
+
+**Dark-sky overlay zones.** Rings around Rosemary Hill Observatory and Chiefland Astronomy Village apply stricter
+rules to every fixture inside them, public or private: an LZ0 core (U0, narrow-band amber, motion-only) and an LZ1
+buffer (U0, ≤ 2700 K). Shown: the *Flagstaff LZ1 overlay* preset (3-mile core, 5-mile buffer), about $0.79M in public
+retrofits.
+
+![Growth, viewing time and spectral view](docs/screenshots/04-growth-time-spectral.jpg)
+
+**Viewing time, growth and spectral view.** *Viewing time* switches between the late-night window used for Bortle
+classes (01:00–04:00) and the evening (20:30–22:30), when sports fields are lit. *Extrapolate growth trend* adds 1–10
+years of growth from the satellite-trained forecast (orange: brighter by 2034 where no ordinance applies). *Spectral
+view* redraws the Change layer for one band, here scotopic (night vision), and compares the drop in upward light the
+eye would see (−23.5%) with what the VIIRS satellite would record (−24.9%): the satellite barely sees the blue in white
+LEDs, so a retrofit looks like a bigger drop from orbit.
+
+![Streetlights layer over Gainesville](docs/screenshots/05-streetlights.jpg)
+
+**Streetlights layer.** Where the model puts public streetlights: modeled fixtures per ~500 m cell, placed along
+OpenStreetMap roads (roads tagged lit first), and the surveyed points that exist (Gainesville open data in amber,
+OpenStreetMap in blue). Shown zoomed into Gainesville.
+
+![Build mode with two fixture cards equipped](docs/screenshots/06-build-mode.jpg)
+
+**Build mode.** A catalog of 17 DarkSky-compliant fixture types in six categories, each card with its spectrum,
+uplight rating, lumens, watts, installed unit cost (with source) and how many existing fixtures it replaces.
+Equipping a card updates the sky, the costs, the brief and the clustered install markers on the map. Shown: a
+full-cutoff 3000 K cobra-head for street lights and a shoebox area light for commercial lighting ($28.0M public,
+11.7-year payback; the owners' $3.1M for private fixtures is listed separately).
+
+![3D view of downtown Gainesville](docs/screenshots/07-3d-view.jpg)
+
+**3D view.** Terrain (×3), buildings and every modeled light source at street level under the sky-brightness map:
+mapped streetlights where they stand, modeled ones spread along the roads of their cell, colored by fixture type.
+Shown: downtown Gainesville.
+
+### Sites and the night sky
+
+![Sites tab with the all-sky view](docs/screenshots/08-sites.jpg)
+
+**Sites tab.** Today's and the scenario's zenith brightness at ten reference sites, with Bortle class and the
+DarkSky Park tier, and an all-sky view of the selected site.
+
+<p><img src="docs/screenshots/09a-all-sky-downtown.jpg" width="49%" alt="All-sky view, downtown Gainesville"> <img src="docs/screenshots/09b-all-sky-rosemary-hill.jpg" width="49%" alt="All-sky view, Rosemary Hill Observatory"></p>
+
+**Full-screen all-sky view**, the same moonless evening (November 9, 2026, 21:00): downtown Gainesville (18.43
+mag/arcsec², Bortle 7, naked-eye limit about 4.3, with Ocala's light dome on the horizon) and Rosemary Hill Observatory
+(21.69, Bortle 3, limit about 6.5). Stars, Milky Way, Sun and Moon are placed for any date and time; *Play* runs the
+night, and toggles add terrain and lights, a sky-glow indicator and a false-color luminance map. Illustrative, not a
+photograph.
+
+### Costs
+
+![Costs tab](docs/screenshots/10-costs.jpg)
+
+**Costs tab** for the Groveland-style scenario: capital cost (retrofits × unit price + dimming nodes), yearly energy and
+maintenance savings, simple payback, the 15-year cumulative cash position, and each utility's tariff with its rate
+basis; lines without a loaded tariff are flagged.
+
+### Observatory siting
+
+![Observatory tab with the suitability map](docs/screenshots/11-observatory.jpg)
+
+**Observatory tab.** Scores every ~1 km cell of an 11-county region for a new research observatory with a weighted sum
+of criteria whose weights you set (current sky, 10-year development, clarity, distance from cities, land availability,
+elevation, road access, land cost). The top 20 sites of at least four contiguous cells are listed and mapped, with
+Rosemary Hill and Chiefland as reference rows. Hovering a candidate shows its score, 2024 → 2034 sky, land estimate and
+strengths; here #1, in Lafayette County, on 92% state land.
+
+![Land prices overlay](docs/screenshots/12-land-prices.jpg)
+
+**Land prices.** Market $/acre from 1,205 qualified vacant-land sales (2021–2025) and the 2025 Florida tax roll, public
+land in blue, and each candidate's price range for an 80-acre site.
+
+### Stargazing tonight
+
+![Stargaze tab](docs/screenshots/13-stargaze.jpg)
+
+**Stargaze tab.** The live Open-Meteo forecast over the modeled sky: *Dark & clear* combines darkness with forecast cloud
+for the hour on the slider, and *Best spots* ranks places for a use case (grab & go, star party, deep-sky imaging,
+buying property).
+
+![Spot report with the hourly forecast](docs/screenshots/14-stargaze-report.jpg)
+
+**Spot report** (pick a spot, or click anywhere on the map): modeled sky, light domes by direction, horizon, road access,
+land ownership and price, tonight's darkness and Moon, and an hourly observing forecast (darkness, cloud, transparency
+and seeing proxies, dew, wind) with the best window.
+
+### Satellite data and the AI
+
+![VIIRS layer](docs/screenshots/15-viirs.jpg)
+
+**VIIRS layer.** NASA Black Marble (VNP46A2) yearly median radiance of cloud-free nights, 2012–2024, with the airglow
+background removed; the slider steps through the years.
+
+![Trend 2012–24 layer](docs/screenshots/16-trend.jpg)
+
+**Trend 2012–24.** Change in radiance from 2012–14 to 2022–24, for cells lit at either end: growth along I-75 and
+around Ocala, declines in some older cores.
+
+![AI tab overview](docs/screenshots/17-ai-overview.jpg)
+
+**AI tab.** What is learned from data (a statistical change detector and a LightGBM forecast) and what is not, starting
+with the satellite record and its airglow correction (the background glow by year). The map switches to *Change
+events*. See [ADR 0011](docs/adr/0011-viirs-first-run.md) and [ADR 0012](docs/adr/0012-step-test-and-ai-tab.md).
+
+![Change events and the cell inspector](docs/screenshots/18-ai-change-events.jpg)
+
+**Change events and the cell inspector.** Each lit cell is tested for a sudden step on top of its trend (false alarms 1
+in 1,000, calibrated by simulation). Clicking an event or any cell shows its 13 yearly values, the fitted line or step,
+and why it was or was not flagged; shown: the Celebration Pointe area, +311% in 2016.
+
+![Growth forecast back-test](docs/screenshots/19-ai-forecast.jpg)
+
+**The growth forecast, back-tested.** What the LightGBM model relies on, its error on years it never saw next to "no
+change" and each cell's own trend, and predicted vs observed growth by tenth of cells: it gets the order right but not the
+amount, because lit areas fell 3.7% in 2012–18 and rose 20.6% in 2018–24.
+
+### The brief and the fine print
+
+![Brief tab](docs/screenshots/20-brief.jpg)
+
+**Brief tab.** The defensibility panel lists what the numbers rest on and what is missing (calibration stations, utility
+inventories). The legislative brief summarizes the scenario and downloads as a PDF that opens with "These outputs are
+planning projections, not observed outcomes", with every figure linked back to the scenario field it came from.
+
+![About and data](docs/screenshots/21-about.jpg)
+
+**About & data.** How the model works, where the light comes from, and the fixture inventory by county and owner with
+its confidence.
+
+### On a phone
+
+<img src="docs/screenshots/22-phone.jpg" width="300" alt="The app on a phone">
+
+The same app on a 390 px phone screen (shown at 2×): map on top, panels below.
+
 ## Quick start
 
 ```bash
@@ -18,7 +180,7 @@ python -m uv venv --python 3.12 .venv
 python -m uv pip install --python .venv -e ".[dev,ml,viirs]"
 .venv/Scripts/python -m pipeline.ingest_all      # pull public sources into data_raw/ (cached)
 .venv/Scripts/python -m pipeline.build           # precompute web/public/dark-sky/data/ and docs/sanity_check.md
-.venv/Scripts/python -m pytest                   # 76 tests (50 Dark Sky, 5 WildSight, 21 Public Art; 1 skips until florida_budgets.yaml exists)
+.venv/Scripts/python -m pytest                   # 79 tests (53 Dark Sky, 5 WildSight, 21 Public Art; 1 skips until florida_budgets.yaml exists)
 
 # Web client
 cd web
@@ -41,10 +203,11 @@ the current package runs in **VIIRS mode** (below). To refresh, or on a new mach
 ```
 
 The build switches to VIIRS mode whenever every year is cached: each year's airglow background is removed,
-private light is placed by 2024 radiance, the VIIRS year slider and 2012–2024 trend map appear, and 10-year growth
-comes from the LightGBM forecast, whose back-test against "no change" is shown in the Observatory tab. The first
-real run found a double scaling bug, the solar-cycle airglow and a back-test that flattered the model; see
-[ADR 0011](docs/adr/0011-viirs-first-run.md).
+private light is placed by 2024 radiance, the VIIRS year slider, 2012–2024 trend map and change-event map appear,
+and 10-year growth comes from the LightGBM forecast. The **AI tab** explains both models with their checks (change
+events with a cell inspector, the forecast's back-test against "no change"). The first real run found a double
+scaling bug, the solar-cycle airglow and a back-test that flattered the model ([ADR 0011](docs/adr/0011-viirs-first-run.md));
+the step detector was then rebuilt ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md)).
 
 ## What is in the demo (PRD 0A.2 v2.0 column)
 
@@ -58,6 +221,7 @@ real run found a double scaling bug, the solar-cycle airglow and a back-test tha
 | B | B-02 per-site scorecard (raw, score, weight, contribution) | Observatory tab | `test_B_02_*` |
 | B | B-06 RHO and CAV always scored as reference rows | Observatory tab | `test_B_06_*` |
 | B | simplified B-03: 2034 magnitude from the growth trend | Observatory tab | – |
+| – | How the AI works: change events, cell inspector, forecast back-test (added on request) | AI tab | `changes.test.ts`, `test_ml.py` |
 | C | C-01 every PDF figure hyperlinks to its scenario field | Brief tab / PDF | `test_C_01_*` |
 | C | C-04 defensibility panel | Brief tab | `test_C_04_*` |
 
@@ -83,7 +247,7 @@ heads and light pools: mapped streetlights where they stand, modeled ones spread
 sports towers at real venues; equipped cards recolor their share. In the Sites sky view, **Terrain & lights** puts the
 same scene under the stars (eye height 2 m to 600 m), and **Indicators** / **Luminance map** add a sky-glow curve,
 a luminance readout (mag/arcsec², mcd/m²) and a false-color sky ([ADR 0009](docs/adr/0009-3d-terrain-lights-skyglow.md)).
-A **Budget** readout on the map (every tab but Observatory) keeps public cost, yearly savings, payback, 15-year ROI
+A **Budget** readout on the map (Scenario, Sites, Costs and Brief tabs) keeps public cost, yearly savings, payback, 15-year ROI
 and a cumulative cash chart in view for the current scenario; it collapses to one line and links to the Costs tab.
 
 Also shipped: the A-06 tariff and rate date on every money line, the Groveland-style ordinance preset (A-04 is
@@ -185,13 +349,14 @@ See [docs/adr/](docs/adr/). In short:
 11. Public Art Policy Simulator, a third app on the same platform (added on request): see [publicart/README.md](publicart/README.md).
 12. A homepage at the site root for the three apps; the Dark Sky Simulator moved to `/dark-sky/`, and old `/#s=…` links are forwarded. ([ADR 0010](docs/adr/0010-homepage-and-dark-sky-path.md))
 13. VIIRS first run: no double scaling, a per-year airglow background removed, and a growth back-test scored against "no change". ([ADR 0011](docs/adr/0011-viirs-first-run.md))
+14. Change events from a step-versus-trend test calibrated by simulation, and an AI tab that explains both models (added on request). ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
 ## Open items that need Jay (PRD 0B, plus new ones)
 
 - The County's +19% Alachua radiance growth (2012–2024) [AC-EPAC] is not reproduced by VNP46A2 (+3.0%, first vs last three years); find out which product and method the County used before quoting it.
-- The step-change detector reads steady trends as steps (about two thirds of lit pixels flagged); it needs a step-versus-trend test before it is shown as retrofit detection.
+- The step test finds large new lighting but, at about 10% year-to-year noise, misses most retrofits; detecting those needs monthly data or utility work-order records ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md)).
 - Confirm RHO's county and verify every approximate coordinate in 6.5 (they drive the sanity fit).
 - Census API key (free) would restore the ACS structure-type split for the private stock.
 - Ask FDOT District 2 where Feature 341 now lives, and Alachua County GIS about the Cityworks endpoint.

@@ -48,6 +48,30 @@ def trend_layers(stack15: dict[int, np.ndarray]):
     return arr, t
 
 
+def change_events(grid: Grid, arr: np.ndarray, tr: dict, towns: list[tuple[str, float, float]], top: int = 40):
+    """Group flagged pixels into events (8-connected, same direction), largest radiance change first."""
+    from scipy import ndimage
+
+    sy, sp = tr["step_year"], tr["step_pct"]
+    delta = arr[-3:].mean(axis=0) - arr[:3].mean(axis=0)
+    out = []
+    for sign in (1, -1):
+        lab, n = ndimage.label((sy > 0) & (np.sign(sp) == sign), structure=np.ones((3, 3)))
+        for i in range(1, n + 1):
+            r, c = np.nonzero(lab == i)
+            lon, lat = grid.west + (c.mean() + 0.5) * grid.res, grid.north - (r.mean() + 0.5) * grid.res
+            name, tlon, tlat = min(towns, key=lambda t: (t[1] - lon) ** 2 + ((t[2] - lat) * 1.15) ** 2)
+            year = int(np.bincount(sy[r, c]).argmax())
+            # The cell the AI tab opens: the largest step among cells that stepped in the event's year.
+            k = np.argmax(np.where(sy[r, c] == year, np.abs(sp[r, c]), -1))
+            out.append({"year": year, "pct": round(float(np.median(sp[r, c])), 1),
+                        "pixels": int(len(r)), "change": round(float(delta[r, c].sum()), 1),
+                        "lon": round(float(lon), 4), "lat": round(float(lat), 4), "cell": int(r[k] * grid.nx + c[k]),
+                        "near": name, "near_km": round(float(np.hypot((tlon - lon) * 96.6, (tlat - lat) * 111.0)), 1)})
+    out.sort(key=lambda e: -abs(e["change"]))
+    return out[:top], {"rises": sum(e["pct"] > 0 for e in out), "drops": sum(e["pct"] < 0 for e in out)}
+
+
 def growth_rates(stack_rg: dict[int, np.ndarray], cov: dict[str, np.ndarray], valid: np.ndarray, clip=(-0.01, 0.06)):
     """LightGBM growth rate per region cell plus back-test metrics; falls back to Theil-Sen if too few lit cells."""
     lit = valid & (stack_rg[2018] > 0.5)

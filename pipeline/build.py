@@ -508,7 +508,10 @@ def main():
         meta["viirs_a15"] = write_log16(OUT / "viirs_a15.bin", list(arr))
         meta["viirs_trend_a15"] = write_lin16(OUT / "viirs_trend_a15.bin", [tr["pct_change"], tr["step_year"].astype(float), tr["step_pct"]])
         meta["viirs_trend_a15"]["names"] = ["pct_change", "step_year", "step_pct"]
+        towns = [(n, float(f["properties"]["INTPTLON"]), float(f["properties"]["INTPTLAT"])) for n, f in ctx["fl_places"].items()]
+        events, event_counts = viirs_mode.change_events(a15, arr, tr, towns)
         viirs_meta = {"years": viirs_mode.YEARS, "background_nw": {g: {str(y): round(v, 3) for y, v in b.items()} for g, b in viirs_bg.items()},
+                      "steps": {**tr["step_meta"], "events": event_counts}, "events": events,
                       "county_pct_change": {
             f: float((arr[-3:].mean(0)[ctx["county15"][f]].sum() / max(arr[:3].mean(0)[ctx["county15"][f]].sum(), 1e-9) - 1) * 100)
             for f in COUNTY_FIPS}}

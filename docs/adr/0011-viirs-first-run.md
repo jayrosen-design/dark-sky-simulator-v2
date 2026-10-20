@@ -48,10 +48,9 @@ showed up that the synthetic test data could not reveal.
   is Bortle 3 by 0.002 mag (the PRD rates it Bortle 4). The Observatory ranking moves west: the old top two were in
   Levy near Chiefland (score 0.850); the top three are now in Lafayette (0.879, 92% state land), Dixie (0.877, 93%
   water-management-district land) and Levy (0.867).
-- The step-change detector flags about two thirds of lit pixels because a steady trend also produces a large
-  before/after difference; it needs a step-versus-trend test before its output is presented as retrofit detection.
-  Spot checks are plausible: Celebration Pointe +315% (2017), Butler Plaza +76% (2016), Chiefland -28% and
-  Archer -27% (2015).
+- The step-change detector flagged about two thirds of lit pixels because a steady trend also produces a large
+  before/after difference (Chiefland -28% and Archer -27% in 2015 were gradual declines). Replaced by a
+  step-versus-trend test in [ADR 0012](0012-step-test-and-ai-tab.md).
 
 ## Consequences
 - The package now runs in VIIRS mode; the seed-mode path stays for machines without the cache.

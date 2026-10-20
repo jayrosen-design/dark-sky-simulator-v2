@@ -142,7 +142,8 @@ export default function ScenarioPanel() {
 
       <Card title="4 · Growth baseline">
         <Toggle label="Extrapolate growth trend" checked={p.growth_baseline === "trend"} onChange={(v) => setParams({ growth_baseline: v ? "trend" : "hold_2024" })}
-          hint={e.data_status.viirs.loaded ? "Per-cell VIIRS 2012–2024 trend." : "Proxy until VIIRS loads: housing-unit growth 2010→2020 by county subdivision (Census)."} />
+          hint={e.growth_model.method === "lightgbm" ? "LightGBM forecast from the VIIRS 2012–2024 record, assuming the 2018–2024 pace continues (see the AI tab)."
+            : e.data_status.viirs.loaded ? "Per-cell VIIRS 2012–2024 trend." : "Proxy until VIIRS loads: housing-unit growth 2010→2020 by county subdivision (Census)."} />
         {p.growth_baseline === "trend" && (
           <Slider label="Years ahead" value={p.growth_years} min={1} max={10} unit=" yr" onChange={(v) => setParams({ growth_years: v })} />
         )}
