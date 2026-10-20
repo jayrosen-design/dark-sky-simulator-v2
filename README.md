@@ -317,7 +317,8 @@ taken after midnight it is +0.21 mag. See
 
 Two halves: an offline Python pipeline turns public data into a static data package, and a browser app recombines
 that package for any scenario without a server. The diagrams follow the code in `ingest/`, `engine/`, `pipeline/`,
-`ml/` and `web/src/`.
+`ml/` and `web/src/`; each section ends with the math it uses, with the values of this build (2026-10-19). Symbols are
+defined under each block; *x* is a map cell, *t* a year.
 
 ### 1. System overview
 
@@ -389,6 +390,49 @@ Each component (a fixture group in one county, a ring of an overlay zone, or the
 counties) gets one basis layer per kernel term. Controls in the browser change only how much flux each component
 emits, so the sky for any scenario is a weighted sum of these precomputed layers.
 
+**The math.** Streetlights are spread along roads: OpenStreetMap roads tagged lit count fully, other public roads in
+proportion to the housing density around them.
+
+```math
+w_{\text{road}}(x) = \ell_{\text{lit}}(x) + \big(\ell_{\text{all}}(x) - \ell_{\text{lit}}(x)\big)\,\min\!\left(1,\ \frac{\rho(x)}{\rho_{\text{full}}}\right)
+```
+
+*ℓ* is road length in the cell (km), *ρ* the housing density smoothed with a one-cell Gaussian, and *ρ*<sub>full</sub> the
+density at which every road counts as lit (seed). Counties without a public inventory get fixtures per home from a
+least-squares fit to the two that have one:
+
+```math
+(\hat a_u, \hat a_r) = \arg\min_{a_u,\,a_r} \sum_{c\,\in\,\{\text{Alachua},\ \text{Levy}\}} \big(N_c - a_u U_c - a_r R_c\big)^2
+```
+
+*N*<sub>c</sub> is the county's public fixture count and *U*<sub>c</sub>, *R*<sub>c</sub> its urban and rural housing units
+(â<sub>u</sub> = 0.464 and â<sub>r</sub> = 0.148 fixtures per home in this build). Each stock *s* of *n*<sub>s</sub>
+fixtures is spread by a placement field that sums to one, and each component *c* (a group in a county, an overlay
+ring, or outside light) is convolved once per kernel term:
+
+```math
+P_s(x) = \frac{w_s(x)}{\sum_{x'} w_s(x')}, \qquad
+P_c = \frac{\sum_{s\in c} \Phi_{s,t}\, P_s}{\sum_{s\in c} \Phi_{s,t}}, \qquad
+B_{c,t}(x) = \big(K_t * P_c\big)(x)
+```
+
+*w*<sub>s</sub> is the road weight for streetlights, Census housing or 2024 VIIRS radiance for private light, and venue
+points for sports; *Φ* is a stock's effective flux (section 3) and *K*<sub>t</sub> the kernel for term
+*t* ∈ {direct, reflected}. The one global scale is the value that best reproduces the ten corpus site magnitudes:
+
+```math
+\alpha^{*} = \arg\min_{\alpha}\ \sqrt{\frac{1}{10}\sum_{i=1}^{10}\Big( m\big(\alpha\,\textstyle\sum_{c,t}\Phi_{c,t}\,B_{c,t}(x_i)\big) - m_i^{\text{corpus}} \Big)^2}
+```
+
+searched over 4,000 log-spaced values between 10<sup>−3</sup> and 10<sup>2</sup> (α\* = 0.460, RMSE 0.46 mag). Growth
+multiplies the emissions before they scatter, so the exported growth factor is a ratio of convolved fields:
+
+```math
+G(x) = \frac{L_{2034}(x)}{L_{2024}(x)} = \frac{\sum_t \big(K_t * (E_t\, e^{10\,\hat r})\big)(x)}{\sum_t \big(K_t * E_t\big)(x)}
+```
+
+*E*<sub>t</sub> is the region's emission field and *r̂* the growth rate per cell (section 8).
+
 ### 3. Skyglow physics: from a fixture to a magnitude
 
 ```mermaid
@@ -408,6 +452,70 @@ The kernels come from a Garstang single-scattering integral (Rayleigh and Henyey
 slant-path extinction, Earth curvature), fitted to an analytic curve. Direct uplight leaves mostly near the horizon
 (the θ⁴ term) and travels far, which is why shielding matters most for distant skies. The global scale α is a sanity
 fit to ten corpus site values, not a calibration.
+
+**The math.** Each fixture emits upward in two ways (Garstang 1986), with *θ* the zenith angle of emission:
+
+```math
+I_{\text{dir}}(\theta) = \frac{0.554\,\theta^{4}}{2\pi}, \qquad I_{\text{refl}}(\theta) = \frac{\cos\theta}{\pi} \qquad [\text{cd per lm}]
+```
+
+The zenith luminance at an observer a horizontal distance *D* from 1 lm of source is a single-scattering integral up the
+vertical line of sight (altitude *h* from 5 m to 40 km):
+
+```math
+K_t(D) = \int_{h_{\min}}^{h_{\max}} \frac{I_t(\theta)\, e^{-\tau(h)\, r/h'}}{r^{2}}
+\Big[\beta_R\, e^{-h/H_R}\, P_R(\psi) + \beta_M\, e^{-h/H_M}\, P_{HG}(\psi)\Big]\, e^{-\tau(h)}\ dh
+```
+
+```math
+h' = h + \frac{D^{2}}{2R_{\oplus}}, \quad r = \sqrt{D^{2} + h'^{2}}, \quad \cos\theta = \frac{h'}{r}, \quad \cos\psi = -\cos\theta
+```
+
+```math
+\tau(h) = \beta_R H_R\big(1 - e^{-h/H_R}\big) + \beta_M H_M\big(1 - e^{-h/H_M}\big), \qquad
+P_R(\psi) = \frac{3}{16\pi}\big(1 + \cos^{2}\psi\big), \qquad
+P_{HG}(\psi) = \frac{1 - g^{2}}{4\pi\,\big(1 + g^{2} - 2g\cos\psi\big)^{3/2}}
+```
+
+The first factor is the light reaching altitude *h* along the slant path (inverse square, extinction along the air mass
+*r/h′*), the bracket is molecular (Rayleigh) plus aerosol (Henyey-Greenstein) scattering, and the last factor is
+extinction on the way down to the observer. *h′* drops the source below the observer's horizon for Earth's curvature
+(*R*<sub>⊕</sub> = 6,371 km). Rayleigh: *τ*<sub>R</sub> = 0.097 at 555 nm, *H*<sub>R</sub> = 8 km,
+*β*<sub>R</sub> = *τ*<sub>R</sub>/*H*<sub>R</sub>. Aerosol: *β*<sub>M</sub> = (*T* − 1) *τ*<sub>R</sub>/*H*<sub>M</sub>
+with Linke turbidity *T* = 3.5 (summer) and 2.5 (winter), *H*<sub>M</sub> = 1.5 km, asymmetry *g* = 0.80; optical depth
+scales as *λ*<sup>−4</sup> (Rayleigh) and *λ*<sup>−1.3</sup> (aerosol). The integral is averaged over the two seasons
+and fitted, by least squares on 120 log-spaced distances from 0.05 to 100 km, to
+
+```math
+\ln K_t(D) \approx c_0 + c_1 \ln D + c_2 (\ln D)^{2} + c_3 (\ln D)^{3} + c_4 D, \qquad K_t(D > 100\ \text{km}) = 0
+```
+
+(largest error 7.4% for the direct term, 5.3% for the reflected term). Lamp spectra enter through a factor per photopic
+lumen, from each lamp type's power fractions *p*<sub>b</sub> in five bands (415, 480, 555, 590, 680 nm):
+
+```math
+S_{t,\text{mode}}(q) = \frac{\sum_b p_b\, s_{t,b}\, W_{\text{mode},b}}{\sum_b p_b\, \bar V_b}, \qquad
+s_{t,b} = \frac{\int K_t^{(\lambda_b)}(D)\, 2\pi D\, dD}{\int K_t^{(555)}(D)\, 2\pi D\, dD}
+```
+
+*W* is the band-mean photopic (*V̄*) or scotopic (*V̄′*) sensitivity, or one band alone. A stock of *n* fixtures in
+cohorts *k* (share *f*, lumens *ℓ*, U-rating *u*, lamp type *q*, lit share of the viewing window *o*) emits
+
+```math
+\Phi_{\text{dir}} = n \sum_k f_k\, \ell_k\, \mathrm{ULOR}(u_k)\, S_{\text{dir}}(q_k)\, o_k, \qquad
+\Phi_{\text{refl}} = n \sum_k f_k\, \ell_k\, \big(1 - \mathrm{ULOR}(u_k)\big)\, a\, S_{\text{refl}}(q_k)\, o_k
+```
+
+ULOR is the uplight ratio of the U-rating (U0 = 0, U1 = 0.003, U2 = 0.012, U3 = 0.06, U4 = 0.18, U5 = 0.30) and
+*a* = 0.15 the effective ground albedo. Luminance becomes a sky magnitude, and Bortle is a label on that magnitude:
+
+```math
+m = 12.6 - 2.5 \log_{10}\big(L_{\text{art}} + L_{\text{nat}}\big), \qquad L_{\text{nat}} = 10^{(12.6 - 22.0)/2.5} = 1.74\times 10^{-4}\ \text{cd m}^{-2}
+```
+
+```math
+\text{Bortle}(m) = \min\{\,b : m \ge m_b^{\min}\,\}, \qquad \text{e.g. class 3 for } 21.69 \le m < 21.89
+```
 
 ### 4. Browser runtime: what happens when you move a control
 
@@ -436,6 +544,59 @@ The same pure functions run in the tests: a Vitest case checks that the browser'
 pipeline's `engine/flux.py` for every component, and the scenario lives in the URL so any view can be shared or
 linked from the PDF brief.
 
+**The math.** Each control rewrites the fixture cohorts of the selected stocks, then the flux formula of section 3 runs
+again. The lit share of the viewing window *W* (late night 01:00–04:00 or evening 20:30–22:30) for operating hours *H*,
+and the effect of a curfew window *C* dimmed to level *d* (or motion-only, *d*<sub>m</sub> = 0.30 all night):
+
+```math
+o = \frac{|H \cap W|}{|W|}, \qquad
+o' = o\left(1 - (1 - d)\,\frac{|C \cap W|}{|W|}\right), \qquad
+e' = e\left(1 - (1 - d)\,\frac{\min(|C|,\ T_{\text{night}})}{T_{\text{night}}}\right), \qquad
+o'_{\text{motion}} = d_m\, o
+```
+
+*o* scales sky brightness and *e* scales energy (*T*<sub>night</sub> = 11.5 h). Shielding converts a share *p* of the
+cohorts worse than the target rating: *f*<sub>k</sub> becomes (1 − *p*) *f*<sub>k</sub> at the old rating plus
+*p f*<sub>k</sub> at the target; sodium and metal-halide lamps become LED at *ℓ′* = 0.5 *ℓ* (derived from the seed energy saving per retrofit and
+the lamp efficacies);
+the CCT cap moves warmer-than-allowed lamps to the cap; intensity scales *ℓ′* = (1 − *i*) *ℓ*; a Build-mode card replaces
+its share with the card's lumens, watts and rating; overlay rings force U0 with amber, motion-only light (LZ0) or U0 at
+≤ 2700 K (LZ1). The map then recombines the basis layers:
+
+```math
+L^{\text{scn}}_{30}(x) = \alpha \sum_{c,t} \Phi^{\text{scn}}_{c,t}\, B_{c,t}(x), \qquad
+m^{\text{scn}}_{15}(x) = 12.6 - 2.5 \log_{10}\!\Big( L^{\text{base}}_{15}(x)\ \mathcal{U}\!\left[\frac{L^{\text{scn}}_{30}\, G^{\,y/10}}{L^{\text{base}}_{30}}\right]\!(x) + L_{\text{nat}} \Big)
+```
+
+The fine 15-arcsec baseline keeps its detail and the 30-arcsec layers carry the change; 𝒰 is bilinear upsampling,
+*G*<sup>y/10</sup> adds *y* years of growth, and the Change layer shows Δ*m* = *m*<sup>scn</sup> − *m*<sup>base</sup>
+(positive = darker). The VIIRS readout repeats the flux without scattering, at the 01:30 satellite overpass, with each lamp
+type's correction factor for the sensor's blindness to blue:
+
+```math
+V = n \sum_k f_k\, \ell_k\, \big(\mathrm{ULOR}_k + (1 - \mathrm{ULOR}_k)\, a\big)\, \frac{o_k^{\,01{:}30}}{\mathrm{CF}(q_k)}
+```
+
+Costs follow the public fixtures that change:
+
+```math
+E = \frac{n \sum_k f_k\, W_k\, e_k\, T_{\text{burn}}}{1000}\ \ \text{kWh/yr}, \qquad W_k = \frac{\ell_k}{\eta(q_k)}\ \text{(or the card's watts)}, \qquad T_{\text{burn}} = 4{,}100\ \text{h}
+```
+
+```math
+\text{CAPEX} = \sum_{\text{replaced}} n f_k\, c_{\text{unit}} + N_{\text{nodes}}\, c_{\text{node}}, \qquad
+B = \sum_{\text{tariffs}} \sigma \big(\Delta E_{\text{retrofit}} + \delta\, \Delta E_{\text{dimming}}\big)\, r + M_{\text{avoided}} - N_{\text{nodes}}\big(c_{\text{CMS}} + c_{\text{reserve}}\big)
+```
+
+```math
+\text{payback} = \frac{\text{CAPEX}}{B}, \qquad \text{cash}(y) = -\,\text{CAPEX} + y\,B, \qquad \text{ROI}_{15} = \frac{15\,B - \text{CAPEX}}{\text{CAPEX}}
+```
+
+*η* is the lamp type's efficacy (lm/W), *N*<sub>nodes</sub> the dimmed fixtures (each needs a control node), *σ* a
+stock's share on each tariff, *r* the tariff's $/kWh, *δ* = 1 only if the tariff pays for dimming (flat-rate "deemed"
+tariffs value the retrofit at the generic rate and dimming at $0), and *M*<sub>avoided</sub> the maintenance no longer
+spent on replaced sodium and metal-halide lamps.
+
 ### 5. Observatory siting and Stargaze
 
 ```mermaid
@@ -452,6 +613,60 @@ flowchart LR
 
 Site ranking is a transparent weighted sum, not machine learning; its development-trajectory criterion and its
 2034 sky column come from the growth forecast below.
+
+**The math.** Every criterion is scaled to 0–1 per ~1 km cell and combined with the weights *w* you set:
+
+```math
+S(x) = \frac{\sum_k w_k\, n_k(x)}{\sum_k w_k}
+```
+
+```math
+\begin{aligned}
+n_{\text{sky}} &= \operatorname{clip}\!\left(\frac{m_{2024} - 20.5}{22.0 - 20.5}\right) \\
+n_{\text{trajectory}} &= 1 - \operatorname{clip}\!\left(\frac{g}{50}\right), \qquad g = 100\,(e^{10\hat r} - 1) \\
+n_{\text{clarity}} &= \operatorname{clip}\!\left(\frac{c - 0.40}{0.75 - 0.40}\right), \qquad c = 0.50 + 0.05\operatorname{clip}\!\left(\frac{d_{\text{coast}}}{30\ \text{km}}\right) \\
+n_{\text{urban}} &= \frac{1}{1 + e^{-(d_{\text{urban}} - 30)/8}} \\
+n_{\text{land}} &= \text{area-weighted class: public 1.0, agricultural 0.6, residential 0.1} \\
+n_{\text{elevation}} &= \tfrac12\,\frac{z - z_{\min}}{z_{\max} - z_{\min}} + \tfrac12\left(1 - \operatorname{clip}\!\left(\frac{h_{\text{horizon}}}{10^{\circ}}\right)\right) \\
+n_{\text{access}} &= \operatorname{clip}\!\left(\frac{15 - d_{\text{road}}}{15 - 3}\right) \\
+n_{\text{land cost}} &= \pi + (1 - \pi)\operatorname{clip}\!\left(\frac{\ln 40{,}000 - \ln v}{\ln 40{,}000 - \ln 2{,}000}\right)
+\end{aligned}
+```
+
+clip limits to [0, 1]; *d* are distances in km (urban cores are places of 10,000 people or more); *h*<sub>horizon</sub> is
+the highest terrain angle within 10 km over 16 directions; *π* is the cell's public share of parcel area and *v* the
+market price ($/acre). Sites are the 4-connected clusters of at least four cells among the best-scoring 1%, 2%, 4%, 8% or
+16% of cells (the first cut that yields 20 sites), ranked by their mean score. Land prices are the median and
+interquartile range of up to the 15 nearest qualified vacant-land sales within 25 km (county median if fewer than 5):
+
+```math
+\text{cost} = \tilde v \cdot A, \qquad \text{range} = \big[v_{25}\, A,\ v_{75}\, A\big], \qquad A = 80\ \text{acres by default}
+```
+
+Stargaze ranks cells with the same layers plus the forecast, as a weighted mean of factors whose weights depend on the
+use case (grab & go: dark 0.40, clear 0.35, access 0.25):
+
+```math
+f_{\text{dark}} = \operatorname{clip}\!\left(\frac{m - 20}{2}\right), \quad
+f_{\text{clear}} = 1 - \frac{\overline{\text{cloud}}}{100}, \quad
+f_{\text{access}} = \operatorname{clip}\!\left(1 - \frac{d_{\text{road}} - d_{\text{full}}}{d_{\text{zero}} - d_{\text{full}}}\right), \quad
+\text{score} = \frac{\sum_j w_j f_j}{\sum_j w_j}
+```
+
+The hourly "go" score multiplies clear sky by usable darkness, which falls in twilight and under the Moon (*φ* is the
+Moon's illuminated fraction); transparency and seeing are 1–5 proxies stepped on aerosol optical depth, humidity, high
+cloud and the 250 hPa jet-stream wind, and dew risk on the temperature–dew point spread (≤ 2 °C high, ≤ 4 °C moderate):
+
+```math
+\text{go} = 100\,\max\!\left(0,\ 1 - \frac{\text{cloud}}{100}\right) D, \qquad
+D = \begin{cases}
+0 & \text{Sun above the horizon} \\
+0.15 & \text{civil and nautical twilight} \\
+0.5 & \text{astronomical twilight} \\
+1 - 0.7\,\varphi & \text{dark, Moon up} \\
+1 & \text{dark, Moon down}
+\end{cases}
+```
 
 ### 6. How the AI works: satellite data to models
 
@@ -478,6 +693,33 @@ Two models learn from data: a statistical change detector and a LightGBM forecas
 upper atmosphere, follows the solar cycle (0.10 nW at the 2019–20 minimum, 0.33 nW in 2023); removing it first keeps
 forests and wetlands from appearing to brighten ([ADR 0011](docs/adr/0011-viirs-first-run.md)).
 
+**The math.** Each year's value is the median of the high-quality nights, then the airglow background is removed:
+
+```math
+L_t(x) = \operatorname*{median}_{\text{nights in year } t,\ \mathrm{QF} = 0} R(x), \qquad
+b_t = \operatorname*{median}_{x \in \mathcal{D}} L_t(x), \qquad
+\tilde L_t(x) = \max\big(L_t(x) - b_t,\ 0\big)
+```
+
+*R* is the daily BRDF-corrected radiance (nW cm<sup>−2</sup> sr<sup>−1</sup>) and 𝒟 the darkest fifth of the grid by
+2012–2024 median radiance (b<sub>2020</sub> = 0.10, b<sub>2023</sub> = 0.33 on the region grid). Analysis uses log
+radiance with a floor, the region's shared movement, and a cell is tested only if lit at either end:
+
+```math
+y_t(x) = \ln \max\big(\tilde L_t(x),\ 0.05\big), \qquad
+c_t = \operatorname*{median}_{x\ \text{lit}} \big(y_t(x) - \bar y(x)\big), \qquad
+\text{lit}(x) \iff \max\big(\bar{\tilde L}_{2012\text{-}14}(x),\ \bar{\tilde L}_{2022\text{-}24}(x)\big) > 1\ \text{nW}
+```
+
+The trend map and the growth-rate fallback (used if fewer than 500 cells are lit) are
+
+```math
+\Delta\%(x) = 100\left(\frac{\max\big(\bar{\tilde L}_{2022\text{-}24}(x),\ 0.05\big)}{\max\big(\bar{\tilde L}_{2012\text{-}14}(x),\ 0.05\big)} - 1\right), \qquad
+\hat r_{\text{TS}}(x) = \operatorname*{median}_{i < j} \frac{y_j(x) - y_i(x)}{t_j - t_i}
+```
+
+the second being the Theil-Sen slope, robust to a few bad years.
+
 ### 7. The step test for one pixel (`ml/trends.py`)
 
 ```mermaid
@@ -500,6 +742,39 @@ Choosing the best of eight split years inflates an ordinary F test, so the cutof
 series; the statistic does not depend on the line or the noise level, so one simulation serves every pixel. At the
 real year-to-year scatter (about 10%), large new lighting is found and most 20–40% retrofit drops are not
 ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md)).
+
+**The math.** With the region's movement removed, *z*<sub>t</sub> = *y*<sub>t</sub> − *c*<sub>t</sub>, two models are
+fitted by least squares to the 13 years (*n* = 13):
+
+```math
+\text{M}_1:\ z_t = a + b\,t + \varepsilon_t, \qquad
+\text{M}_2^{(k)}:\ z_t = a + b\,t + d\,\mathbf{1}[\,t \ge k\,] + \varepsilon_t, \qquad k \in \{2015, \dots, 2022\}
+```
+
+```math
+F_k = \frac{\mathrm{RSS}_1 - \mathrm{RSS}_2^{(k)}}{\mathrm{RSS}_2^{(k)} / (n - 3)}, \qquad F^{*} = \max_k F_k, \qquad \hat k = \arg\max_k F_k
+```
+
+Taking the best of eight splits makes *F*\* larger than an ordinary *F* statistic, so its cutoff comes from simulation.
+*F*\* does not change if the series is shifted, tilted or rescaled, so one simulation of pure noise serves every cell:
+
+```math
+F_{\text{crit}} = Q_{1 - \alpha}\!\left( F^{*} \ \middle|\ z_t \overset{\text{iid}}{\sim} \mathcal{N}(0, 1) \right) = 36.3, \qquad \alpha = 0.001,\ \ 200{,}000\ \text{simulated series}
+```
+
+```math
+\text{flagged}(x) \iff \text{lit}(x)\ \wedge\ F^{*}(x) \ge F_{\text{crit}}\ \wedge\ \big|e^{\hat d} - 1\big| \ge 0.20, \qquad
+\text{step} = 100\,\big(e^{\hat d} - 1\big)\%\ \text{in year } \hat k
+```
+
+The expected number of chance flags is *α N*<sub>lit</sub> = 0.001 × 28,986 ≈ 29. Each lit cell's noise is
+*σ̂* = √(RSS<sub>1</sub>/(*n* − 2)) (median 9.7%), and the detection rates in the AI tab are the shares flagged among
+20,000 simulated series with that noise and a step of the given size in 2019. Flagged cells are grouped into 8-connected
+events of one direction, ranked by the radiance they gained or lost:
+
+```math
+\Delta_{\text{event}} = \sum_{x \in \text{event}} \Big(\bar{\tilde L}_{2022\text{-}24}(x) - \bar{\tilde L}_{2012\text{-}14}(x)\Big)
+```
 
 ### 8. The growth forecast and its back-test (`ml/growth.py`)
 
@@ -524,6 +799,56 @@ In this build the model matches "no change" on total brightness (21.2% median er
 3.7% in 2012–18 and rose 20.6% in 2018–24, a reversal nothing in the earlier years predicted. It does rank where
 growth concentrates (correlation 0.35), the part that matters when comparing candidate sites.
 
+**The math.** The target is a cell's average yearly growth in log radiance, and the inputs are its state at the start of
+the window:
+
+```math
+r_{a \to b}(x) = \frac{\ln \max(L_b, 0.05) - \ln \max(L_a, 0.05)}{b - a}, \qquad
+\mathbf{s}_a(x) = \big(d_{\text{road}},\ d_{\text{urban}},\ \rho_{\text{HU}},\ z,\ \mathbf{1}_{\text{conservation}},\ \ln \max(L_a, 0.05)\big)
+```
+
+LightGBM builds the model as a sum of small regression trees, each fitted to what the previous ones still get wrong
+(squared loss):
+
+```math
+F_0 = \bar r, \qquad F_m(\mathbf{s}) = F_{m-1}(\mathbf{s}) + \eta\, f_m(\mathbf{s}), \qquad
+f_m = \arg\min_{f \in \text{trees}} \sum_i \big(r_i - F_{m-1}(\mathbf{s}_i) - f(\mathbf{s}_i)\big)^2
+```
+
+with 300 trees, learning rate *η* = 0.05, at most 31 leaves, at least 40 cells per leaf, and 80% of rows and 90% of
+inputs sampled per tree. The back-test and its scores:
+
+```math
+\hat F = \text{fit}\big(\mathbf{s}_{2012} \mapsto r_{2012 \to 2018}\big), \qquad
+\hat L_{2024} = L_{2018}\, e^{6\, \hat F(\mathbf{s}_{2018})}
+```
+
+```math
+\text{MdAPE} = \operatorname*{median}_{L_{2024} > 0.5} \left| \frac{\hat L_{2024}}{L_{2024}} - 1 \right|, \qquad
+\text{RMSE}_{\ln} = \sqrt{\overline{\big(\ln \hat L_{2024} - \ln L_{2024}\big)^{2}}}, \qquad
+\rho = \operatorname{corr}\big(\hat F(\mathbf{s}_{2018}),\ r_{2018 \to 2024}\big)
+```
+
+The baselines replace the model's rate with 0 ("no change") or with each cell's own *r*<sub>2012→2018</sub>. Results in
+this build: MdAPE 21.2% (no change 21.2%, own trend 25.4%), RMSE<sub>ln</sub> 0.449 (0.467), *ρ* = 0.35. The spatial check
+assigns 16 × 16-cell blocks at random to five folds and predicts each fold from a model that never saw it:
+
+```math
+R^{2}_{\text{CV}} = 1 - \frac{\sum_i \big(r_i - \hat r_i^{(-\text{fold}(i))}\big)^{2}}{\sum_i \big(r_i - \bar r\big)^{2}} = 0.18
+```
+
+Feature importance is each input's share of the total loss reduction (split gain) across all trees. The forecast refits
+on the latest window and carries that pace forward ten years:
+
+```math
+\hat F' = \text{fit}\big(\mathbf{s}_{2018} \mapsto r_{2018 \to 2024}\big), \qquad
+\hat r(x) = \operatorname{clip}\big(\hat F'(\mathbf{s}_{2024}(x)),\ -0.01,\ 0.06\big), \qquad
+L_{2034}(x) = L_{2024}(x)\, e^{10\, \hat r(x)}
+```
+
+Without the VIIRS cache, the rate falls back to Census housing growth by county subdivision,
+*r* = ln(HU<sub>2020</sub>/HU<sub>2010</sub>)/10.
+
 ### 9. How the models are checked
 
 ```mermaid
@@ -544,6 +869,16 @@ flowchart TD
   end
   PY ~~~ VT ~~~ OBS
 ```
+
+**The math.** Naked-eye Globe at Night reports (limiting magnitude) are converted to sky brightness by inverting the
+standard relation, and model-minus-observed residuals *e* are summarized with robust statistics:
+
+```math
+m_{\text{SQM}} = 5\Big(4.316 - \log_{10}\big(10^{(7.93 - \text{NELM})/5} - 1\big)\Big), \qquad
+\tilde e = \operatorname{median}(e), \qquad \text{MAD} = \operatorname{median}\big|\,e - \tilde e\,\big|
+```
+
+For the 53 meter readings, *ẽ* = +0.52 mag and MAD = 0.45 mag (positive: the model is darker than observed).
 
 ## Data reality check (2026-09-26)
 
