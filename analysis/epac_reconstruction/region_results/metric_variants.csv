@@ -1,0 +1,25 @@
+rms_error_pts,channel,region_shape,statistic,alachua_county_pct,gainesville_pct,alachua_city_pct,paynes_prairie_5km_pct
+4.856,luma (cv2/PIL gray),bounding box,mean,12.767,7.428,10.689,7.724
+5.122,luma (cv2/PIL gray),outline,mean,11.367,1.526,12.675,10.582
+5.689,"mean of R,G,B",bounding box,mean,10.9,7.158,9.582,7.106
+5.707,"mean of R,G,B",outline,mean,9.892,1.71,11.653,9.883
+6.207,"value, max(R,G,B)",outline,mean,9.344,1.422,12.641,9.262
+6.212,"value, max(R,G,B)",bounding box,mean,10.025,6.784,10.609,6.466
+6.271,luma (cv2/PIL gray),bounding box,sum above 38,12.163,9.471,17.704,8.741
+6.442,"value, max(R,G,B)",bounding box,sum above 38,14.068,9.714,19.423,8.746
+6.585,"mean of R,G,B",bounding box,sum above 38,8.486,8.19,11.779,7.587
+6.652,"yellow, (R+G)/2 - B",outline,mean,21.622,-0.246,21.425,15.744
+6.747,"mean of R,G,B",outline,sum above 38,8.377,2.165,16.539,11.572
+6.799,"value, max(R,G,B)",outline,sum above 38,13.377,2.411,21.674,12.972
+6.954,luma (cv2/PIL gray),outline,sum above 38,11.619,2.347,21.045,13.105
+7.227,"yellow, (R+G)/2 - B",bounding box,mean,25.931,8.112,21.889,11.116
+7.306,"mean of R,G,B",bounding box,lit pixel count (>38),15.508,16.701,19.31,14.614
+8.499,"yellow, (R+G)/2 - B",bounding box,lit pixel count (>38),14.159,6.616,24.486,7.568
+8.782,"mean of R,G,B",outline,lit pixel count (>38),15.225,5.667,26.617,19.24
+9.973,"yellow, (R+G)/2 - B",bounding box,sum above 38,11.174,2.921,24.142,3.726
+11.988,luma (cv2/PIL gray),bounding box,lit pixel count (>38),22.695,19.796,29.14,17.126
+12.001,"yellow, (R+G)/2 - B",outline,lit pixel count (>38),12.925,2.254,32.696,11.831
+12.21,luma (cv2/PIL gray),outline,lit pixel count (>38),21.633,6.704,33.158,22.254
+12.336,"value, max(R,G,B)",outline,lit pixel count (>38),25.314,6.985,32.89,21.626
+13.213,"yellow, (R+G)/2 - B",outline,sum above 38,9.683,-1.431,32.618,8.312
+13.55,"value, max(R,G,B)",bounding box,lit pixel count (>38),26.577,20.323,31.632,16.973

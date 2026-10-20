@@ -38,8 +38,9 @@ starts in 2013):
 | City of Alachua (bounding box) | −0.1% | −7.5% |
 | Paynes Prairie Preserve (bounding box) | +21.8% | +27.5% |
 
-The reconstruction script, boundaries and results are kept with the slide images outside this repository
-(`epac_reconstruction/`, next to it).
+The scripts, boundaries and results are in [analysis/epac_reconstruction](../../analysis/epac_reconstruction/README.md):
+`alachua_screenshot_regions.py` measures the screenshots and `radiance_comparison.py` produces the radiance table.
+The slide images themselves (Google Maps views) are not in the repository.
 
 ## Decision
 - The +19% and 16% → 21% are described as what they are: grayscale change across the whole screenshot map view,

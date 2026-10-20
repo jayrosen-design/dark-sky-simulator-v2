@@ -1,0 +1,10 @@
+region,pixels,mean_gray_2012,mean_gray_2024,change_pct,lit_2012_pct,lit_2024_pct,published_pct
+Alachua County,91946,35.586,39.631,11.367,26.148,31.805,19
+Gainesville (city limits),6126,117.558,119.352,1.526,88.394,94.319,6
+City of Alachua (city limits),3463,62.085,69.954,12.675,54.866,73.058,10
+Paynes Prairie Preserve State Park,3156,37.639,45.904,21.958,30.577,47.782,
+Paynes Prairie Preserve + 2 km,8232,46.706,53.108,13.708,38.423,50.182,
+Paynes Prairie Preserve + 5 km,15866,47.639,52.68,10.582,37.13,45.393,15
+Paynes Prairie Preserve + 10 km,32840,44.321,48.416,9.238,34.105,40.329,
+"Paynes Prairie + 5 km, outside Gainesville",13842,33.851,39.268,16.004,28.493,38.21,
+First reconstruction's rectangle (212 x 131 km),1011200,22.174,26.29,18.559,16.173,20.734,19

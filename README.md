@@ -950,4 +950,5 @@ wildsight/ WildSight Planner pipeline, config, tests and docs (its web app is we
 publicart/ Public Art Policy Simulator pipeline, registry, capital program, assumptions, tests and docs (web/src/publicart)
 tests/     pytest (engine, contracts, ML, VIIRS-mode build)
 docs/      ADRs, sanity check, demo script, v3.0 funding one-pager
+analysis/  one-off analyses: epac_reconstruction (what the County's +19% measured, ADR 0013)
 ```

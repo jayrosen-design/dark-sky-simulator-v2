@@ -1,0 +1,9 @@
+rectangle,pixels,mean_gray_2012,mean_gray_2024,change_pct,lit_2012_pct,lit_2024_pct,published_pct
+Whole map view (first reconstruction's crop),1011200,22.174,26.29,18.559,16.173,20.734,19
+"Alachua County, bounding box",126378,32.895,37.095,12.767,23.537,28.879,19
+"Gainesville, bounding box",14508,74.22,79.734,7.428,59.608,71.409,6
+"City of Alachua, bounding box",8632,45.49,50.353,10.689,38.126,49.235,10
+"Paynes Prairie Preserve, bounding box",7470,45.002,51.195,13.764,36.212,46.586,15
+Gainesville Downtown (2025 app),360,145.953,142.031,-2.687,97.222,91.667,6
+Suburban Gainesville (2025 app),5896,116.291,119.869,3.077,88.67,96.269,6
+Paynes Prairie (2025 app),2773,46.986,54.856,16.749,40.245,58.925,15

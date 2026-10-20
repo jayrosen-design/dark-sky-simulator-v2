@@ -9,3 +9,5 @@ web/dist/
 web/coverage/
 *.tsbuildinfo
 .vercel/
+# EPAC screenshot analysis: slide images and figures show Google Maps imagery, not ours to republish
+analysis/epac_reconstruction/**/*.png
