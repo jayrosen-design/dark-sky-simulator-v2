@@ -15,7 +15,7 @@ so on every screen.
 Live at [dark-sky-simulator-v2.vercel.app/dark-sky/](https://dark-sky-simulator-v2.vercel.app/dark-sky/). Screenshots are from
 the 2026-10-19 build (VIIRS mode) at 1440 × 860 unless noted; they are a snapshot, so retake them after visible changes.
 The left panel has seven tabs (Scenario, Sites, Costs, Observatory, Stargaze, AI, Brief); the map on the right follows
-the tab, and its layer buttons switch what it shows.
+the tab, and its layer buttons switch what it shows. How it is built: [Technical architecture](#technical-architecture).
 
 ### Lighting scenarios and the map
 
@@ -312,6 +312,238 @@ fit, not calibration. Against 53 public Globe at Night **SQM** readings never us
 model − observed residual is +0.52 mag (±0.45; seed mode +0.48): the model reads somewhat dark. For the 11 readings
 taken after midnight it is +0.21 mag. See
 [docs/sanity_check.md](docs/sanity_check.md).
+
+## Technical architecture
+
+Two halves: an offline Python pipeline turns public data into a static data package, and a browser app recombines
+that package for any scenario without a server. The diagrams follow the code in `ingest/`, `engine/`, `pipeline/`,
+`ml/` and `web/src/`.
+
+### 1. System overview
+
+```mermaid
+flowchart LR
+  subgraph SRC["Public data"]
+    direction TB
+    EE["Google Earth Engine<br/>NASA VIIRS VNP46A2"]
+    CEN["Census TIGERweb<br/>block groups, places, roads"]
+    OSM["OpenStreetMap<br/>roads, lamps, sports venues"]
+    INV["Streetlight inventories<br/>Gainesville open data, county seeds"]
+    LND["FGIO / DOR parcels, FNAI lands,<br/>USGS 3DEP elevation"]
+    GAN["Globe at Night<br/>sky-quality readings"]
+  EE ~~~ CEN ~~~ OSM ~~~ INV ~~~ LND ~~~ GAN
+  end
+  SEED["seed/ and counties/<br/>assumptions with provenance"]
+  subgraph PIPE["Offline pipeline, Python 3.12"]
+    direction TB
+    ING["pipeline.ingest_all<br/>cached in data_raw/"]
+    BLD["pipeline.build<br/>physics, placement, AI, site layers"]
+  end
+  PKG[("Static data package<br/>web/public/dark-sky/data<br/>engine.json, 16-bit grids, GeoJSON")]
+  subgraph WEB["Browser app: React, Vite, MapLibre, Three.js"]
+    APP["Scenario engine, map, panels,<br/>all-sky view, PDF brief"]
+  end
+  LIVE["Live in the browser<br/>Open-Meteo forecast, OpenFreeMap tiles,<br/>AWS terrain tiles"]
+  HOST["Vercel static hosting<br/>deploys from main"]
+  SRC --> PIPE
+  SEED --> PIPE
+  ING --> BLD
+  PIPE --> PKG --> WEB
+  LIVE --> WEB
+  HOST -.-> WEB
+```
+
+Everything heavy (scattering integrals, convolutions, satellite processing, model training) runs once offline. The
+browser only loads the package and does weighted sums, so a phone can explore any scenario instantly.
+
+### 2. Build pipeline (`python -m pipeline.build`)
+
+```mermaid
+flowchart TD
+  RAW[("data_raw/ cache")] --> CTX
+  SEED["seed/ and counties/ manifests<br/>fixture stocks, spectra, costs, sites"] --> STK
+  subgraph PHY["Physics, engine/"]
+    GF["garstang.fit_kernel<br/>single scattering, summer and winter, 100 km"] --> GK["kernel images<br/>direct uplight and ground-reflected"]
+    SF["spectral.skyglow_factors<br/>five bands per lamp type"]
+  end
+  VM["viirs_mode<br/>see How the AI works"]
+  CTX["placement_context<br/>housing, roads, places, lit-road share,<br/>2024 VIIRS radiance when cached"] --> STK["build_stocks<br/>fixtures per owner and county,<br/>a placement field for each stock"]
+  VM --> CTX
+  STK --> CMP["build_components<br/>group × county, overlay rings<br/>around RHO and CAV, external light"]
+  CMP --> FLX["flux.effective_flux<br/>per component and kernel term"]
+  SF --> FLX
+  FLX --> CONV["convolve source fields with kernels<br/>15-arcsec baseline, 30-arcsec basis layers"]
+  GK --> CONV
+  CONV --> ANC["anchor: one global scale α<br/>least squares on 10 corpus sites"]
+  ANC --> MAPS["baseline sky maps<br/>Module A and the 11-county region"]
+  VM --> GROW["10-year growth per cell"]
+  MAPS --> GROW --> MB["build_module_b<br/>sky, 2034 sky, growth, clarity, distance to cores,<br/>land, elevation, road access"]
+  LP["pipeline.land<br/>DOR parcels and qualified sales"] --> MB
+  MAPS --> SAN["sanity check<br/>Globe at Night SQM, never fitted"]
+  MAPS --> OUT[("engine.json, baseline_a15, basis_a30,<br/>growth_a30, mcda_b, viirs_a15, viirs_trend_a15")]
+  MB --> OUT
+  SAN --> OUT
+```
+
+Each component (a fixture group in one county, a ring of an overlay zone, or the light from outside the eight
+counties) gets one basis layer per kernel term. Controls in the browser change only how much flux each component
+emits, so the sky for any scenario is a weighted sum of these precomputed layers.
+
+### 3. Skyglow physics: from a fixture to a magnitude
+
+```mermaid
+flowchart TD
+  F["Fixture cohort<br/>count, lumens, lamp type, U-rating"] --> D["Direct uplight<br/>lm × ULOR(U)"]
+  F --> R["Ground-reflected<br/>lm × (1 − ULOR) × albedo"]
+  D --> SD["× spectral factor<br/>lamp type and band"]
+  R --> SR["× spectral factor"]
+  SD --> KD["convolve with the direct kernel<br/>θ⁴ emission near the horizon"]
+  SR --> KR["convolve with the reflected kernel<br/>cos θ emission"]
+  KD --> SUM["α × sum over components<br/>+ natural sky"]
+  KR --> SUM
+  SUM --> MAG["zenith luminance → mag/arcsec²<br/>→ Bortle label"]
+```
+
+The kernels come from a Garstang single-scattering integral (Rayleigh and Henyey-Greenstein aerosol scattering,
+slant-path extinction, Earth curvature), fitted to an analytic curve. Direct uplight leaves mostly near the horizon
+(the θ⁴ term) and travels far, which is why shielding matters most for distant skies. The global scale α is a sanity
+fit to ten corpus site values, not a calibration.
+
+### 4. Browser runtime: what happens when you move a control
+
+```mermaid
+sequenceDiagram
+  actor U as User
+  participant P as Panels and Build mode
+  participant S as Zustand store and URL hash
+  participant M as computeModel
+  participant E as scenario.ts
+  participant F as field.ts
+  participant V as Map, sites, budget, brief
+  U->>P: move a control or equip a fixture card
+  P->>S: setParams(patch)
+  S->>M: new scenario parameters
+  M->>E: evaluateComponents
+  Note over E: selection, shielding, CCT cap, intensity,<br/>curfew and viewing window, overlay zones, cards
+  E-->>M: flux per component and term, baseline and scenario
+  M->>F: combine basis layers, α × Σ flux × layer
+  F-->>M: sky fields, 15-arcsec baseline × 30-arcsec ratio × growth
+  M-->>V: magnitudes, change map, site values, costs, VIIRS vs visual
+  V-->>U: everything updates with no server call
+```
+
+The same pure functions run in the tests: a Vitest case checks that the browser's baseline flux equals the
+pipeline's `engine/flux.py` for every component, and the scenario lives in the URL so any view can be shared or
+linked from the PDF brief.
+
+### 5. Observatory siting and Stargaze
+
+```mermaid
+flowchart LR
+  MB[("mcda_b layers<br/>about 1 km region grid")] --> N["normalize each criterion<br/>engine/mcda.ts"]
+  W["weights you set"] --> WLC["weighted linear combination"]
+  N --> WLC --> CL["cluster the best cells<br/>at least 4 contiguous"] --> TOP["top 20 sites<br/>plus RHO and CAV reference rows"]
+  LPJ[("land_parcels.json<br/>2025 DOR roll, 1,205 sales")] --> LE["land estimate per site"]
+  TOP --> LE
+  MB --> SP["spot ranking by use case<br/>engine/spots.ts"]
+  OM["Open-Meteo hourly forecast<br/>fetched live"] --> WX["cloud, transparency and seeing proxies,<br/>dew, wind, engine/weather.ts"]
+  WX --> SP --> REP["spot report and hourly forecast"]
+```
+
+Site ranking is a transparent weighted sum, not machine learning; its development-trajectory criterion and its
+2034 sky column come from the growth forecast below.
+
+### 6. How the AI works: satellite data to models
+
+```mermaid
+flowchart TD
+  EE["Earth Engine: NASA/VIIRS/002/VNP46A2<br/>daily DNB_BRDF_Corrected_NTL"] --> Q["keep Mandatory_Quality_Flag = 0<br/>cloud-free, high quality"]
+  Q --> MED["annual median per pixel, 2012–2024<br/>computePixels onto both grids"]
+  MED --> NPZ[("data_raw/viirs_*.npz")]
+  NPZ --> BG["remove the airglow background<br/>median of the darkest fifth, per year"]
+  BG --> ST["corrected stacks<br/>13 years × 2 grids"]
+  ST --> PL["2024 radiance → placement weight<br/>for private and outside light"]
+  ST --> TR["trend raster<br/>% change, first vs last 3 years"]
+  ST --> STEP["step test on every lit pixel<br/>diagram 7"]
+  STEP --> EV["change events<br/>8-connected groups, nearest town"]
+  ST --> GB["LightGBM growth model<br/>diagram 8"]
+  GB --> RATE["growth rate per ~1 km cell"]
+  RATE --> G34["2034 sky: growth toggle,<br/>Observatory 2034 column and trajectory criterion"]
+  TR --> PKG[("engine.json, viirs_a15, viirs_trend_a15")]
+  EV --> PKG
+  PKG --> UI["AI tab, Change events and Trend layers<br/>the inspector reruns the step test in the browser"]
+```
+
+Two models learn from data: a statistical change detector and a LightGBM forecast. Airglow, the faint light of the
+upper atmosphere, follows the solar cycle (0.10 nW at the 2019–20 minimum, 0.33 nW in 2023); removing it first keeps
+forests and wetlands from appearing to brighten ([ADR 0011](docs/adr/0011-viirs-first-run.md)).
+
+### 7. The step test for one pixel (`ml/trends.py`)
+
+```mermaid
+flowchart TD
+  A["13 yearly values of one cell"] --> L{"lit?<br/>first or last 3-year mean above 1 nW"}
+  L -- no --> N1["not tested: too dim"]
+  L -- yes --> C["ln radiance minus the region's<br/>shared movement"]
+  C --> F1["fit a straight line"]
+  C --> F2["fit a line plus a step<br/>at each split year 2015–2022"]
+  F1 --> FS["F statistic for adding the step<br/>keep the best split"]
+  F2 --> FS
+  FS --> T{"F at least 36.3?<br/>1 in 1,000 under pure noise,<br/>from 200,000 simulated cells"}
+  T -- no --> N2["no step: a trend fits as well"]
+  T -- yes --> SZ{"step at least 20%?"}
+  SZ -- no --> N3["real but small step"]
+  SZ -- yes --> Y["flagged: step year and size"]
+```
+
+Choosing the best of eight split years inflates an ordinary F test, so the cutoff comes from simulating noise-only
+series; the statistic does not depend on the line or the noise level, so one simulation serves every pixel. At the
+real year-to-year scatter (about 10%), large new lighting is found and most 20–40% retrofit drops are not
+([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md)).
+
+### 8. The growth forecast and its back-test (`ml/growth.py`)
+
+```mermaid
+flowchart TD
+  subgraph BT["Back-test: scored on years the model never saw"]
+    direction LR
+    X12["each cell in 2012<br/>distance to cores and roads, housing,<br/>elevation, conservation land, radiance"] --> FIT["fit LightGBM<br/>state → growth 2012–2018"]
+    FIT --> PRED["apply to the 2018 state<br/>→ predicted 2024"]
+    PRED --> SC["score against observed 2024<br/>beside no change and each cell's own trend"]
+    SC --> REP["shown in the AI tab: median and log error,<br/>rate correlation, spatial-block CV,<br/>feature importance, predicted vs observed by tenth"]
+  end
+  subgraph FC["Forecast"]
+    direction LR
+    X18["each cell in 2018"] --> FIT2["refit: state → growth 2018–2024"]
+    FIT2 --> APP2["apply to the 2024 state<br/>→ growth to 2034, assuming the 2018–24 pace"]
+  end
+  BT -- "then refit the same way on the latest window" --> FC
+```
+
+In this build the model matches "no change" on total brightness (21.2% median error each) because lit areas fell
+3.7% in 2012–18 and rose 20.6% in 2018–24, a reversal nothing in the earlier years predicted. It does rank where
+growth concentrates (correlation 0.35), the part that matters when comparing candidate sites.
+
+### 9. How the models are checked
+
+```mermaid
+flowchart TD
+  subgraph PY["pytest"]
+    T1["synthetic data: steady trends are not steps,<br/>false alarms near 1 in 1,000,<br/>a region-wide jump is not a local event"]
+    T2["leakage: a back-test that saw 2018–2024<br/>would fail the test"]
+    T3["the full VIIRS-mode build<br/>on a synthetic radiance cache"]
+  end
+  subgraph VT["vitest"]
+    T4["browser step test = pipeline<br/>on every lit pixel"]
+    T5["browser flux = engine/flux.py<br/>for every component"]
+  end
+  subgraph OBS["Against observations"]
+    T6["10 corpus sites<br/>set the one global scale"]
+    T7["53 Globe at Night SQM readings<br/>never fitted"]
+    T8["NOAA EOG monthly composites<br/>one-off cross-check of the 2021–24 rise"]
+  end
+  PY ~~~ VT ~~~ OBS
+```
 
 ## Data reality check (2026-09-26)
 
