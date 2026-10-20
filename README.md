@@ -622,14 +622,14 @@ S(x) = \frac{\sum_k w_k\, n_k(x)}{\sum_k w_k}
 
 ```math
 \begin{aligned}
-n_{\text{sky}} &= \operatorname{clip}\!\left(\frac{m_{2024} - 20.5}{22.0 - 20.5}\right) \\
-n_{\text{trajectory}} &= 1 - \operatorname{clip}\!\left(\frac{g}{50}\right), \qquad g = 100\,(e^{10\hat r} - 1) \\
-n_{\text{clarity}} &= \operatorname{clip}\!\left(\frac{c - 0.40}{0.75 - 0.40}\right), \qquad c = 0.50 + 0.05\operatorname{clip}\!\left(\frac{d_{\text{coast}}}{30\ \text{km}}\right) \\
+n_{\text{sky}} &= \mathrm{clip}\!\left(\frac{m_{2024} - 20.5}{22.0 - 20.5}\right) \\
+n_{\text{trajectory}} &= 1 - \mathrm{clip}\!\left(\frac{g}{50}\right), \qquad g = 100\,(e^{10\hat r} - 1) \\
+n_{\text{clarity}} &= \mathrm{clip}\!\left(\frac{c - 0.40}{0.75 - 0.40}\right), \qquad c = 0.50 + 0.05\mathrm{clip}\!\left(\frac{d_{\text{coast}}}{30\ \text{km}}\right) \\
 n_{\text{urban}} &= \frac{1}{1 + e^{-(d_{\text{urban}} - 30)/8}} \\
 n_{\text{land}} &= \text{area-weighted class: public 1.0, agricultural 0.6, residential 0.1} \\
-n_{\text{elevation}} &= \tfrac12\,\frac{z - z_{\min}}{z_{\max} - z_{\min}} + \tfrac12\left(1 - \operatorname{clip}\!\left(\frac{h_{\text{horizon}}}{10^{\circ}}\right)\right) \\
-n_{\text{access}} &= \operatorname{clip}\!\left(\frac{15 - d_{\text{road}}}{15 - 3}\right) \\
-n_{\text{land cost}} &= \pi + (1 - \pi)\operatorname{clip}\!\left(\frac{\ln 40{,}000 - \ln v}{\ln 40{,}000 - \ln 2{,}000}\right)
+n_{\text{elevation}} &= \tfrac12\,\frac{z - z_{\min}}{z_{\max} - z_{\min}} + \tfrac12\left(1 - \mathrm{clip}\!\left(\frac{h_{\text{horizon}}}{10^{\circ}}\right)\right) \\
+n_{\text{access}} &= \mathrm{clip}\!\left(\frac{15 - d_{\text{road}}}{15 - 3}\right) \\
+n_{\text{land cost}} &= \pi + (1 - \pi)\mathrm{clip}\!\left(\frac{\ln 40{,}000 - \ln v}{\ln 40{,}000 - \ln 2{,}000}\right)
 \end{aligned}
 ```
 
@@ -647,9 +647,9 @@ Stargaze ranks cells with the same layers plus the forecast, as a weighted mean 
 use case (grab & go: dark 0.40, clear 0.35, access 0.25):
 
 ```math
-f_{\text{dark}} = \operatorname{clip}\!\left(\frac{m - 20}{2}\right), \quad
+f_{\text{dark}} = \mathrm{clip}\!\left(\frac{m - 20}{2}\right), \quad
 f_{\text{clear}} = 1 - \frac{\overline{\text{cloud}}}{100}, \quad
-f_{\text{access}} = \operatorname{clip}\!\left(1 - \frac{d_{\text{road}} - d_{\text{full}}}{d_{\text{zero}} - d_{\text{full}}}\right), \quad
+f_{\text{access}} = \mathrm{clip}\!\left(1 - \frac{d_{\text{road}} - d_{\text{full}}}{d_{\text{zero}} - d_{\text{full}}}\right), \quad
 \text{score} = \frac{\sum_j w_j f_j}{\sum_j w_j}
 ```
 
@@ -696,8 +696,8 @@ forests and wetlands from appearing to brighten ([ADR 0011](docs/adr/0011-viirs-
 **The math.** Each year's value is the median of the high-quality nights, then the airglow background is removed:
 
 ```math
-L_t(x) = \operatorname*{median}_{\text{nights in year } t,\ \mathrm{QF} = 0} R(x), \qquad
-b_t = \operatorname*{median}_{x \in \mathcal{D}} L_t(x), \qquad
+L_t(x) = \mathrm{median}_{\text{nights in year } t,\ \mathrm{QF} = 0} R(x), \qquad
+b_t = \mathrm{median}_{x \in \mathcal{D}} L_t(x), \qquad
 \tilde L_t(x) = \max\big(L_t(x) - b_t,\ 0\big)
 ```
 
@@ -707,7 +707,7 @@ radiance with a floor, the region's shared movement, and a cell is tested only i
 
 ```math
 y_t(x) = \ln \max\big(\tilde L_t(x),\ 0.05\big), \qquad
-c_t = \operatorname*{median}_{x\ \text{lit}} \big(y_t(x) - \bar y(x)\big), \qquad
+c_t = \mathrm{median}_{x\ \text{lit}} \big(y_t(x) - \bar y(x)\big), \qquad
 \text{lit}(x) \iff \max\big(\bar{\tilde L}_{2012\text{-}14}(x),\ \bar{\tilde L}_{2022\text{-}24}(x)\big) > 1\ \text{nW}
 ```
 
@@ -715,7 +715,7 @@ The trend map and the growth-rate fallback (used if fewer than 500 cells are lit
 
 ```math
 \Delta\%(x) = 100\left(\frac{\max\big(\bar{\tilde L}_{2022\text{-}24}(x),\ 0.05\big)}{\max\big(\bar{\tilde L}_{2012\text{-}14}(x),\ 0.05\big)} - 1\right), \qquad
-\hat r_{\text{TS}}(x) = \operatorname*{median}_{i < j} \frac{y_j(x) - y_i(x)}{t_j - t_i}
+\hat r_{\text{TS}}(x) = \mathrm{median}_{i < j} \frac{y_j(x) - y_i(x)}{t_j - t_i}
 ```
 
 the second being the Theil-Sen slope, robust to a few bad years.
@@ -824,9 +824,9 @@ inputs sampled per tree. The back-test and its scores:
 ```
 
 ```math
-\text{MdAPE} = \operatorname*{median}_{L_{2024} > 0.5} \left| \frac{\hat L_{2024}}{L_{2024}} - 1 \right|, \qquad
+\text{MdAPE} = \mathrm{median}_{L_{2024} > 0.5} \left| \frac{\hat L_{2024}}{L_{2024}} - 1 \right|, \qquad
 \text{RMSE}_{\ln} = \sqrt{\overline{\big(\ln \hat L_{2024} - \ln L_{2024}\big)^{2}}}, \qquad
-\rho = \operatorname{corr}\big(\hat F(\mathbf{s}_{2018}),\ r_{2018 \to 2024}\big)
+\rho = \mathrm{corr}\big(\hat F(\mathbf{s}_{2018}),\ r_{2018 \to 2024}\big)
 ```
 
 The baselines replace the model's rate with 0 ("no change") or with each cell's own *r*<sub>2012→2018</sub>. Results in
@@ -842,7 +842,7 @@ on the latest window and carries that pace forward ten years:
 
 ```math
 \hat F' = \text{fit}\big(\mathbf{s}_{2018} \mapsto r_{2018 \to 2024}\big), \qquad
-\hat r(x) = \operatorname{clip}\big(\hat F'(\mathbf{s}_{2024}(x)),\ -0.01,\ 0.06\big), \qquad
+\hat r(x) = \mathrm{clip}\big(\hat F'(\mathbf{s}_{2024}(x)),\ -0.01,\ 0.06\big), \qquad
 L_{2034}(x) = L_{2024}(x)\, e^{10\, \hat r(x)}
 ```
 
@@ -875,7 +875,7 @@ standard relation, and model-minus-observed residuals *e* are summarized with ro
 
 ```math
 m_{\text{SQM}} = 5\Big(4.316 - \log_{10}\big(10^{(7.93 - \text{NELM})/5} - 1\big)\Big), \qquad
-\tilde e = \operatorname{median}(e), \qquad \text{MAD} = \operatorname{median}\big|\,e - \tilde e\,\big|
+\tilde e = \mathrm{median}(e), \qquad \text{MAD} = \mathrm{median}\big|\,e - \tilde e\,\big|
 ```
 
 For the 53 meter readings, *ẽ* = +0.52 mag and MAD = 0.45 mag (positive: the model is darker than observed).
