@@ -109,8 +109,12 @@ export interface EngineData {
     viirs_a15?: Log16Meta;
     viirs_trend_a15?: Lin16Meta;
   };
-  viirs: null | { years: number[]; county_pct_change: Record<string, number> };
-  growth_model: { method: string; source?: string; median_ape_pct?: number; naive_median_ape_pct?: number; rmse_log?: number; n_cells?: number; note?: string };
+  viirs: null | { years: number[]; background_nw: Record<string, Record<string, number>>; county_pct_change: Record<string, number> };
+  growth_model: {
+    method: string; source?: string; median_ape_pct?: number; nochange_median_ape_pct?: number; naive_median_ape_pct?: number;
+    rmse_log?: number; nochange_rmse_log?: number; rate_corr?: number; cv_r2?: number;
+    lit_change_pct?: Record<"2012-2018" | "2018-2024", number>; n_cells?: number; note?: string;
+  };
   physics: {
     kernel_fits: Record<Term, { coeffs: number[]; d_min_km: number; d_max_km: number; max_rel_error: number }>;
     kernel_profile: Record<string, number[]>;

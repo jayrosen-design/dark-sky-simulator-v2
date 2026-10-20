@@ -214,8 +214,9 @@ export default function MapView() {
         const r = viirs.years[e.viirs.years.indexOf(year)];
         return paint(g, (i) => { const t = Math.min(1, Math.max(0, Math.log10(r[i] / 0.1) / 3)); return [255 * t, 200 * t ** 1.5, 90 * t ** 3, r[i] > 0.1 ? 60 + 195 * t : 0]; });
       }
-      const pct = viirs.trend[0];
-      return paint(g, (i) => (viirs.years[viirs.years.length - 1][i] > 0.3 ? deltaColor(-pct[i], 50) : [0, 0, 0, 0]));
+      // Only cells lit at either end (> 1 nW): below that, year-to-year noise swings dim cells by ±50%.
+      const [pct, first, last] = [viirs.trend[0], viirs.years[0], viirs.years[viirs.years.length - 1]];
+      return paint(g, (i) => (Math.max(first[i], last[i]) > 1 ? deltaColor(-pct[i], 50) : [0, 0, 0, 0]));
     }
     if (view === "fixtures") {
       const f = d.fixCat15?.[0];
@@ -661,7 +662,7 @@ function Legend({ view, mode, lift, anchor }: { view: string; mode: string; lift
     body = <div className="text-[10px]">VIIRS DNB annual median radiance, nW cm⁻² sr⁻¹ (log scale, 0.1 → 100)</div>;
   } else if (view === "trend") {
     body = <><div className="h-2 w-40 rounded" style={{ background: "linear-gradient(90deg, rgb(60,150,255), rgba(0,0,0,0), rgb(255,110,70))" }} />
-      <div className="flex justify-between text-[10px]"><span>−50%</span><span>radiance 2012–14 → 2022–24</span><span>+50%</span></div></>;
+      <div className="flex justify-between gap-2 text-[10px]"><span>−50%</span><span>radiance 2012–14 → 2022–24, lit cells</span><span>+50%</span></div></>;
   } else if (view === "fixtures") {
     body = <div className="max-w-[16rem] text-[10px]"><span className="text-amber-400">●</span> Gainesville Socrata <span className="ml-2 text-glow-400">●</span> OSM (surveyed) · shading = <b>modeled</b> public fixtures expected per ~500 m cell, placed on OSM roads (lit roads first); 8 counties</div>;
   } else {

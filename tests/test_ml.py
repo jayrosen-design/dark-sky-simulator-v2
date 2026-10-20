@@ -1,4 +1,4 @@
-"""ML components on synthetic VIIRS-like data (real VIIRS needs Earth Engine credentials)."""
+"""ML components on synthetic VIIRS-like data, so each property is known exactly."""
 import numpy as np
 import pytest
 
@@ -49,6 +49,20 @@ def test_growth_backtest_on_structured_data():
     r, l34 = growth.forecast(res["model"], stack, {**cov, "log_radiance": np.log(stack[2024])}, np.ones(shape, bool))
     assert np.corrcoef(r.ravel(), r_true.ravel())[0, 1] > 0.8
     assert np.all(l34 > stack[2024] * 0.9)
+
+
+def test_backtest_cannot_see_the_held_out_years():
+    # Flat 2012-2018, then +3%/yr everywhere: a back-test that never trains on 2018-2024 must miss the rise
+    # (about 16% too dark, like no change); one that leaked the hold-out would score near zero.
+    pytest.importorskip("lightgbm")
+    rng = np.random.default_rng(5)
+    shape = (40, 40)
+    base = rng.uniform(1, 50, shape)
+    stack = {y: base * np.exp(0.03 * max(0, y - 2018)) * np.exp(rng.normal(0, 0.01, shape)) for y in range(2012, 2025)}
+    cov = {k: rng.uniform(0, 10, shape) for k in ("d_road_km", "d_urban_km", "hu_density", "elevation", "conservation")}
+    res = growth.backtest(stack, cov, np.ones(shape, bool))
+    assert res["median_ape_pct"] > 10 and abs(res["median_ape_pct"] - res["nochange_median_ape_pct"]) < 3
+    assert res["lit_change_pct"]["2018-2024"] == pytest.approx((np.exp(0.18) - 1) * 100, rel=0.05)
 
 
 def test_blocked_cv_runs():

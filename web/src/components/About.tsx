@@ -33,7 +33,10 @@ export default function About({ onClose }: { onClose: () => void }) {
                 derived rates for the six neighbors ({e.public_rates.urban_per_hu.toFixed(3)} per urban and {e.public_rates.rural_per_hu.toFixed(3)} per rural home);
                 private light follows Census 2020 housing. One global brightness scale is fitted to the corpus
                 site values (RMSE {e.anchor.rmse_mag.toFixed(2)} mag over {e.anchor.n_sites} sites); that is a sanity fit, not a calibration.</p>
-            ) : <p>Light-source strength follows VIIRS VNP46A2 annual medians, LED-corrected with literature factors.</p>}
+            ) : <p>Private light and light from outside the eight counties are placed by NASA VIIRS VNP46A2 2024 annual median radiance (minus each year's
+                airglow background) instead of Census housing; public streetlights stay on the OpenStreetMap road network, and fixture counts still come from the
+                inventories and Census. One global brightness scale is fitted to the corpus site values (RMSE {e.anchor.rmse_mag.toFixed(2)} mag over {e.anchor.n_sites} sites);
+                that is a sanity fit, not a calibration.</p>}
             <table className="mt-2 w-full text-xs">
               <thead className="text-left text-star-500"><tr><th className="font-normal">County</th><th className="font-normal">Group</th><th className="text-right font-normal">Fixtures</th><th className="text-right font-normal">Confidence</th></tr></thead>
               <tbody>{inv.map((r) => (

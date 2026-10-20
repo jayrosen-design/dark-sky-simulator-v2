@@ -4,7 +4,7 @@ import { useStore } from "../state/store";
 import { useMcda, type RefRow } from "../state/mcda";
 import { CRITERIA, defaultWeights, landEstimate, type Candidate, type LandEstimate, type ScoreLine } from "../engine/mcda";
 import type { EngineData } from "../engine/types";
-import { Card, fmtInt, fmtUsd, Seg, Slider } from "./ui";
+import { Card, fmtInt, fmtPct, fmtUsd, Seg, Slider } from "./ui";
 
 const UNIT: Record<string, (v: number) => string> = {
   sky: (v) => `${v.toFixed(2)} mag`, sprawl: (v) => `+${v.toFixed(0)}% / 10 yr`, clarity: (v) => `${(v * 100).toFixed(0)}% nights`,
@@ -144,7 +144,7 @@ export default function ObservatoryPanel() {
         <p className="mt-2 text-[11px] text-star-500">
           Sites are ≥ {e.seed.mcda.site_min_cells.value} contiguous ~1 km cells among the best-scoring cells. 2034 values extrapolate
           {e.growth_model.method === "lightgbm"
-            ? ` the LightGBM growth forecast (back-test 2012–2018 → 2024: median error ${e.growth_model.median_ape_pct?.toFixed(1)}% vs ${e.growth_model.naive_median_ape_pct?.toFixed(1)}% for trend persistence, ${e.growth_model.n_cells?.toLocaleString("en-US")} lit cells)`
+            ? ` the LightGBM growth forecast, which assumes the 2018–2024 pace continues (back-test trained on 2012–2018, scored on 2024 over ${e.growth_model.n_cells?.toLocaleString("en-US")} lit cells: median error ${e.growth_model.median_ape_pct?.toFixed(1)}% vs ${e.growth_model.nochange_median_ape_pct?.toFixed(1)}% for no change and ${e.growth_model.naive_median_ape_pct?.toFixed(1)}% for each cell's own trend; lit radiance went from ${fmtPct(e.growth_model.lit_change_pct!["2012-2018"])} in 2012–2018 to ${fmtPct(e.growth_model.lit_change_pct!["2018-2024"])} in 2018–2024, a reversal no model trained on the earlier years could foresee)`
             : e.data_status.viirs.loaded ? " the per-cell VIIRS trend" : " the 2010→2020 housing-growth proxy (VIIRS not loaded; back-test unavailable)"}.
           Clarity uses the PRD seed climatology (0.50 coastal → 0.55 inland), not MODIS.
           {e.land ? " Land class uses Florida DOR parcel land-use codes (parcels ≥ 5 acres) plus FNAI conservation lands." : " Land class is a proxy (FNAI conservation lands, else housing density) until parcels load."}

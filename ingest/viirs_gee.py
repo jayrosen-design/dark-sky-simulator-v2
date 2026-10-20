@@ -8,7 +8,7 @@ Recipe (2.2): daily DNB_BRDF_Corrected_NTL, keep Mandatory_Quality_Flag == 0 (hi
 no lunar/stray-light issues flagged), annual per-pixel median, nW cm^-2 sr^-1. VNP46A2 in Earth Engine
 starts 2012-01-19, so no EOG fill is needed for 2012-2013.
 
-Status: written against the Earth Engine Python API; not yet run (no credentials on the build machine).
+Status: first run 2026-10-19 (project dark-sky-simulator, noncommercial Community tier); ~25 s per year and grid.
 """
 from __future__ import annotations
 
@@ -18,7 +18,8 @@ from .common import cache_path
 
 COLLECTION = "NASA/VIIRS/002/VNP46A2"
 BAND = "DNB_BRDF_Corrected_NTL"
-SCALE = 0.1  # catalog scale factor for DNB_BRDF_Corrected_NTL
+# The catalog lists a 0.1 scale, but Earth Engine serves this band already scaled (double, nW cm^-2 sr^-1):
+# 2024 median at downtown Gainesville = 73, Paynes Prairie = 0.57. Multiplying again made everything 10x too dark.
 
 
 def _init(project: str | None):
@@ -39,8 +40,7 @@ def annual_medians(grid, years=range(2012, 2025), project: str | None = None, re
             continue
         ee = ee or _init(project)
         col = (ee.ImageCollection(COLLECTION).filterDate(f"{year}-01-01", f"{year + 1}-01-01")
-               .map(lambda img: img.select(BAND).multiply(SCALE)
-                    .updateMask(img.select("Mandatory_Quality_Flag").eq(0))))
+               .map(lambda img: img.select(BAND).updateMask(img.select("Mandatory_Quality_Flag").eq(0))))
         img = col.median().rename("radiance").addBands(col.count().rename("n_clear")).unmask(0)
         arr = ee.data.computePixels({
             "expression": img,

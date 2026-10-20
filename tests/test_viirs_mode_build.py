@@ -1,8 +1,8 @@
 """End-to-end build in VIIRS mode with a synthetic radiance cache, written to a temp directory.
 
 Exercises the code path that runs after `earthengine authenticate`: radiance-based placement, trend and
-step-change export, and the LightGBM growth model with back-test metrics. Real VNP46A2 data has not been
-run through it yet.
+step-change export, and the LightGBM growth model with back-test metrics. The first run on real VNP46A2 data
+is described in docs/adr/0011-viirs-first-run.md.
 """
 import json
 

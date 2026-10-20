@@ -18,7 +18,7 @@ python -m uv venv --python 3.12 .venv
 python -m uv pip install --python .venv -e ".[dev,ml,viirs]"
 .venv/Scripts/python -m pipeline.ingest_all      # pull public sources into data_raw/ (cached)
 .venv/Scripts/python -m pipeline.build           # precompute web/public/dark-sky/data/ and docs/sanity_check.md
-.venv/Scripts/python -m pytest                   # 75 tests (49 Dark Sky, 5 WildSight, 21 Public Art; 1 skips until florida_budgets.yaml exists)
+.venv/Scripts/python -m pytest                   # 76 tests (50 Dark Sky, 5 WildSight, 21 Public Art; 1 skips until florida_budgets.yaml exists)
 
 # Web client
 cd web
@@ -28,22 +28,23 @@ npm test           # Vitest: requirement-ID acceptance tests
 npm run build      # static site in web/dist (relative paths; host under any sub-path)
 ```
 
-### Turning on VIIRS (needs you, once)
+### VIIRS (Earth Engine)
 
-The PRD's satellite baseline (NASA Black Marble VNP46A2, 2012–2024) comes from Google Earth Engine, which needs
-your Google account and a Cloud project registered for Earth Engine (free research tier). No credentials exist on
-this machine, so the current package runs in **seed mode** (below).
+The PRD's satellite baseline (NASA Black Marble VNP46A2, 2012–2024) comes from Google Earth Engine through Jay's
+personal Cloud project `dark-sky-simulator` (noncommercial Community tier). It was first pulled on 2026-10-19, and
+the current package runs in **VIIRS mode** (below). To refresh, or on a new machine:
 
 ```bash
 .venv/Scripts/earthengine authenticate
-.venv/Scripts/python -m pipeline.ingest_all --viirs --ee-project <your-gcp-project>
+.venv/Scripts/python -m pipeline.ingest_all --viirs --ee-project dark-sky-simulator
 .venv/Scripts/python -m pipeline.build
 ```
 
-The build then switches to VIIRS mode automatically: light placement follows 2024 radiance, per-pixel trend and
-retrofit step-change maps and a 2012–2024 year slider appear, and 10-year growth comes from the LightGBM forecast
-with its 2012–2018 → 2024 back-test error shown in the Observatory tab. That path is covered by a test with a
-synthetic radiance cache (`tests/test_viirs_mode_build.py`); it has not yet run on real VNP46A2 data.
+The build switches to VIIRS mode whenever every year is cached: each year's airglow background is removed,
+private light is placed by 2024 radiance, the VIIRS year slider and 2012–2024 trend map appear, and 10-year growth
+comes from the LightGBM forecast, whose back-test against "no change" is shown in the Observatory tab. The first
+real run found a double scaling bug, the solar-cycle airglow and a back-test that flattered the model; see
+[ADR 0011](docs/adr/0011-viirs-first-run.md).
 
 ## What is in the demo (PRD 0A.2 v2.0 column)
 
@@ -93,19 +94,19 @@ toggle, shareable scenario URLs, PNG map export, and a Three.js all-sky view dri
 twilight and moonlight added (Krisciunas & Schaefer 1991); compass, altitude-ring, light-dome and star-name overlays;
 autoplay in full screen).
 
-Headline projections (seed mode, uncalibrated; zenith mag/arcsec², higher is darker):
+Headline projections (VIIRS mode, build of 2026-10-19, uncalibrated; zenith mag/arcsec², higher is darker):
 
 | Scenario (Alachua + Levy unless noted) | Paynes Prairie | RHO | CAV | Public CAPEX | Payback |
 | --- | --- | --- | --- | --- | --- |
-| Today (model, late night) | 20.98 | 21.66 | 21.85 | – | – |
-| All public fixtures U0 + 3000K | 21.20 | 21.74 | 21.87 | $17.2M | 7.4 yr |
-| Groveland-style, public only | 21.31 | 21.77 | 21.88 | $26.6M | 18.6 yr |
-| Groveland-style, public + private | 21.62 | 21.86 | 21.93 | $26.6M (public) | 18.6 yr |
-| Groveland-style, public + private, all 8 counties | 21.65 | 21.89 | 21.94 | $98.9M (public) | 17.0 yr |
-| Levy overlays (LZ0 2 mi, LZ1 5 mi) around RHO and CAV | 20.98 | 21.76 | 21.87 | $0.75M | 13.6 yr |
-| Marion public fixtures U0 + 3000K (alone) | 20.99 | 21.67 | 21.85 | $30.8M | 9.2 yr |
-| Today, evening (20:30–22:30) | 20.56 | 21.55 | 21.78 | – | – |
-| Evening, all sports fixtures → LED 3000K with visors, 8 counties | 20.76 | 21.62 | 21.82 | $75.8M | – |
+| Today (model, late night) | 20.98 | 21.69 | 21.86 | – | – |
+| All public fixtures U0 + 3000K | 21.20 | 21.77 | 21.89 | $17.2M | 7.4 yr |
+| Groveland-style, public only | 21.30 | 21.80 | 21.89 | $26.6M | 18.6 yr |
+| Groveland-style, public + private | 21.62 | 21.88 | 21.94 | $26.6M (public) | 18.6 yr |
+| Groveland-style, public + private, all 8 counties | 21.65 | 21.91 | 21.96 | $98.9M (public) | 17.0 yr |
+| Levy overlays (LZ0 2 mi, LZ1 5 mi) around RHO and CAV | 20.98 | 21.77 | 21.88 | $0.75M | 13.6 yr |
+| Marion public fixtures U0 + 3000K (alone) | 20.98 | 21.70 | 21.86 | $30.8M | 9.2 yr |
+| Today, evening (20:30–22:30) | 20.56 | 21.58 | 21.79 | – | – |
+| Evening, all sports fixtures → LED 3000K with visors, 8 counties | 20.76 | 21.65 | 21.83 | $75.8M | – |
 
 Cross-checks against the corpus: the public-only retrofit gives Paynes Prairie +0.22 mag (the Gainesville
 assessment [GNV-ASSESS] predicted +0.2 to +0.4), and the Levy public retrofit CAPEX of $1.88M matches
@@ -135,23 +136,24 @@ engine/ (pure physics) ◄──────────────────
 - **web/**: Vite + React 18 + TypeScript + Tailwind, MapLibre GL on OpenFreeMap tiles, Zustand, Recharts, jsPDF,
   Three.js.
 
-### Seed mode (current package)
+### VIIRS mode (current package)
 
-Until VIIRS is loaded, public streetlights are placed on the OpenStreetMap road network (roads tagged `lit=yes`
-count fully; other roads in proportion to Census housing density), using the PRD 6.5 counts by owner for Alachua
-and Levy. The six neighbors have no public inventory anywhere, so their public counts come from rates derived from
-Alachua and Levy (0.464 fixtures per urban home, 0.148 per rural home, confidence 0.2). Private light follows
-Census 2020 housing. One global flux scale is fitted to the ten corpus site magnitudes (RMSE 0.52 mag); that is a
-sanity fit, not calibration. Against 53 public Globe at Night **SQM** readings never used in any fit, the median
-model − observed residual is +0.48 mag (±0.45): the model reads somewhat dark. For the 11 readings taken after
-midnight it is +0.15 mag. See
+Public streetlights are placed on the OpenStreetMap road network (roads tagged `lit=yes` count fully; other roads
+in proportion to Census housing density), using the PRD 6.5 counts by owner for Alachua and Levy. The six neighbors
+have no public inventory anywhere, so their public counts come from rates derived from Alachua and Levy (0.464
+fixtures per urban home, 0.148 per rural home, confidence 0.2). Private light, and light from outside the eight
+counties, follows 2024 VIIRS radiance (Census 2020 housing in seed mode, used when the VIIRS cache is absent). One
+global flux scale is fitted to the ten corpus site magnitudes (RMSE 0.46 mag; 0.52 in seed mode); that is a sanity
+fit, not calibration. Against 53 public Globe at Night **SQM** readings never used in any fit, the median
+model − observed residual is +0.52 mag (±0.45; seed mode +0.48): the model reads somewhat dark. For the 11 readings
+taken after midnight it is +0.21 mag. See
 [docs/sanity_check.md](docs/sanity_check.md).
 
 ## Data reality check (2026-09-26)
 
 | Source (PRD 7) | Status |
 | --- | --- |
-| VIIRS VNP46A2 via Earth Engine | code ready, **not pulled** (needs your credentials) |
+| VIIRS VNP46A2 via Earth Engine | pulled 2026-10-19: 2012–2024 annual medians on both grids, 180+ clear nights per pixel per year; airglow background removed ([ADR 0011](docs/adr/0011-viirs-first-run.md)) |
 | FDOT RCI Feature 341, District 2 | **no longer published** at the PRD endpoint; the statewide lighting points cover District 5 only. The FDOT count is spread along TIGER state roads (confidence 0.3) |
 | Gainesville Socrata `tk33-9jw3` | 267 points |
 | Alachua Cityworks test layer | endpoint timed out on every attempt |
@@ -182,12 +184,14 @@ See [docs/adr/](docs/adr/). In short:
 10. WildSight Planner, a separate app on the same platform (added on request): see [wildsight/README.md](wildsight/README.md).
 11. Public Art Policy Simulator, a third app on the same platform (added on request): see [publicart/README.md](publicart/README.md).
 12. A homepage at the site root for the three apps; the Dark Sky Simulator moved to `/dark-sky/`, and old `/#s=…` links are forwarded. ([ADR 0010](docs/adr/0010-homepage-and-dark-sky-path.md))
+13. VIIRS first run: no double scaling, a per-year airglow background removed, and a growth back-test scored against "no change". ([ADR 0011](docs/adr/0011-viirs-first-run.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
 ## Open items that need Jay (PRD 0B, plus new ones)
 
-- Run `earthengine authenticate` so the VIIRS series, trend maps and growth back-test can be generated.
+- The County's +19% Alachua radiance growth (2012–2024) [AC-EPAC] is not reproduced by VNP46A2 (+3.0%, first vs last three years); find out which product and method the County used before quoting it.
+- The step-change detector reads steady trends as steps (about two thirds of lit pixels flagged); it needs a step-versus-trend test before it is shown as retrofit detection.
 - Confirm RHO's county and verify every approximate coordinate in 6.5 (they drive the sanity fit).
 - Census API key (free) would restore the ACS structure-type split for the private stock.
 - Ask FDOT District 2 where Feature 341 now lives, and Alachua County GIS about the Cityworks endpoint.

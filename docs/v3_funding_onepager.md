@@ -5,12 +5,12 @@ for a county attorney, an ESPC lender, and UF Astronomy.*
 
 ## What v2.0 already shows (uncalibrated)
 - Groveland-style ordinance in Alachua and Levy: Paynes Prairie 20.98 → 21.62 mag/arcsec² (clears the 21.2 DarkSky
-  Park threshold), RHO 21.66 → 21.86, CAV 21.85 → 21.93 (Bortle 3 → 2).
+  Park threshold), RHO 21.69 → 21.88, CAV 21.86 → 21.94 (Bortle 3 → 2).
 - Public-only retrofit gives Paynes Prairie +0.22 mag, inside the +0.2 to +0.4 the Gainesville assessment predicted.
 - Six neighboring counties are modeled too, but with no public inventory at all (confidence 0.2): utility data
   agreements matter beyond Alachua and Levy.
 - A first ranked list of 20 candidate observatory sites across the 11-county region, each with a land-cost
-  estimate from the 2025 tax roll and recorded sales (e.g. the top site is 93% water-management-district land).
+  estimate from the 2025 tax roll and recorded sales (e.g. the top site, in Lafayette County, is 92% state land).
 - Alachua's measured +19% VIIRS radiance growth, 2012–2024 [AC-EPAC].
 
 ## What is missing, and what it costs (Phase 1, through 2027-03-31)

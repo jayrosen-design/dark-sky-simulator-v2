@@ -1,19 +1,19 @@
 # Two-minute AI Days demo path (2026-10-21)
 
-Open the site on a phone. Numbers below are from the current seed-mode package; re-read them after any rebuild.
+Open the site on a phone. Numbers below are from the VIIRS-mode package built 2026-10-19; re-read them after any rebuild.
 
 1. **0:00 – The badge.** Point at "Uncalibrated planning projection". "Everything here is modeled from public data
    and literature physics. The point of the next phase is to turn it into measurement."
 2. **0:15 – Today's sky.** Map on *Sky (today)*. Gainesville's dome, Ocala to the southeast, dark western Levy.
-   Tap Rosemary Hill: 21.66 mag/arcsec², Bortle 4. Tap Chiefland Astronomy Village: 21.85, Bortle 3.
+   Tap Rosemary Hill: 21.69 mag/arcsec², Bortle 3 (on the 3/4 line; the PRD rates it Bortle 4). Tap Chiefland Astronomy Village: 21.86, Bortle 3.
 3. **0:35 – One tap, a Groveland-style ordinance.** Scenario → *Groveland-style ordinance*. Switch the map to
    *Change*: blue over both counties, reaching beyond the county lines. Sites tab: Paynes Prairie 20.98 → 21.62,
-   RHO 21.66 → 21.86, CAV 21.85 → 21.93 (Bortle 3 → 2).
-4. **0:55 – Only the streetlights.** Untick *Private*. Paynes Prairie is now 21.31: public lighting alone gets about
+   RHO 21.69 → 21.88, CAV 21.86 → 21.94 (Bortle 3 → 2).
+4. **0:55 – Only the streetlights.** Untick *Private*. Paynes Prairie is now 21.30: public lighting alone gets about
    half way. Costs tab: $26.6M CAPEX, most of it retrofits, with smart nodes for dimming; each tariff line shows its rate basis.
 5. **1:15 – Protect the observatories.** Reset, untick every group, turn on the RHO and CAV overlays (LZ0 2 mi,
-   LZ1 5 mi). RHO 21.66 → 21.76 for about $0.75M in public retrofits (including sports fields inside the zones).
-   (Optional: *All 8* counties with the Groveland preset shows what regional adoption adds: RHO 21.89.)
+   LZ1 5 mi). RHO 21.69 → 21.77 for about $0.75M in public retrofits (including sports fields inside the zones).
+   (Optional: *All 8* counties with the Groveland preset shows what regional adoption adds: RHO 21.91.)
    Optional Build-mode beat: open *Build mode*, equip "Cobra-head LED, full cutoff, 2700K" for street lights and watch
    the install markers and the $28M total appear.
 6. **1:30 – Where UF should build.** Observatory tab: the heatmap and top-20 sites; open #1's scorecard. RHO and
