@@ -62,7 +62,7 @@ OpenStreetMap in blue). Shown zoomed into Gainesville.
 **Build mode.** A catalog of 17 DarkSky-compliant fixture types in six categories, each card with its spectrum,
 uplight rating, lumens, watts, installed unit cost (with source) and how many existing fixtures it replaces.
 Equipping a card updates the sky, the costs, the brief and the clustered install markers on the map. Shown: a
-full-cutoff 3000 K cobra-head for street lights and a shoebox area light for commercial lighting ($28.0M public,
+full-cutoff 2700 K cobra-head for street lights and a shoebox area light for commercial lighting ($28.0M public,
 11.7-year payback; the owners' $3.1M for private fixtures is listed separately).
 
 ![3D view of downtown Gainesville](docs/screenshots/07-3d-view.jpg)
