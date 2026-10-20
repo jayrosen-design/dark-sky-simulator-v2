@@ -11,7 +11,8 @@ for a county attorney, an ESPC lender, and UF Astronomy.*
   agreements matter beyond Alachua and Levy.
 - A first ranked list of 20 candidate observatory sites across the 11-county region, each with a land-cost
   estimate from the 2025 tax roll and recorded sales (e.g. the top site, in Lafayette County, is 92% state land).
-- Alachua's measured +19% VIIRS radiance growth, 2012–2024 [AC-EPAC].
+- Measured radiance growth, 2013–2024: about +20% across the 212 × 131 km region around Alachua County (the area
+  behind the +19% in [AC-EPAC]) and +3% to +6% in the county itself (ADR 0013).
 
 ## What is missing, and what it costs (Phase 1, through 2027-03-31)
 | Gap | v3.0 fix | Cost or dependency (PRD) |

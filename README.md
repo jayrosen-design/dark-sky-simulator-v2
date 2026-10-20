@@ -917,12 +917,12 @@ See [docs/adr/](docs/adr/). In short:
 12. A homepage at the site root for the three apps; the Dark Sky Simulator moved to `/dark-sky/`, and old `/#s=…` links are forwarded. ([ADR 0010](docs/adr/0010-homepage-and-dark-sky-path.md))
 13. VIIRS first run: no double scaling, a per-year airglow background removed, and a growth back-test scored against "no change". ([ADR 0011](docs/adr/0011-viirs-first-run.md))
 14. Change events from a step-versus-trend test calibrated by simulation, and an AI tab that explains both models (added on request). ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md))
+15. The County's +19% [AC-EPAC] measured a 212 × 131 km map view, not the county; the app quotes calibrated county radiance (+2.9% to +6.1%, 2013–2024). ([ADR 0013](docs/adr/0013-alachua-trend-figure.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 
 ## Open items that need Jay (PRD 0B, plus new ones)
 
-- The County's +19% Alachua radiance growth (2012–2024) [AC-EPAC] is not reproduced by VNP46A2 (+3.0%, first vs last three years); find out which product and method the County used before quoting it.
 - The step test finds large new lighting but, at about 10% year-to-year noise, misses most retrofits; detecting those needs monthly data or utility work-order records ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md)).
 - Confirm RHO's county and verify every approximate coordinate in 6.5 (they drive the sanity fit).
 - Census API key (free) would restore the ACS structure-type split for the private stock.

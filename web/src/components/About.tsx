@@ -46,7 +46,8 @@ export default function About({ onClose }: { onClose: () => void }) {
           </section>
           <section>
             <h3 className="font-semibold text-star-100">Measured trend</h3>
-            <p>{t ? `Alachua County VIIRS radiance +${t.county_pct}% (2012–2024), lit area ${t.lit_area_pct[0]}% → ${t.lit_area_pct[1]}%, Gainesville +${t.gainesville_pct}%, Paynes Prairie vicinity +${t.paynes_prairie_vicinity_pct}% [AC-EPAC]. ` : ""}
+            <p>{t ? `Calibrated radiance in Alachua County rose +${t.measured.county_black_marble_pct}% (NASA Black Marble) to +${t.measured.county_eog_pct}% (NOAA EOG) from 2013 to 2024, and about +${t.measured.gainesville_pct}% around Gainesville. `
+              + `The +${t.epac.region_pct}% (lit area ${t.epac.region_lit_area_pct[0]}% → ${t.epac.region_lit_area_pct[1]}%) in the County's January 2026 EPAC presentation [AC-EPAC] comes from night-lights map screenshots covering a 212 × 131 km region around the county, where NOAA's radiance rose +${t.measured.region_eog_pct}% (docs/adr/0013). ` : ""}
               {e.viirs
                 ? `This package's VNP46A2 series (first vs last three years): ${Object.entries(e.viirs.county_pct_change).map(([f, v]) => `${e.county_names[f]} ${v >= 0 ? "+" : ""}${v.toFixed(1)}%`).join(", ")}.`
                 : "Levy County has no published trend; per-pixel trends for both counties appear here once the VIIRS series is loaded."}</p>

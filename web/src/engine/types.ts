@@ -164,8 +164,10 @@ export interface EngineData {
     surveyed_points: number;
   };
   trend_seed: Record<string, null | {
-    county_pct: number; lit_area_pct: [number, number]; gainesville_pct: number;
-    city_of_alachua_pct: number; paynes_prairie_vicinity_pct: number;
+    // ADR 0013: the EPAC figures are screenshot grayscale over a 212 x 131 km view; `measured` is calibrated radiance.
+    epac: { region_pct: number; region_lit_area_pct: [number, number]; gainesville_pct: number;
+      city_of_alachua_pct: number; paynes_prairie_vicinity_pct: number };
+    measured: { county_eog_pct: number; county_black_marble_pct: number; region_eog_pct: number; gainesville_pct: number };
   }>;
   ordinance_seed: Record<string, string>;
   county_names: Record<string, string>;

@@ -70,7 +70,7 @@ export async function buildBrief(m: Model, link: (field: string) => string) {
 
   line("Problem", 12, "bold");
   const t = m.e.trend_seed["12001"];
-  line(t ? `Alachua County's measured VIIRS radiance rose ${t.county_pct}% from 2012 to 2024 (lit area ${t.lit_area_pct[0]}% to ${t.lit_area_pct[1]}%; Paynes Prairie vicinity +${t.paynes_prairie_vicinity_pct}%) [AC-EPAC]. ` : "");
+  line(t ? `Calibrated satellite radiance in Alachua County rose ${t.measured.county_black_marble_pct}% (NASA Black Marble) to ${t.measured.county_eog_pct}% (NOAA EOG) from 2013 to 2024, and ${t.measured.region_eog_pct}% across the surrounding 212 x 131 km region, the area behind the ${t.epac.region_pct}% cited in January 2026 [AC-EPAC]. ` : "");
   line(m.e.data_status.viirs.loaded ? "Per-pixel trends for both counties are in the data package." :
     "Levy County has no published radiance trend yet; the VIIRS 2012-2024 series for both counties is pending Earth Engine access.", 10);
   gap(4);

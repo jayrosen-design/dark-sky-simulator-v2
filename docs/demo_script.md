@@ -86,8 +86,9 @@ switches to *Change events* on its own.
 ### Do not claim
 
 - **The January 2026 EPAC vote.** It is cited in the PRD [AC-EPAC]; confirm the wording before it goes on a slide.
-- **Alachua +19% radiance growth.** That is the County's figure [AC-EPAC]; this data measures +3.0% (2012–14 vs
-  2022–24). Quote it as the County's, or not at all, until its method is known.
+- **Alachua +19% radiance growth.** The County's +19% and 16% → 21% [AC-EPAC] came from map screenshots covering a
+  212 × 131 km region, not the county (ADR 0013). Say "about 20% across the region around Alachua County, 3 to 6% in
+  the county itself" (NOAA +6.1%, NASA +2.9%, 2013–2024).
 - **That the detector finds retrofits.** It finds large new lighting; most retrofit-sized drops are below its noise.
 - **The World Equestrian Center.** The 2021 event west of Ocala lies on its street, but its opening date is not confirmed
   in any source found (a "2021 Ocala International Horse Show debuts new World Equestrian Center" article exists but
@@ -111,6 +112,9 @@ switches to *Change events* on its own.
   feeds it a 2018–2024 jump and fails if the model could see it.
 - **Cost?** The satellite pull runs on Earth Engine's free noncommercial tier, a small share of its 150 EECU-hours a
   month; the app is static files on free hosting.
+- **Didn't the County find +19%?** That figure came from two map screenshots and covers the whole map view, from
+  Perry to the St. Johns River; NOAA's radiance for that region rose about 20%. Measured on the county boundary,
+  radiance rose 3 to 6%, and about 5% around Gainesville.
 - **How good is the sky model?** One brightness scale is fitted to 10 reference site values from Clear Dark Sky and IDA
   (RMSE 0.46 mag). Against 53
   Globe at Night meter readings never used in any fit, readings are a median 0.52 mag brighter than the model (0.21

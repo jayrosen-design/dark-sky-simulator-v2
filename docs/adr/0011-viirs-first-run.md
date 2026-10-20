@@ -43,7 +43,7 @@ showed up that the synthetic test data could not reveal.
   SQM residual did not (+0.48 -> +0.52 mag median, spread 0.45 both times).
 - Measured change, first vs last three years: Alachua +3.0%, Levy +17.4% (+11.4% counting only cells lit
   throughout). The corpus figure for Alachua, +19% for 2012-2024 [AC-EPAC], is not reproduced by this product;
-  the About panel shows both.
+  ADR 0013 traces it to the whole screenshot map view around the county.
 - Headline sites move by at most 0.03 mag and costs are unchanged; Rosemary Hill reads 21.69 (21.66 before), which
   is Bortle 3 by 0.002 mag (the PRD rates it Bortle 4). The Observatory ranking moves west: the old top two were in
   Levy near Chiefland (score 0.850); the top three are now in Lafayette (0.879, 92% state land), Dixie (0.877, 93%

@@ -61,7 +61,7 @@ params:
   ulor_u3: {value: 0.060, provenance: corpus, ref: "6.2"}
   ulor_u4: {value: 0.180, provenance: corpus, ref: "6.2"}
   ulor_u5: {value: 0.300, provenance: corpus, ref: "6.2"}
-  seed_growth_rate_per_yr:   {value: 0.015, provenance: corpus, ref: "6.6 (Alachua mean ~1.46%/yr from +19% over 12 yr)"}
+  seed_growth_rate_per_yr:   {value: 0.015, provenance: corpus, ref: "6.6 (~1.46%/yr from the +19% in [AC-EPAC], which covers the 212 x 131 km region around Alachua, ADR 0013; seed-mode fallback only)"}
   # Viewing time. Magnitudes default to the SQM window (01:00-04:00, row above); the evening window covers public
   # star parties, when sports and evening-only lighting are still on.
   evening_window_start:      {value: "20:30", provenance: design, ref: "v2.0 viewing-time switch"}
