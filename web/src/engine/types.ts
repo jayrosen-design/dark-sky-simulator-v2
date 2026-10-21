@@ -119,7 +119,7 @@ export interface EngineData {
     growth_a30: Lin16Meta;
     fixtures_cat_a15: Lin16Meta;
     county_a15: { file: string; values: string[]; shape: [number, number] };
-    mcda_b: Lin16Meta;
+    mcda_b: Lin16Meta & { excluded?: { applied: boolean; flood?: boolean; fema_coverage?: number | null; cells: number; of: number; by_rule?: Record<string, number> } };
     mcda_b_county: { file: string; values: string[]; shape: [number, number] };
     viirs_a15?: Log16Meta;
     viirs_trend_a15?: Lin16Meta;
@@ -185,6 +185,10 @@ export interface EngineData {
       urban_core_min_population: { value: number };
       site_min_cells: { value: number };
       top_sites: { value: number };
+      exclusions?: { wet_max_frac: { value: number }; coast_buffer_km: { value: number }; min_elev_m?: { value: number };
+        coastal_flood_max_m?: { value: number }; river_flood_max_m?: { value: number };
+        floodplain_max_frac?: { value: number }; max_drive_min?: { value: number } };
+      travel?: { origin: { lon: number; lat: number; label: string } };
       land_pricing?: { target_site_acres: { value: number; options: number[] } };
     };
     overlay: {

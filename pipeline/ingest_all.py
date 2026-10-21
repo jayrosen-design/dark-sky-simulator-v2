@@ -8,7 +8,7 @@ import argparse
 import json
 
 from engine.grid import Grid
-from ingest import census, globe_at_night, inventory, landscape, viirs_gee
+from ingest import census, flood_gee, globe_at_night, inventory, landcover_gee, landscape, viirs_gee
 from ingest.common import cache_path
 
 from .config import load_region
@@ -46,7 +46,11 @@ def main(argv=None):
     if a.viirs:
         for g in (ag, rg):
             viirs_gee.annual_medians(g, project=a.ee_project, refresh=a.refresh)
+        landcover_gee.fractions(rg, project=a.ee_project, refresh=a.refresh)
+        flood_gee.depths(rg, project=a.ee_project, refresh=a.refresh)
     report["viirs_cached"] = {"module_a": viirs_gee.available(ag), "region": viirs_gee.available(rg)}
+    report["nlcd_cached"] = landcover_gee.available(rg)
+    report["aqueduct_cached"] = flood_gee.available(rg)
     cache_path("ingest_report.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
 

@@ -10,6 +10,8 @@ weights:
   access:    {value: 0.05, label: "Proximity to paved road"}
   # Not a PRD 6.6 criterion: weight 0 keeps the Research optical defaults unchanged; raise it to let cost steer the ranking.
   land_cost: {value: 0.00, label: "Land acquisition cost"}
+  # Not a PRD 6.6 criterion (docs/adr/0014): added so the ranking favors sites UF astronomers can reach for a night's work.
+  travel:    {value: 0.15, label: "Drive time from UF"}
 anchors:
   sky_mag:            {worst: 20.5, best: 22.0, form: linear, provenance: "6.6"}
   sprawl_growth_pct:  {best: 0, worst: 50, form: inverse_linear, provenance: "6.6 (capped at +50%)"}
@@ -24,6 +26,26 @@ anchors:
   # Land acquisition cost score: public land scores 1 (transfer/lease, no market purchase); private land is scored on the
   # nearby market price, log-linear from best to worst $/acre (design anchors).
   land_cost_usd_acre: {best: 2000, worst: 40000, form: log_inverse, provenance: "design"}
+  # Approximate drive from campus: 1 within 45 min (Rosemary Hill is about 40), falling to 0 at the 90-minute cutoff.
+  drive_min:          {best: 45, worst: 90, form: inverse_linear, provenance: "design"}
+# Cells no observatory can use (docs/adr/0014): mostly open water or wetland (NLCD 2021), within the coastal strip
+# (distance to open Gulf water), low enough for storm surge, in a projected 100-year flood (WRI Aqueduct), mostly inside
+# FEMA's mapped 100-year floodplain (where swamps and low flatwoods flood from rain, not just rivers), or too far to
+# drive from campus. The NLCD, Aqueduct and FEMA rules apply only when their caches exist.
+exclusions:
+  wet_max_frac:    {value: 0.5, provenance: "design (more than half the cell open water or wetland)"}
+  coast_buffer_km: {value: 5, provenance: "design (marsh, storm surge and sea haze along the Big Bend coast)"}
+  min_elev_m:      {value: 5, provenance: "design: Hurricane Idalia (2023) surge reached 8-12 ft above ground on the Big Bend coast (NHC Tropical Cyclone Report AL102023); NOAA (2022) projects 14-18 in of Gulf sea-level rise by 2050; 5 m (16 ft) keeps about a meter of margin"}
+  coastal_flood_max_m: {value: 0, provenance: "WRI Aqueduct Floods V2: 100-year coastal flood in 2080 under RCP8.5 with subsidence; any depth excludes"}
+  river_flood_max_m:   {value: 0.3, provenance: "WRI Aqueduct Floods V2: 100-year riverine flood in 2080 under RCP8.5, mean of 5 GCMs; depth is design (about a foot)"}
+  floodplain_max_frac: {value: 0.25, provenance: "design: more than a quarter of the cell in FEMA's 1%-annual-chance floodplain (NFHL Special Flood Hazard Area: zones A, AE, AH, AO, VE); stricter than the wetland rule because the site must stay dry for decades"}
+  max_drive_min:   {value: 90, provenance: "design (about an hour and a half from campus; Rosemary Hill is about 40 minutes)"}
+# Drive-time model (pipeline/travel.py): cost-distance over the region grid from campus. Cells crossed by a TIGER primary
+# road are driven at the primary speed, by a secondary road at the secondary speed, other land at the local speed.
+travel:
+  origin: {lon: -82.3549, lat: 29.6436, label: "UF's Gainesville campus"}
+  speeds_kmh: {primary: 90, secondary: 70, local: 40}
+  provenance: "design speeds; gives about 40 min to Rosemary Hill, 52 to Chiefland, 43 to Ocala and 53 to Lake City"
 urban_core_min_population: {value: 10000, provenance: "3 Module B (IDA UNSP threshold)"}
 site_min_cells: {value: 4, provenance: "3 Module B B-01 (>= 4 contiguous cells)"}
 top_sites: {value: 20, provenance: "3 Module B B-01"}

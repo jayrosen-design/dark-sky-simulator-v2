@@ -10,7 +10,9 @@ for a county attorney, an ESPC lender, and UF Astronomy.*
 - Six neighboring counties are modeled too, but with no public inventory at all (confidence 0.2): utility data
   agreements matter beyond Alachua and Levy.
 - A first ranked list of 20 candidate observatory sites across the 11-county region, each with a land-cost
-  estimate from the 2025 tax roll and recorded sales (e.g. the top site, in Lafayette County, is 92% state land).
+  estimate from the 2025 tax roll and recorded sales (e.g. the top site, in Levy County beside the Chiefland Astronomy
+  Village, about $605K for 80 acres and 58 minutes from campus; water, wetland, the coast, storm-surge ground, projected
+  2080 floods, FEMA's 100-year floodplain and sites over ~90 minutes away are excluded).
 - Measured radiance growth, 2013–2024: about +20% across the 212 × 131 km region around Alachua County (the area
   behind the +19% in [AC-EPAC]) and +3% to +6% in the county itself (ADR 0013).
 

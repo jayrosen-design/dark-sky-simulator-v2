@@ -3,13 +3,14 @@
 // always score RHO and CAV as reference rows (B-06).
 import type { EngineData, GridMeta } from "./types";
 
-export const CRITERIA = ["sky", "sprawl", "clarity", "urban", "land", "elevation", "access", "land_cost"] as const;
+export const CRITERIA = ["sky", "sprawl", "clarity", "urban", "land", "elevation", "access", "travel", "land_cost"] as const;
 export type Criterion = (typeof CRITERIA)[number];
 export type Weights = Record<Criterion, number>;
 
 export interface McdaData {
   grid: GridMeta;
-  // sky, sprawl, clarity, urban, land, elevation, horizon, access, mag_2034, plus parcel layers from pipeline/land.py
+  // sky, sprawl, clarity, urban, land, elevation, horizon, access, travel (drive minutes from UF), mag_2034,
+  // plus parcel layers from pipeline/land.py
   raw: Record<string, Float32Array>;
   county: Int8Array;
   countyFips: string[];
@@ -49,6 +50,10 @@ export function normalizeAll(e: EngineData, d: McdaData): Record<Criterion, Floa
     const hor = 1 - clip01((d.raw.horizon[i] - A.horizon_deg.best) / (A.horizon_deg.worst - A.horizon_deg.best));
     out.elevation[i] = 0.5 * clip01(elev) + 0.5 * hor;
     out.access[i] = clip01((A.access_km.zero - d.raw.access[i]) / (A.access_km.zero - A.access_km.full));
+    // Drive time from campus (docs/adr/0014); a data package without the layer scores 0 here (its seed weight is 0 too).
+    const t = d.raw.travel?.[i];
+    out.travel[i] = A.drive_min && t !== undefined && Number.isFinite(t)
+      ? clip01((A.drive_min.worst - t) / (A.drive_min.worst - A.drive_min.best)) : 0;
   }
   return out;
 }
@@ -66,7 +71,7 @@ export function wlc(norm: Record<Criterion, Float32Array>, w: Weights) {
 }
 
 export interface ScoreLine { criterion: Criterion | "horizon"; raw: number; norm: number; weight: number; contrib: number }
-const rawOf = (d: McdaData, k: Criterion, i: number) => (k === "land_cost" ? d.raw.sale_usd_acre?.[i] ?? NaN : d.raw[k][i]);
+const rawOf = (d: McdaData, k: Criterion, i: number) => (k === "land_cost" ? d.raw.sale_usd_acre?.[i] ?? NaN : d.raw[k]?.[i] ?? NaN);
 
 /** Public land scores 1 (transfer or lease); private land scores log-linearly on the nearby market $/acre. */
 function landCostScore(a: Record<string, number>, d: McdaData, i: number) {

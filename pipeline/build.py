@@ -21,11 +21,11 @@ from scipy import ndimage
 from engine import bortle, garstang, spectral
 from engine.flux import TERMS, effective_flux
 from engine.grid import Grid, convolve, distance_km_to, distance_transform_km, resample_block_mean, sample_bilinear
-from ingest import census, globe_at_night, inventory, landscape
+from ingest import census, fema_nfhl, flood_gee, globe_at_night, inventory, landcover_gee, landscape
 from ingest.common import RAW
 
 from . import rasterize as R
-from . import land, sanity, viirs_mode
+from . import land, sanity, travel, viirs_mode
 from .config import ROOT, load_county, load_region, load_seed, p
 from .encode import write_lin16, write_log16
 
@@ -580,6 +580,9 @@ def region_covariates(rg, ctx):
     cores = [f for f in ctx["places"] if (f["properties"]["POP100"] or 0) >= load_seed()["mcda"]["urban_core_min_population"]["value"]]
     cons = landscape.conservation_lands(rg.bounds())["features"]
     cons_mask = R.polygon_mask(rg, [f["geometry"] for f in cons if f.get("geometry")])
+    nlcd = landcover_gee.fractions(rg) if landcover_gee.available(rg) else None
+    flood = flood_gee.depths(rg) if flood_gee.available(rg) else None
+    fema = fema_nfhl.sfha_fraction(rg) if fema_nfhl.available(rg) else None
     return {
         "d_road_km": distance_transform_km(rg, R.line_length_km(rg, ctx["roads"]) > 0),
         "d_urban_km": distance_transform_km(rg, R.polygon_mask(rg, [f["geometry"] for f in cores])),
@@ -587,7 +590,15 @@ def region_covariates(rg, ctx):
         "elevation": np.where(water, 0.0, dem),
         "conservation": cons_mask.astype(float),
         "water": water, "dem": dem, "valid": ~water,
+        "nlcd": nlcd, "flood": flood, "fema": fema,
     }
+
+
+def module_b_land_mask(rg):
+    """Land cells (3DEP data) inside the Module B counties: the cells the FEMA floodplain fetch covers."""
+    fips = set(load_region()["region_fips"])
+    feats = [f for f in census.counties(rg.bounds())["features"] if f["properties"]["GEOID"] in fips]
+    return R.polygon_mask(rg, [f["geometry"] for f in feats]) & np.isfinite(landscape.dem_3dep(rg.bounds(), rg.nx, rg.ny))
 
 
 def build_module_b(rg, ctx, seed, L_region, L_region_2034, r_rg, cov):
@@ -635,15 +646,44 @@ def build_module_b(rg, ctx, seed, L_region, L_region_2034, r_rg, cov):
     land_score = np.where(np.isfinite(land_layers["land_score"]), land_layers["land_score"], proxy)
     land_score = np.where(cons_mask, cls["public_conservation"], land_score)
 
+    # Approximate drive time from campus over the major-road network (docs/adr/0014); open water can't be crossed.
+    ex, nlcd, flood, tr = mc["exclusions"], cov["nlcd"], cov["flood"], mc["travel"]
+    blocked = water | (nlcd["water"] > 0.5) if nlcd is not None else water
+    drive = travel.drive_minutes(rg, ctx["roads"], blocked, (tr["origin"]["lon"], tr["origin"]["lat"]), tr["speeds_kmh"])
+
     raw = {"sky": sky_mag, "sprawl": growth_pct, "clarity": clarity, "urban": d_urban,
            "land": land_score, "elevation": np.where(water, np.nan, dem), "horizon": horizon,
-           "access": d_road, "mag_2034": mag_2034,
+           "access": d_road, "travel": drive, "mag_2034": mag_2034,
            **{k: v for k, v in land_layers.items() if k != "land_score"}}
     order = list(raw)
-    valid = w(in_region & ~water)
+    # Unusable cells (docs/adr/0014): mostly open water or wetland, within the coastal strip, low enough for storm surge,
+    # in a projected 100-year flood or mostly in FEMA's mapped floodplain, or too far to drive from campus. The land
+    # cover, flood and floodplain rules apply only with their caches, so a build without them keeps the earlier behavior.
+    land_ok = in_region & ~water
+    rules = {"low": dem < ex["min_elev_m"]["value"], "far": ~(drive <= ex["max_drive_min"]["value"])}
+    if nlcd is not None:
+        # The Gulf: open water (no 3DEP data, or mostly NLCD water) connected to the grid edge, so inland lakes get no buffer.
+        lab, _ = ndimage.label(water | (nlcd["water"] > 0.5))
+        edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
+        d_gulf = distance_transform_km(rg, np.isin(lab, edge[edge > 0]))
+        rules["wet"] = nlcd["water"] + nlcd["wetland"] > ex["wet_max_frac"]["value"]
+        rules["coast"] = d_gulf < ex["coast_buffer_km"]["value"]
+    if flood is not None:
+        rules["flood"] = (flood["coastal"] > ex["coastal_flood_max_m"]["value"]) | (flood["riverine"] > ex["river_flood_max_m"]["value"])
+    fema, fema_cover = cov["fema"], None
+    if fema is not None:
+        # FEMA tiles are fetched only where the other rules leave cells (ingest/fema_nfhl.py), so report that coverage.
+        others = w(land_ok & ~np.logical_or.reduce(list(rules.values())))
+        fema_cover = float(np.isfinite(w(fema)[others]).mean())
+        rules["floodplain"] = fema > ex["floodplain_max_frac"]["value"]
+    excluded = np.logical_or.reduce(list(rules.values()))
+    valid = w(land_ok & ~excluded)
     layers = [np.where(valid, w(raw[k]), np.nan) for k in order]
     meta = {"mcda_b": write_lin16(OUT / "mcda_b.bin", layers)}
     meta["mcda_b"]["names"] = order
+    meta["mcda_b"]["excluded"] = {"applied": nlcd is not None, "flood": flood is not None, "fema_coverage": fema_cover,
+                                  "cells": int(w(land_ok & excluded).sum()), "of": int(w(land_ok).sum()),
+                                  "by_rule": {k: int(w(land_ok & v).sum()) for k, v in rules.items()}}
     lab = np.where(valid, w(county_lab), -1)
     meta["mcda_b_county"] = {"file": "mcda_b_county.bin", "values": county_vals, "shape": list(lab.shape)}
     (OUT / "mcda_b_county.bin").write_bytes(lab.astype(np.int8).tobytes())

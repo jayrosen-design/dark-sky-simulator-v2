@@ -9,7 +9,7 @@ import { Card, fmtInt, fmtPct, fmtUsd, Seg, Slider } from "./ui";
 const UNIT: Record<string, (v: number) => string> = {
   sky: (v) => `${v.toFixed(2)} mag`, sprawl: (v) => `+${v.toFixed(0)}% / 10 yr`, clarity: (v) => `${(v * 100).toFixed(0)}% nights`,
   urban: (v) => `${v.toFixed(0)} km`, land: (v) => `class score ${v.toFixed(2)}`,
-  elevation: (v) => `${v.toFixed(0)} m`, access: (v) => `${v.toFixed(1)} km`,
+  elevation: (v) => `${v.toFixed(0)} m`, access: (v) => `${v.toFixed(1)} km`, travel: (v) => `${v.toFixed(0)} min drive`,
   land_cost: (v) => (Number.isFinite(v) ? `$${fmtInt(v)}/acre nearby sales` : "no sales data"),
 };
 
@@ -28,6 +28,21 @@ function Scorecard({ lines }: { lines: ScoreLine[] }) {
       </tbody>
     </table>
   );
+}
+
+/** The rules that removed cells from siting (docs/adr/0014), as one sentence; empty for older data packages. */
+function exclusionText(e: EngineData) {
+  const x = e.files.mcda_b.excluded, s = e.seed.mcda.exclusions;
+  if (!x || !s) return "";
+  const parts: string[] = [];
+  if (x.applied) parts.push(`more than ${Math.round(s.wet_max_frac.value * 100)}% open water or wetland (NLCD 2021)`, `within ${s.coast_buffer_km.value} km of the Gulf`);
+  if (s.min_elev_m) parts.push(`below ${s.min_elev_m.value} m elevation (storm-surge reach)`);
+  if (x.flood && s.river_flood_max_m) parts.push(`in the 100-year coastal flood or more than ${s.river_flood_max_m.value} m of 100-year river flooding projected for 2080 under high emissions (WRI Aqueduct)`);
+  const fc = x.fema_coverage;
+  if (fc != null && s.floodplain_max_frac) parts.push(`more than ${Math.round(s.floodplain_max_frac.value * 100)}% inside FEMA's mapped 100-year floodplain${fc < 0.995 ? ` (FEMA data for ${Math.round(fc * 100)}% of the remaining cells)` : ""}`);
+  if (s.max_drive_min) parts.push(`more than about ${s.max_drive_min.value} minutes' drive from ${e.seed.mcda.travel?.origin.label ?? "campus"}`);
+  if (!parts.length) return "";
+  return ` Cells ${parts.slice(0, -1).join(", ")}${parts.length > 1 ? " or " : ""}${parts[parts.length - 1]} are excluded (${x.cells.toLocaleString("en-US")} of ${x.of.toLocaleString("en-US")} cells).`;
 }
 
 /** Short cost label for a list row: public land is transferred or leased, private land is priced on nearby sales. */
@@ -118,7 +133,7 @@ export default function ObservatoryPanel() {
           <Slider key={k} label={labels[k]?.label ?? k} value={Math.round(weights[k] * 100)} min={0} max={60} unit="%"
             onChange={(v) => setWeights({ ...weights, [k]: v / 100 })} />
         ))}
-        <p className="text-[11px] text-star-500">Weights are renormalized to sum to 1. Ranking updates live (B-01). Land acquisition cost is not a PRD 6.6 criterion, so it starts at 0%; raise it to let price steer the ranking.</p>
+        <p className="text-[11px] text-star-500">Weights are renormalized to sum to 1. Ranking updates live (B-01). Land acquisition cost is not a PRD 6.6 criterion, so it starts at 0%; raise it to let price steer the ranking. Drive time from UF isn't one either: it starts at 15% so the ranking favors sites within reach of campus (ADR 0014); set it to 0% for the PRD weights.</p>
       </Card>
 
       {e.land && (
@@ -142,7 +157,8 @@ export default function ObservatoryPanel() {
             estimate(c.cellList, c.best), `${e.region_county_names[c.county] ?? c.county} · ${c.cells} cells`))}</ol>
         )}
         <p className="mt-2 text-[11px] text-star-500">
-          Sites are ≥ {e.seed.mcda.site_min_cells.value} contiguous ~1 km cells among the best-scoring cells. 2034 values extrapolate
+          Sites are ≥ {e.seed.mcda.site_min_cells.value} contiguous ~1 km cells among the best-scoring cells.
+          {exclusionText(e)} 2034 values extrapolate
           {e.growth_model.method === "lightgbm"
             ? ` the LightGBM growth forecast, which assumes the 2018–2024 pace continues (back-test trained on 2012–2018, scored on 2024 over ${e.growth_model.n_cells?.toLocaleString("en-US")} lit cells: median error ${e.growth_model.median_ape_pct?.toFixed(1)}% vs ${e.growth_model.nochange_median_ape_pct?.toFixed(1)}% for no change and ${e.growth_model.naive_median_ape_pct?.toFixed(1)}% for each cell's own trend; lit radiance went from ${fmtPct(e.growth_model.lit_change_pct!["2012-2018"])} in 2012–2018 to ${fmtPct(e.growth_model.lit_change_pct!["2018-2024"])} in 2018–2024, a reversal no model trained on the earlier years could foresee)`
             : e.data_status.viirs.loaded ? " the per-cell VIIRS trend" : " the 2010→2020 housing-growth proxy (VIIRS not loaded; back-test unavailable)"}.

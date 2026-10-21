@@ -100,9 +100,11 @@ basis; lines without a loaded tariff are flagged.
 
 **Observatory tab.** Scores every ~1 km cell of an 11-county region for a new research observatory with a weighted sum
 of criteria whose weights you set (current sky, 10-year development, clarity, distance from cities, land availability,
-elevation, road access, land cost). The top 20 sites of at least four contiguous cells are listed and mapped, with
+elevation, road access, drive time from UF, land cost). The top 20 sites of at least four contiguous cells are listed and mapped, with
 Rosemary Hill and Chiefland as reference rows. Hovering a candidate shows its score, 2024 → 2034 sky, land estimate and
-strengths; here #1, in Lafayette County, on 92% state land.
+strengths; here #1, in Levy County beside the Chiefland Astronomy Village (about $605K of land for an 80-acre site,
+58 minutes from campus). Cells that are mostly water or wetland, near the coast, below 5 m, projected to flood by 2080,
+mostly in FEMA's 100-year floodplain or over ~90 minutes from UF are excluded ([ADR 0014](docs/adr/0014-siting-water-wetland-exclusion.md)).
 
 ![Land prices overlay](docs/screenshots/12-land-prices.jpg)
 
@@ -199,8 +201,12 @@ the current package runs in **VIIRS mode** (below). To refresh, or on a new mach
 ```bash
 .venv/Scripts/earthengine authenticate
 .venv/Scripts/python -m pipeline.ingest_all --viirs --ee-project dark-sky-simulator
+.venv/Scripts/python -m ingest.fema_nfhl
 .venv/Scripts/python -m pipeline.build
 ```
+
+`ingest.fema_nfhl` renders FEMA's 100-year floodplain tile by tile from FEMA's map service (minutes per tile, one
+request at a time) for the observatory siting rules ([ADR 0014](docs/adr/0014-siting-water-wetland-exclusion.md)).
 
 The build switches to VIIRS mode whenever every year is cached: each year's airglow background is removed,
 private light is placed by 2024 radiance, the VIIRS year slider, 2012–2024 trend map and change-event map appear,
@@ -899,6 +905,9 @@ For the 53 meter readings, *ẽ* = +0.52 mag and MAD = 0.45 mag (positive: the m
 | Open-Meteo forecast + air quality (Stargaze, live in the browser) | hourly cloud (0.2° grid), humidity, dew point, wind, 250 hPa wind, aerosol optical depth; CC BY 4.0, free for non-commercial use |
 | Census | TIGERweb 2020 counts (the ACS API now needs a key, so the private stock uses the Alachua structure blend, 1.379 fixtures per housing unit) |
 | 3DEP, FNAI, Globe at Night | pulled |
+| NLCD 2021 land cover via Earth Engine | pulled 2026-10-20: open-water and wetland share per region cell, used to exclude unbuildable observatory sites ([ADR 0014](docs/adr/0014-siting-water-wetland-exclusion.md)) |
+| WRI Aqueduct Floods V2 via Earth Engine | pulled 2026-10-20: 100-year coastal and river flood depth in 2080 (RCP8.5) per region cell, used to exclude flood-prone observatory sites (ADR 0014) |
+| FEMA National Flood Hazard Layer (map service) | pulled 2026-10-20: share of each cell in the 100-year floodplain (Special Flood Hazard Areas), rendered tile by tile where siting cells remain (ADR 0014) |
 
 ## Deviations from the PRD (with reasons)
 
@@ -918,6 +927,7 @@ See [docs/adr/](docs/adr/). In short:
 13. VIIRS first run: no double scaling, a per-year airglow background removed, and a growth back-test scored against "no change". ([ADR 0011](docs/adr/0011-viirs-first-run.md))
 14. Change events from a step-versus-trend test calibrated by simulation, and an AI tab that explains both models (added on request). ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md))
 15. The County's +19% [AC-EPAC] measured a 212 × 131 km map view, not the county; the app quotes calibrated county radiance (+2.9% to +6.1%, 2013–2024). ([ADR 0013](docs/adr/0013-alachua-trend-figure.md))
+16. Observatory siting excludes cells more than half open water or wetland (NLCD 2021), a 5 km coastal strip, ground below 5 m (storm surge), projected 2080 floods (WRI Aqueduct), cells mostly in FEMA's 100-year floodplain, and cells more than about 90 minutes' drive from UF; drive time is also a new criterion (weight 0.15). Most of the earlier top 20 sat in Big Bend marsh or far from campus. ([ADR 0014](docs/adr/0014-siting-water-wetland-exclusion.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 

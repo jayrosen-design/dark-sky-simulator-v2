@@ -79,9 +79,10 @@ switches to *Change events* on its own.
     detector's false-alarm rate is checked on simulated noise. And this page re-runs the detector for any cell you
     click; a test requires it to agree with the pipeline on every lit cell."
 
-12. **10:00 – Hand-off.** "The order is what matters for choosing a site." Open the Observatory tab: #1 is in Lafayette
-    County, score 0.879, on 92% state land; its development-trajectory criterion and 2034 sky column come from this
-    forecast.
+12. **10:00 – Hand-off.** "The order is what matters for choosing a site." Open the Observatory tab: #1 is in Levy
+    County beside the Chiefland Astronomy Village, score 0.779, about $605K for 80 acres, 58 minutes from campus (water,
+    wetland, flood-prone and far cells are excluded, ADR 0014); its development-trajectory criterion and 2034 sky column
+    come from this forecast.
 
 ### Do not claim
 
