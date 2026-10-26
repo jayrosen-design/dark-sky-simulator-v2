@@ -928,6 +928,7 @@ See [docs/adr/](docs/adr/). In short:
 14. Change events from a step-versus-trend test calibrated by simulation, and an AI tab that explains both models (added on request). ([ADR 0012](docs/adr/0012-step-test-and-ai-tab.md))
 15. The County's +19% [AC-EPAC] measured a 212 × 131 km map view, not the county; the app quotes calibrated county radiance (+2.9% to +6.1%, 2013–2024). ([ADR 0013](docs/adr/0013-alachua-trend-figure.md))
 16. Observatory siting excludes cells more than half open water or wetland (NLCD 2021), a 5 km coastal strip, ground below 5 m (storm surge), projected 2080 floods (WRI Aqueduct), cells mostly in FEMA's 100-year floodplain, and cells more than about 90 minutes' drive from UF; drive time is also a new criterion (weight 0.15). Most of the earlier top 20 sat in Big Bend marsh or far from campus. ([ADR 0014](docs/adr/0014-siting-water-wetland-exclusion.md))
+17. The all-sky view's light domes come from the mapped light (VIIRS 2024 upward radiance, scaled by the scenario's change in each cell, plus Jacksonville, Tampa and Tallahassee as point sources) through a single-scattering estimate, instead of Gaussians toward five listed towns; the zenith stays the model's value. ([ADR 0015](docs/adr/0015-light-domes-from-mapped-light.md))
 
 Not built (v2.0 stretch): the YOLOv8 luminaire detector on Mapillary imagery for US 441.
 

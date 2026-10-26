@@ -32,7 +32,7 @@ indicators for how sky glow varies across the sky.
 - **Indicators:** a directional luminance model (`engine/skyglow.ts`, with a GLSL twin): each component (artificial,
   natural, twilight, moonlight) is normalized so the zenith equals the modeled value; the spread is illustrative
   (brightening toward the horizon, Gaussian light domes toward the regional towns, forward scattering near the Sun
-  and Moon). Shown as a sky-glow curve (10° altitude by azimuth) drawn along the horizon and as a chart, a
+  and Moon). The light domes now come from the mapped light ([ADR 0015](0015-light-domes-from-mapped-light.md)). Shown as a sky-glow curve (10° altitude by azimuth) drawn along the horizon and as a chart, a
   crosshair readout in mag/arcsec² and mcd/m² (L = 10.8e4 · 10^(-0.4 m) cd/m²), and a false-color luminance map.
 
 ## Consequences

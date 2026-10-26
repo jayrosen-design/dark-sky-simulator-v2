@@ -1,21 +1,19 @@
-// Directional sky brightness for the all-sky view indicators (glow curve, luminance readout, false-color map).
+// Directional sky brightness for the all-sky view (sky shading, glow curve, luminance readout, false-color map).
 // The zenith value is the model's (artificial + natural, plus twilight and moonlight); how brightness spreads over
-// the sky is illustrative: brightening toward the horizon, Gaussian light domes toward the regional towns, and
-// forward scattering around the Sun and Moon. Each component is normalized so the zenith equals the modeled value.
+// the sky is a sketch: brightening toward the horizon, light domes computed from the mapped light (engine/horizon.ts),
+// and forward scattering around the Sun and Moon. Each component is normalized so the zenith equals the modeled value.
 // SKYGLOW_GLSL mirrors luminanceAt() for the shader; keep the two in step.
 import { NATURAL_MAG } from "../shared/sky";
+import { domeAt, type DomeTable } from "./horizon";
 
 const RAD = Math.PI / 180;
-/** Light-dome brightness near the horizon relative to the zenith artificial glow. At Rosemary Hill (Gainesville ~30 km
- *  away, dome strength ~0.35) the sky at 10° altitude toward Gainesville comes out ~0.2 mag brighter than the darkest
- *  direction. Illustrative; the model computes only the zenith value. */
-const DOME_GAIN = 20;
 /** Linear luminance relative to 22.0 mag/arcsec² (natural sky ≈ 1.1), to keep shader floats well-scaled. */
 export const rel = (mag: number) => 10 ** (-0.4 * (mag - 22));
 export const magOf = (r: number) => 22 - 2.5 * Math.log10(r);
 /** mag/arcsec² → mcd/m² (L = 10.8e4 · 10^(-0.4 m) cd/m²). */
 export const mcdOf = (mag: number) => 10.8e4 * 10 ** (-0.4 * mag) * 1000;
 
+/** Named towns around a place, for labeling the sky (the domes themselves come from engine/horizon.ts). */
 export interface Dome { name: string; km: number; az: number; strength: number } // az in degrees from north
 
 export function domesFor(lightDomes: { name: string; lat: number; lon: number; population: number }[], lat: number, lon: number): Dome[] {
@@ -28,17 +26,17 @@ export function domesFor(lightDomes: { name: string; lat: number; lon: number; p
 
 export interface GlowModel {
   art: number; nat: number; twi: number; moon: number;   // zenith components, relative units
-  domes: Dome[];
+  dome: DomeTable | null;                                 // light domes relative to the zenith artificial glow
   sun: { alt: number; az: number }; moonPos: { alt: number; az: number };
 }
 
 /** Components from the modeled zenith magnitude (which already includes the natural sky) and twilight/moon magnitudes. */
-export function glowModel(modelMag: number, twilightMag: number, moonMag: number, domes: Dome[], sun: { alt: number; az: number }, moonPos: { alt: number; az: number }): GlowModel {
+export function glowModel(modelMag: number, twilightMag: number, moonMag: number, dome: DomeTable | null, sun: { alt: number; az: number }, moonPos: { alt: number; az: number }): GlowModel {
   const nat = rel(NATURAL_MAG);
   return {
     art: Math.max(0, rel(modelMag) - nat), nat,
     twi: Math.max(0, rel(twilightMag) - nat), moon: Number.isFinite(moonMag) ? rel(moonMag) : 0,
-    domes, sun, moonPos,
+    dome, sun, moonPos,
   };
 }
 
@@ -48,12 +46,7 @@ const angle = (a: [number, number, number], b: [number, number, number]) => Math
 // Unnormalized shapes; each is divided by its value at the zenith.
 function shapeArt(g: GlowModel, alt: number, az: number) {
   const hz = 1 - Math.sin(Math.max(0, alt) * RAD);
-  let dome = 0;
-  for (const d of g.domes) {
-    const da = (((az - d.az) % 360) + 540) % 360 - 180;
-    dome += DOME_GAIN * d.strength * Math.exp(-((da * RAD) ** 2) / 0.25);
-  }
-  return 1 + 0.8 * hz * hz + dome * Math.exp(-(Math.max(0, alt) * RAD) / 0.18);
+  return 1 + 0.8 * hz * hz + (g.dome ? domeAt(g.dome, alt, az) : 0);
 }
 const shapeNat = (alt: number) => 1 + 1.5 * (1 - Math.sin(Math.max(0, alt) * RAD)) ** 3;
 const shapeTwi = (dir: [number, number, number], sun: [number, number, number], alt: number) => 1 + 3 * Math.exp(-angle(dir, sun) / 0.6) * (1 - Math.sin(Math.max(0, alt) * RAD));
@@ -82,30 +75,28 @@ export function glowUniforms(g: GlowModel) {
   return {
     uArt: g.art / shapeArt(g, 90, 0), uNat: g.nat / shapeNat(90),
     uTwiL: g.twi / shapeTwi(zen, sun, 90), uMoonL: g.moonPos.alt > 0 ? g.moon / shapeMoon(zen, moon) : 0,
-    uGDomeAz: g.domes.map((d) => d.az * RAD).concat(Array(8).fill(0)).slice(0, 8),
-    uGDomeS: g.domes.map((d) => d.strength).concat(Array(8).fill(0)).slice(0, 8),
     uSunDir: sun, uMoonDir: moon,
   };
 }
 
-/** GLSL twin of luminanceAt (dir: unit vector, y up, azimuth = atan(x, -z)). */
+/** GLSL twin of luminanceAt (dir: unit vector, y up, azimuth = atan(x, -z)). uDomeTex holds the DomeTable: one texel
+ *  per column (azimuth, wrapping) and row (sqrt of altitude / 90°), so linear sampling matches domeAt(). */
 export const SKYGLOW_GLSL = `
   uniform float uArt; uniform float uNat; uniform float uTwiL; uniform float uMoonL;
-  uniform float uGDomeAz[8]; uniform float uGDomeS[8]; uniform vec3 uSunDir; uniform vec3 uMoonDir;
-  float skyLum(vec3 dir) {
+  uniform sampler2D uDomeTex; uniform vec3 uSunDir; uniform vec3 uMoonDir;
+  // Artificial plus natural sky (no twilight or moonlight): what the light domes and the Milky Way are seen against.
+  float artNatLum(vec3 dir) {
     float alt = asin(clamp(dir.y, 0.0, 1.0));
     float hz = 1.0 - sin(alt);
     float az = atan(dir.x, -dir.z);
-    float dome = 0.0;
-    for (int i = 0; i < 8; i++) {
-      float d = mod(az - uGDomeAz[i] + 3.14159265, 6.2831853) - 3.14159265;
-      dome += ${DOME_GAIN.toFixed(1)} * uGDomeS[i] * exp(-d * d / 0.25);
-    }
-    float art = 1.0 + 0.8 * hz * hz + dome * exp(-alt / 0.18);
-    float nat = 1.0 + 1.5 * hz * hz * hz;
+    float dome = texture2D(uDomeTex, vec2(fract(az / 6.2831853), sqrt(alt / 1.5707963))).r;
+    return uArt * (1.0 + 0.8 * hz * hz + dome) + uNat * (1.0 + 1.5 * hz * hz * hz);
+  }
+  float skyLum(vec3 dir) {
+    float hz = 1.0 - sin(asin(clamp(dir.y, 0.0, 1.0)));
     float twi = 1.0 + 3.0 * exp(-acos(clamp(dot(dir, uSunDir), -1.0, 1.0)) / 0.6) * hz;
     float moon = 1.0 + 4.0 * exp(-acos(clamp(dot(dir, uMoonDir), -1.0, 1.0)) / 0.25);
-    return uArt * art + uNat * nat + uTwiL * twi + uMoonL * moon;
+    return artNatLum(dir) + uTwiL * twi + uMoonL * moon;
   }
   // False-color scale by mag/arcsec²: 22 navy, 21 blue, 20 green, 19 yellow, 18 orange, 17 red, 16 white.
   vec3 lumColor(float lum) {

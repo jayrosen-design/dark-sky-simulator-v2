@@ -1,5 +1,5 @@
 // Three.js sky panorama (PRD 4.1 Sky panorama row): v1's static Bortle textures are replaced by a dome
-// shaded from the computed zenith luminance, horizon glow toward the regional light domes, and stars
+// shaded from the computed zenith luminance, light domes computed from the mapped light (engine/horizon.ts), and stars
 // culled at the naked-eye limiting magnitude implied by the zenith value. Stars, Milky Way, Sun and Moon
 // are placed for the chosen date and time at the site; twilight and moonlight add to the modeled sky.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -9,6 +9,8 @@ import type { FeatureCollection } from "geojson";
 import { useData, useModel } from "../state/model";
 import { fetchJson } from "../data/load";
 import { domesFor, glowCurve, glowModel, glowUniforms, luminanceAt, LUM_LEGEND, magOf, mcdOf, SKYGLOW_GLSL, type GlowModel } from "../engine/skyglow";
+import { DOME_NALT, DOME_NAZ, domeTable, farSources, type DomeTable } from "../engine/horizon";
+import { useViirsLayers } from "../state/viirs";
 import { add3DLayers, set3D, setLamps } from "../shared/map/terrain3d";
 import { buildLamps, lampLayers, slotLooks } from "../map/lights3d";
 import { basemapRoads } from "../shared/map/geo";
@@ -100,7 +102,16 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
   frame.current = { st, modelMag, twilightMag: now.twilightMag, moonMag: now.moonMag, nelm, ov };
   const api = useRef<{ update: () => void } | null>(null);
   const domes = useMemo(() => domesFor(m.e.light_domes, siteDef.lat, siteDef.lon), [m.e.light_domes, siteDef]);
-  const glow: GlowModel = useMemo(() => glowModel(modelMag, now.twilightMag, now.moonMag, domes, st.sun, st.moon), [modelMag, now, domes, st]);
+  // Light domes from the mapped light: VIIRS 2024 upward radiance, times the scenario's change in each cell's sky.
+  const viirs = useViirsLayers(m.e, true);
+  const relChange = m.fields?.relChange15;
+  const dome: DomeTable | null = useMemo(() => {
+    if (!viirs) return null;
+    const v24 = viirs.years[viirs.years.length - 1], g = m.e.grids.a15;
+    const em = relChange ? v24.map((v, i) => v * Math.max(0, 1 + relChange[i])) : v24;
+    return domeTable(g, em, siteDef.lat, siteDef.lon, farSources(m.e.light_domes, g, v24));
+  }, [viirs, relChange, siteDef, m.e]);
+  const glow: GlowModel = useMemo(() => glowModel(modelMag, now.twilightMag, now.moonMag, dome, st.sun, st.moon), [modelMag, now, dome, st]);
   const glowRef = useRef(glow);
   glowRef.current = glow;
 
@@ -116,16 +127,19 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
     const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
 
     const gu = glowUniforms(glowRef.current);
+    // The light-dome table as a half-float texture (azimuth wraps; see SKYGLOW_GLSL), refilled when the table changes.
+    const domeTex = new THREE.DataTexture(new Uint16Array(DOME_NAZ * DOME_NALT), DOME_NAZ, DOME_NALT, THREE.RedFormat, THREE.HalfFloatType);
+    domeTex.wrapS = THREE.RepeatWrapping; domeTex.wrapT = THREE.ClampToEdgeWrapping;
+    domeTex.magFilter = domeTex.minFilter = THREE.LinearFilter;
+    domeTex.needsUpdate = true;
+    let domeSrc: DomeTable | null = null;
     const uniforms = {
-      uGlow: { value: 0 },
-      uDomeAz: { value: domes.map((d) => (d.az * Math.PI) / 180).concat(Array(8).fill(0)).slice(0, 8) },
-      uDomeS: { value: domes.map((d) => d.strength).concat(Array(8).fill(0)).slice(0, 8) },
       uPole: { value: new THREE.Vector3(0, 1, 0) },
       uTwi: { value: 0 }, uSun: { value: new THREE.Vector3(0, -1, 0) },
       uMoon: { value: new THREE.Vector3(0, -1, 0) }, uMoonK: { value: 0 },
       // Luminance model (false-color map), see engine/skyglow.ts.
       uFalse: { value: 0 }, uArt: { value: gu.uArt }, uNat: { value: gu.uNat }, uTwiL: { value: gu.uTwiL }, uMoonL: { value: gu.uMoonL },
-      uGDomeAz: { value: gu.uGDomeAz }, uGDomeS: { value: gu.uGDomeS },
+      uDomeTex: { value: domeTex },
       uSunDir: { value: new THREE.Vector3(...gu.uSunDir) }, uMoonDir: { value: new THREE.Vector3(...gu.uMoonDir) },
     };
     const skyGeo = new THREE.SphereGeometry(50, 64, 32);
@@ -133,28 +147,25 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       side: THREE.BackSide, uniforms,
       vertexShader: "varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
       fragmentShader: `
-        varying vec3 vDir; uniform float uGlow; uniform float uDomeAz[8]; uniform float uDomeS[8]; uniform vec3 uPole;
+        varying vec3 vDir; uniform vec3 uPole;
         uniform float uTwi; uniform vec3 uSun; uniform vec3 uMoon; uniform float uMoonK; uniform float uFalse;
         ${SKYGLOW_GLSL}
         void main(){
           float alt = asin(clamp(vDir.y, -1.0, 1.0));
           if (alt < 0.0) { gl_FragColor = vec4(vec3(0.02,0.02,0.025) + vec3(0.05,0.07,0.10)*uTwi, 1.0); return; }
           if (uFalse > 0.5) { gl_FragColor = vec4(lumColor(skyLum(normalize(vDir))), 1.0); return; }
-          float az = atan(vDir.x, -vDir.z);
           float airmass = 1.0 / max(sin(alt), 0.06);
           vec3 night = vec3(0.012,0.016,0.035);
-          vec3 glowCol = mix(vec3(0.20,0.16,0.28), vec3(0.55,0.36,0.18), uGlow);
-          vec3 c = night + glowCol * uGlow * (0.35 + 0.08 * airmass);
-          for (int i = 0; i < 8; i++) {
-            float d = abs(mod(az - uDomeAz[i] + 3.14159, 6.28318) - 3.14159);
-            c += vec3(0.55,0.36,0.16) * uDomeS[i] * exp(-d*d/0.25) * exp(-alt/0.18) * 0.6;
-          }
+          // Glow level from this direction's modeled brightness (light domes included): 0 at 22 mag/arcsec², 1 at 17.5.
+          float glow = clamp(2.5 * log(max(artNatLum(normalize(vDir)), 1e-6)) / log(10.0) / 4.5, 0.0, 1.0);
+          vec3 glowCol = mix(vec3(0.20,0.16,0.28), vec3(0.55,0.36,0.18), glow);
+          vec3 c = night + glowCol * glow * (0.35 + 0.08 * airmass);
           float sd = max(dot(vDir, uSun), 0.0);
           vec3 day = mix(vec3(0.03,0.06,0.16), vec3(0.32,0.52,0.85), smoothstep(0.35, 1.0, uTwi));
           c += day * uTwi + vec3(0.9,0.45,0.18) * pow(sd, 6.0) * uTwi * exp(-alt/0.25) * 1.2;
           float md = max(dot(vDir, uMoon), 0.0);
           c += vec3(0.45,0.5,0.62) * uMoonK * (0.18 + 0.6 * pow(md, 40.0));
-          float mw = exp(-pow(dot(vDir, uPole), 2.0) / 0.02) * pow(1.0 - uGlow, 2.0) * pow(1.0 - uTwi, 2.0) * (1.0 - uMoonK);
+          float mw = exp(-pow(dot(vDir, uPole), 2.0) / 0.02) * pow(1.0 - glow, 2.0) * pow(1.0 - uTwi, 2.0) * (1.0 - uMoonK);
           c += vec3(0.10,0.10,0.12) * mw;
           gl_FragColor = vec4(min(c, vec3(1.0)), 1.0);
         }`,
@@ -285,7 +296,6 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       sunDir.set(...dirFromAltAz(f.st.sun.alt, f.st.sun.az));
       uniforms.uSun.value.copy(sunDir);
       uniforms.uMoon.value.set(...dirFromAltAz(f.st.moon.alt, f.st.moon.az));
-      uniforms.uGlow.value = Math.min(1, Math.max(0, (22.0 - f.modelMag) / 4.5));
       uniforms.uTwi.value = Math.min(1, Math.max(0, (21.9 - f.twilightMag) / 16));
       uniforms.uMoonK.value = Number.isFinite(f.moonMag) ? Math.min(1, Math.max(0, (21.9 - f.moonMag) / 5)) : 0;
       starUniforms.uNelm.value = f.nelm;
@@ -295,7 +305,12 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       const g = glowRef.current, u = glowUniforms(g);
       uniforms.uFalse.value = f.ov.lumMap ? 1 : 0;
       uniforms.uArt.value = u.uArt; uniforms.uNat.value = u.uNat; uniforms.uTwiL.value = u.uTwiL; uniforms.uMoonL.value = u.uMoonL;
-      uniforms.uGDomeAz.value = u.uGDomeAz; uniforms.uGDomeS.value = u.uGDomeS;
+      if (g.dome !== domeSrc) {
+        domeSrc = g.dome;
+        const tex = domeTex.image.data as Uint16Array;
+        for (let i = 0; i < tex.length; i++) tex[i] = THREE.DataUtils.toHalfFloat(Math.min(6e4, g.dome ? g.dome.rel[i] : 0));
+        domeTex.needsUpdate = true;
+      }
       uniforms.uSunDir.value.set(...u.uSunDir); uniforms.uMoonDir.value.set(...u.uMoonDir);
       celestial.visible = !f.ov.lumMap;
       moon.visible = !f.ov.lumMap;
@@ -351,7 +366,7 @@ export default function SkyDome({ place, sites, onPickSite, initialTime, startFu
       cancelAnimationFrame(raf);
       el.removeEventListener("pointerdown", down); el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up);
       el.removeEventListener("wheel", wheel);
-      renderer.dispose(); geo.dispose(); skyGeo.dispose(); moonGeo.dispose(); curve.geometry.dispose();
+      renderer.dispose(); geo.dispose(); skyGeo.dispose(); moonGeo.dispose(); curve.geometry.dispose(); domeTex.dispose();
       el.removeChild(renderer.domElement); el.removeChild(layer); el.removeChild(cross);
     };
   }, [siteDef, domes]); // eslint-disable-line react-hooks/exhaustive-deps
